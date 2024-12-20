@@ -114,8 +114,8 @@
         }
 
         [data-tool="tool4.html"] {
-            --tool-color: #ccc;
-            --tool-color-rgb: 204, 204, 204;
+            --tool-color: #9C27B0;
+            --tool-color-rgb: 156, 39, 176;
         }
 
         [data-tool="tool5.html"] {
@@ -167,6 +167,7 @@
             transition: all 0.3s ease;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             border-top: 4px solid var(--tool-color);
+            position: relative;
         }
 
         .tool-card.disabled {
@@ -197,6 +198,20 @@
             font-size: 0.9rem;
         }
 
+        .poc-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background-color: #9C27B0;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transform: rotate(5deg);
+        }
+
         .tool-frame {
             display: none;
             position: fixed;
@@ -217,7 +232,6 @@
             min-height: calc(100vh - 64px);
         }
 
-        /* Footer Styles */
         .footer {
             position: fixed;
             bottom: 0;
@@ -255,7 +269,7 @@
             <a class="tool-nav-item" data-tool="tool1.html">Staff Validator</a>
             <a class="tool-nav-item" data-tool="tool2.html">Student Validator</a>
             <a class="tool-nav-item" data-tool="tool3.html">Year Calculator</a>
-            <a class="tool-nav-item disabled" data-tool="tool4.html">Tool 4 (Coming Soon)</a>
+            <a class="tool-nav-item" data-tool="tool4.html">Interactive Map</a>
             <a class="tool-nav-item disabled" data-tool="tool5.html">Tool 5 (Coming Soon)</a>
             <a class="tool-nav-item disabled" data-tool="tool6.html">Tool 6 (Coming Soon)</a>
         </nav>
@@ -275,9 +289,10 @@
                 <h2>Year Calculator</h2>
                 <p>Calculate what year a student should be enrolled in, in WA.</p>
             </div>
-            <div class="tool-card disabled" data-tool="tool4.html">
-                <h2>Tool 4</h2>
-                <p>Coming Soon</p>
+            <div class="tool-card" data-tool="tool4.html">
+                <span class="poc-badge">PROOF OF CONCEPT</span>
+                <h2>Interactive Map</h2>
+                <p>An example of using an SVG map with search, & multiple floors.</p>
             </div>
             <div class="tool-card disabled" data-tool="tool5.html">
                 <h2>Tool 5</h2>
