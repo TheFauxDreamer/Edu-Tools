@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tools Homepage</title>
+    <style>
+        /* ... (previous styles remain the same until .tool-nav-item) ... */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f0f2f5;
+            min-height: 100vh;
+        }
+
+        .header {
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: relative;
+            padding: 0.75rem 1.5rem;
+            height: 64px;
+        }
+
+        .header h1 {
+            position: absolute;
+            left: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.25rem;
+            color: #1a1a1a;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            white-space: nowrap;
+        }
+
+        .header h1:hover {
+            opacity: 0.7;
+        }
+
+        .tool-nav {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, calc(-50% - 10px));
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 0.5rem;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            justify-content: center;
+            width: auto;
+            max-width: calc(100% - 200px);
+        }
+
+        .tool-nav.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, -50%);
+        }
+
+        .tool-nav-item {
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            color: #666;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            position: relative;
+            white-space: nowrap;
+        }
+
+        /* New styles for disabled navigation items */
+        .tool-nav-item.disabled {
+            color: #ccc;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .tool-nav-item:hover {
+            color: #1a1a1a;
+        }
+
+        .tool-nav-item::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: transparent;
+            transition: all 0.2s ease;
+        }
+
+        [data-tool="tool1.html"] {
+            --tool-color: #FF4B4B;
+            --tool-color-rgb: 255, 75, 75;
+        }
+
+        [data-tool="tool2.html"] {
+            --tool-color: #4CAF50;
+            --tool-color-rgb: 76, 175, 80;
+        }
+
+        [data-tool="tool3.html"] {
+            --tool-color: #2196F3;
+            --tool-color-rgb: 33, 150, 243;
+        }
+
+        [data-tool="tool4.html"] {
+            --tool-color: #ccc;
+            --tool-color-rgb: 204, 204, 204;
+        }
+
+        [data-tool="tool5.html"] {
+            --tool-color: #ccc;
+            --tool-color-rgb: 204, 204, 204;
+        }
+
+        [data-tool="tool6.html"] {
+            --tool-color: #ccc;
+            --tool-color-rgb: 204, 204, 204;
+        }
+
+        .tool-nav-item::after {
+            background-color: var(--tool-color);
+            opacity: 0;
+        }
+
+        .tool-nav-item:hover::after {
+            opacity: 0.5;
+        }
+
+        .tool-nav-item.active {
+            color: var(--tool-color);
+            font-weight: 600;
+        }
+
+        .tool-nav-item.active::after {
+            opacity: 1;
+        }
+
+        .tool-nav-item.disabled:hover::after {
+            opacity: 0;
+        }
+
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .tool-card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-top: 4px solid var(--tool-color);
+        }
+
+        /* New styles for disabled cards */
+        .tool-card.disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+            background: linear-gradient(to bottom right, #ffffff, rgba(var(--tool-color-rgb), 0.1));
+        }
+
+        .tool-card.disabled:hover {
+            transform: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            background: #ffffff;
+        }
+
+        .tool-card h2 {
+            color: var(--tool-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .tool-card p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .tool-frame {
+            display: none;
+            position: fixed;
+            top: 64px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ffffff;
+        }
+
+        .tool-frame iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .back-button {
+            display: none;
+            position: absolute;
+            left: 1rem;
+            top: 1.5rem;
+            padding: 0.5rem 1rem;
+            background-color: #f0f2f5;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: #1a1a1a;
+        }
+
+        .back-button:hover {
+            background-color: #e4e6e9;
+        }
+
+        .main-view {
+            min-height: calc(100vh - 64px);
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>Tools Homepage</h1>
+        <nav class="tool-nav">
+            <a class="tool-nav-item" data-tool="tool1.html">Staff Validator</a>
+            <a class="tool-nav-item" data-tool="tool2.html">Student Validator</a>
+            <a class="tool-nav-item" data-tool="tool3.html">Year Calculator</a>
+            <a class="tool-nav-item disabled" data-tool="tool4.html">Tool 4 (Coming Soon)</a>
+            <a class="tool-nav-item disabled" data-tool="tool5.html">Tool 5 (Coming Soon)</a>
+            <a class="tool-nav-item disabled" data-tool="tool6.html">Tool 6 (Coming Soon)</a>
+        </nav>
+    </header>
+
+    <main class="main-view">
+        <div class="bento-grid">
+            <div class="tool-card" data-tool="tool1.html">
+                <h2>Staff Validator</h2>
+                <p>Used to check staff data for the Kaartdijin transition.</p>
+            </div>
+            <div class="tool-card" data-tool="tool2.html">
+                <h2>Student Validator</h2>
+                <p>Helps when checking student & contact data for the Kaartdijin transition.</p>
+            </div>
+            <div class="tool-card" data-tool="tool3.html">
+                <h2>Year Calculator</h2>
+                <p>Calculate what year a student should be enrolled in, in WA.</p>
+            </div>
+            <div class="tool-card disabled" data-tool="tool4.html">
+                <h2>Tool 4</h2>
+                <p>Coming Soon</p>
+            </div>
+            <div class="tool-card disabled" data-tool="tool5.html">
+                <h2>Tool 5</h2>
+                <p>Coming Soon</p>
+            </div>
+            <div class="tool-card disabled" data-tool="tool6.html">
+                <h2>Tool 6</h2>
+                <p>Coming Soon</p>
+            </div>
+        </div>
+    </main>
+
+    <div class="tool-frame">
+        <iframe src="" title="Tool"></iframe>
+    </div>
+
+    <script>
+        const header = document.querySelector('.header');
+        const headerTitle = document.querySelector('.header h1');
+        const toolFrame = document.querySelector('.tool-frame');
+        const mainView = document.querySelector('.main-view');
+        const iframe = document.querySelector('iframe');
+        const toolNav = document.querySelector('.tool-nav');
+
+        function activateTool(toolUrl, toolName) {
+            // Check if the tool is disabled
+            const toolElement = document.querySelector(`[data-tool="${toolUrl}"]`);
+            if (toolElement.classList.contains('disabled')) {
+                return;
+            }
+
+            header.classList.add('tool-active');
+            toolNav.classList.add('visible');
+            
+            document.querySelectorAll('.tool-nav-item').forEach(item => {
+                if (item.dataset.tool === toolUrl) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+            
+            mainView.style.display = 'none';
+            toolFrame.style.display = 'block';
+            iframe.src = toolUrl;
+        }
+
+        document.querySelectorAll('.tool-card').forEach(card => {
+            card.addEventListener('click', () => {
+                if (!card.classList.contains('disabled')) {
+                    const toolUrl = card.dataset.tool;
+                    const toolName = card.querySelector('h2').textContent;
+                    activateTool(toolUrl, toolName);
+                }
+            });
+        });
+
+        document.querySelectorAll('.tool-nav-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (!item.classList.contains('disabled')) {
+                    const toolUrl = item.dataset.tool;
+                    const toolName = item.textContent;
+                    activateTool(toolUrl, toolName);
+                }
+            });
+        });
+
+        headerTitle.addEventListener('click', () => {
+            header.classList.remove('tool-active');
+            toolNav.classList.remove('visible');
+            mainView.style.display = 'block';
+            toolFrame.style.display = 'none';
+            iframe.src = '';
+            
+            document.querySelectorAll('.tool-nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+        });
+    </script>
+</body>
+</html>
