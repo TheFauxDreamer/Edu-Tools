@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Validator v2.9.4c</title>
+    <title>Student Validator v2.9.4e</title>
     <style>
         /* Base Reset */
         * {
@@ -2353,11 +2353,27 @@
 
 
 
+
         // Manual patch notes for recent versions
         const manualPatchNotes = {
+            "2.9.4d": {
+                date: "22/12/2024",
+                notes: `
+### Updates
 
+I lied. There's at least one more revision before 2025.
 
+- Fixed a lot of spelling mistakes.        `
+            },
+            "2.9.4c": {
+                date: "20/12/2024",
+                notes: `
+### Updates
 
+Adjusted manual patch notes to be more accurate.
+This should be the final version before school returns. I've added lots of new features & changes since school ended for 2024!
+        `
+            },
             "2.9.4b": {
                 date: "20/12/2024",
                 notes: `
@@ -2396,9 +2412,9 @@ Have to find a way to make this more automatic.
                 date: "19/12/2024",
                 notes: `
 ### Updates
-- Adjusted size of left & right column in settigns modal.
+- Adjusted size of left & right column in settings modal.
 
-Probably only impacts the spacing on my Macbook, but it matters to me.
+Probably only impacts the spacing on my MacBook, but it matters to me.
         `
             },
             "2.9.3": {
@@ -2474,14 +2490,14 @@ The first update with the live "check for updates" feature. Yay. 🎉
                 date: "11/12/2024",
                 notes: `
 ### Updates
-- Chenged mobile number in phone field to warning
+- Changed mobile number in phone field to warning
 - Added toggle to hide year 12s        `
             },
             "2.8.3": {
                 date: "11/12/2024",
                 notes: `
 ### Updates
-- Improved mobile phone check to include variations on monbile number format.
+- Improved mobile phone check to include variations on mobile number format.
 - Improved address checks        `
             },
             "2.8.2": {
@@ -2511,7 +2527,7 @@ The first update with the live "check for updates" feature. Yay. 🎉
                 date: "9/12/2024",
                 notes: `
 ### Updates
-- Beta implementation of the medicalcondition checks.
+- Beta implementation of the medical condition checks.
 `
             },
             "2.7.5": {
@@ -2623,7 +2639,7 @@ The first update with the live "check for updates" feature. Yay. 🎉
 ### Updates
 Preparing a version to share with other schools.
 
-- Added basic instructions on where to get datafiles from.
+- Added basic instructions on how to generate the reports.
 `
             },
             "1.0.0": {
@@ -2641,7 +2657,7 @@ Finally happy with the new validator. Shown to staff for the first time.
                 date: "4/12/2024",
                 notes: `
 ### Updates
-- Added error & warning stats modals, accessable by clicking on the error or warnings totals.
+- Added error & warning stats modals, accessible by clicking on the error or warnings totals.
 `
             },
             "0.9.0a": {
@@ -2673,7 +2689,6 @@ Finally happy with the new validator. Shown to staff for the first time.
 `
             },
         };
-
 
 
         // Function to get version and title components with sub-version support
@@ -2878,6 +2893,9 @@ Finally happy with the new validator. Shown to staff for the first time.
                 .replace(/## (.*)/g, '</ul><h2>$1</h2><ul>')
                 .replace(/# (.*)/g, '</ul><h1>$1</h1><ul>')
 
+                // Links - handle [text](url) format
+                .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>')
+
                 // Bold and italic
                 .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                 .replace(/\*(.*?)\*/g, '<em>$1</em>')
@@ -2885,7 +2903,7 @@ Finally happy with the new validator. Shown to staff for the first time.
                 // List items - handle both - and * for bullet points
                 .replace(/^[\s]*[-*] (.*?)$/gm, '<li>$1</li>')
 
-                // Paragraphs - split on double newlines
+                // Paragraphs
                 .split(/\n\s*\n/)
                 .map(paragraph => paragraph.trim())
                 .filter(paragraph => paragraph.length > 0)
