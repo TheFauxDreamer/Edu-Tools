@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,7 +20,7 @@
 
         .header {
             background-color: #ffffff;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             position: fixed;
             padding: 0.75rem 1.5rem;
             height: 64px;
@@ -109,7 +110,7 @@
             background-color: #ffffff;
             padding: 4px 12px;
             border-radius: 0 0 8px 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             cursor: pointer;
             opacity: 0;
             transition: opacity 0.3s ease, background-color 0.2s ease;
@@ -261,7 +262,7 @@
             padding: 1.5rem;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             border-top: 4px solid var(--tool-color);
             position: relative;
         }
@@ -274,13 +275,13 @@
 
         .tool-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
             background: linear-gradient(to bottom right, #ffffff, rgba(var(--tool-color-rgb), 0.1));
         }
 
         .tool-card.disabled:hover {
             transform: none;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             background: #ffffff;
         }
 
@@ -304,7 +305,21 @@
             border-radius: 12px;
             font-size: 0.7rem;
             font-weight: 600;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            transform: rotate(5deg);
+        }
+
+        .coming-soon-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background-color: #94a3b8;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
             transform: rotate(5deg);
         }
 
@@ -317,12 +332,14 @@
             top: 0;
             background-color: #ffffff;
             z-index: 100;
-            padding-top: 64px; /* Initial padding to account for header */
-            transition: padding-top 0.3s ease; /* Smooth transition for padding change */
+            padding-top: 64px;
+            /* Initial padding to account for header */
+            transition: padding-top 0.3s ease;
+            /* Smooth transition for padding change */
         }
 
-/* When header is hidden, remove the padding */
-.tool-frame.header-hidden {
+        /* When header is hidden, remove the padding */
+        .tool-frame.header-hidden {
             padding-top: 0;
         }
 
@@ -345,17 +362,49 @@
         }
 
         @keyframes rainbow {
-            0% { color: rgb(255, 0, 0); }
-            10% { color: rgb(255, 127, 0); }
-            20% { color: rgb(255, 255, 0); }
-            30% { color: rgb(127, 255, 0); }
-            40% { color: rgb(0, 255, 0); }
-            50% { color: rgb(0, 255, 127); }
-            60% { color: rgb(0, 255, 255); }
-            70% { color: rgb(0, 127, 255); }
-            80% { color: rgb(0, 0, 255); }
-            90% { color: rgb(127, 0, 255); }
-            100% { color: rgb(255, 0, 255); }
+            0% {
+                color: rgb(255, 0, 0);
+            }
+
+            10% {
+                color: rgb(255, 127, 0);
+            }
+
+            20% {
+                color: rgb(255, 255, 0);
+            }
+
+            30% {
+                color: rgb(127, 255, 0);
+            }
+
+            40% {
+                color: rgb(0, 255, 0);
+            }
+
+            50% {
+                color: rgb(0, 255, 127);
+            }
+
+            60% {
+                color: rgb(0, 255, 255);
+            }
+
+            70% {
+                color: rgb(0, 127, 255);
+            }
+
+            80% {
+                color: rgb(0, 0, 255);
+            }
+
+            90% {
+                color: rgb(127, 0, 255);
+            }
+
+            100% {
+                color: rgb(255, 0, 255);
+            }
         }
 
         .footer:hover {
@@ -363,6 +412,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="header-trigger-area"></div>
     <header class="header">
@@ -376,7 +426,8 @@
             <a class="tool-nav-item disabled" data-tool="tool6.html">Tool 6 (Coming Soon)</a>
         </nav>
         <button class="pin-button" title="Toggle header pin">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
                 <path class="pin-path" d="M16 2L16 7L18 9L18 13L12 13L12 22M12 13L6 13L6 9L8 7L8 2L16 2"></path>
                 <path class="slash-path" d="M4 4L20 20" stroke-width="1.5"></path>
             </svg>
@@ -385,7 +436,8 @@
 
 
     <div class="chevron-indicator">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
             <polyline points="6 9 12 15 18 9"></polyline>
         </svg>
     </div>
@@ -410,12 +462,14 @@
                 <p>An example of using an SVG map with search, & multiple floors.</p>
             </div>
             <div class="tool-card disabled" data-tool="tool5.html">
+                <span class="coming-soon-badge">COMING SOON</span>
                 <h2>Phonebook</h2>
-                <p>Coming Soon</p>
+                <p>A searchable directory of staff contact information.</p>
             </div>
             <div class="tool-card disabled" data-tool="tool6.html">
+                <span class="coming-soon-badge">COMING SOON</span>
                 <h2>Tool 6</h2>
-                <p>Coming Soon</p>
+                <p>Additional tools coming in the future.</p>
             </div>
         </div>
     </main>
@@ -429,7 +483,7 @@
     </div>
 
     <script>
-                const header = document.querySelector('.header');
+        const header = document.querySelector('.header');
         const headerTitle = document.querySelector('.header h1');
         const toolFrame = document.querySelector('.tool-frame');
         const mainView = document.querySelector('.main-view');
@@ -455,8 +509,8 @@
         function hideHeader() {
             if (!isPinned && header.classList.contains('tool-active')) {
                 headerTimeout = setTimeout(() => {
-                    if (!header.matches(':hover') && 
-                        !headerTriggerArea.matches(':hover') && 
+                    if (!header.matches(':hover') &&
+                        !headerTriggerArea.matches(':hover') &&
                         !chevronIndicator.matches(':hover')) {
                         header.classList.add('collapsed');
                         chevronIndicator.classList.add('visible');
@@ -471,7 +525,7 @@
             isPinned = !isPinned;
             pinButton.classList.toggle('unpinned');
             header.classList.toggle('unpinned');
-            
+
             if (isPinned) {
                 showHeader();
                 chevronIndicator.classList.remove('visible');
@@ -510,17 +564,17 @@
             // Ensure tool frame starts with header spacing
             toolFrame.classList.remove('header-hidden');
             toolFrame.style.display = 'block';
-            
+
             // Set other UI states
             header.classList.add('tool-active');
             toolNav.classList.add('visible');
             mainView.style.display = 'none';
-            
+
             // Load the tool URL
             requestAnimationFrame(() => {
                 iframe.src = toolUrl;
             });
-            
+
             document.querySelectorAll('.tool-nav-item').forEach(item => {
                 if (item.dataset.tool === toolUrl) {
                     item.classList.add('active');
@@ -532,28 +586,28 @@
 
         headerTitle.addEventListener('click', () => {
             document.title = defaultTitle;
-            
+
             // Reset tool frame
             toolFrame.style.display = 'none';
             toolFrame.classList.remove('header-hidden');
-            
+
             // Reset all header states
             header.classList.remove('tool-active');
             header.classList.remove('unpinned');
             toolNav.classList.remove('visible');
             mainView.style.display = 'block';
-            
+
             // Clear iframe src
             iframe.src = '';
-            
+
             // Reset pin button state
             isPinned = true;
             pinButton.classList.remove('unpinned');
             chevronIndicator.classList.remove('visible');
-            
+
             const footer = document.querySelector('.footer');
             footer.style.display = 'block';
-            
+
             document.querySelectorAll('.tool-nav-item').forEach(item => {
                 item.classList.remove('active');
             });
@@ -582,4 +636,5 @@
         });
     </script>
 </body>
+
 </html>
