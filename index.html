@@ -321,12 +321,16 @@
         const mainView = document.querySelector('.main-view');
         const iframe = document.querySelector('iframe');
         const toolNav = document.querySelector('.tool-nav');
+        const defaultTitle = 'Edu Tools';
 
         function activateTool(toolUrl, toolName) {
             const toolElement = document.querySelector(`[data-tool="${toolUrl}"]`);
             if (toolElement.classList.contains('disabled')) {
                 return;
             }
+
+            // Update page title
+            document.title = `${toolName} | ${defaultTitle}`;
 
             // Hide footer for tool1 and tool2
             const footer = document.querySelector('.footer');
@@ -374,6 +378,9 @@
         });
 
         headerTitle.addEventListener('click', () => {
+            // Reset page title
+            document.title = defaultTitle;
+            
             header.classList.remove('tool-active');
             toolNav.classList.remove('visible');
             mainView.style.display = 'block';
