@@ -20,9 +20,68 @@
         .header {
             background-color: #ffffff;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            position: relative;
+            position: fixed;
             padding: 0.75rem 1.5rem;
             height: 64px;
+            width: 100%;
+            top: 0;
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        /* Only allow header collapse when a tool is active and header is unpinned */
+        .header.tool-active.unpinned.collapsed {
+            transform: translateY(-100%);
+        }
+
+
+        /* Pin button styles */
+        .pin-button {
+            position: absolute;
+            right: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            color: #2196F3;
+            background-color: rgba(33, 150, 243, 0.1);
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        /* Only show pin button when a tool is active */
+        .header.tool-active .pin-button {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .pin-button:hover {
+            background-color: rgba(33, 150, 243, 0.2);
+            color: #1976D2;
+        }
+
+        .pin-button .slash-path {
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            stroke: #dc2626;
+        }
+
+        .pin-button.unpinned {
+            color: #94a3b8;
+            background-color: transparent;
+        }
+
+        .pin-button.unpinned .slash-path {
+            opacity: 1;
+        }
+
+        .pin-button.unpinned:hover {
+            background-color: rgba(220, 38, 38, 0.05);
+            color: #64748b;
         }
 
         .header h1 {
@@ -40,6 +99,38 @@
 
         .header h1:hover {
             opacity: 0.7;
+        }
+
+        .chevron-indicator {
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #ffffff;
+            padding: 4px 12px;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s ease, background-color 0.2s ease;
+            z-index: 999;
+        }
+
+        .chevron-indicator:hover {
+            background-color: #f0f2f5;
+        }
+
+        .chevron-indicator.visible {
+            opacity: 1;
+        }
+
+        .header-trigger-area {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 24px;
+            z-index: 998;
         }
 
         .tool-nav {
@@ -150,6 +241,11 @@
             opacity: 0;
         }
 
+        .main-view {
+            margin-top: 64px;
+            min-height: calc(100vh - 64px);
+        }
+
         .bento-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -215,21 +311,26 @@
         .tool-frame {
             display: none;
             position: fixed;
-            top: 64px;
             left: 0;
             right: 0;
             bottom: 0;
+            top: 0;
             background-color: #ffffff;
+            z-index: 100;
+            padding-top: 64px; /* Initial padding to account for header */
+            transition: padding-top 0.3s ease; /* Smooth transition for padding change */
+        }
+
+/* When header is hidden, remove the padding */
+.tool-frame.header-hidden {
+            padding-top: 0;
         }
 
         .tool-frame iframe {
             width: 100%;
             height: 100%;
             border: none;
-        }
-
-        .main-view {
-            min-height: calc(100vh - 64px);
+            display: block;
         }
 
         .footer {
@@ -263,6 +364,7 @@
     </style>
 </head>
 <body>
+    <div class="header-trigger-area"></div>
     <header class="header">
         <h1>Edu Tools</h1>
         <nav class="tool-nav">
@@ -273,7 +375,20 @@
             <a class="tool-nav-item disabled" data-tool="tool5.html">Tool 5 (Coming Soon)</a>
             <a class="tool-nav-item disabled" data-tool="tool6.html">Tool 6 (Coming Soon)</a>
         </nav>
+        <button class="pin-button" title="Toggle header pin">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path class="pin-path" d="M16 2L16 7L18 9L18 13L12 13L12 22M12 13L6 13L6 9L8 7L8 2L16 2"></path>
+                <path class="slash-path" d="M4 4L20 20" stroke-width="1.5"></path>
+            </svg>
+        </button>
     </header>
+
+
+    <div class="chevron-indicator">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+    </div>
 
     <main class="main-view">
         <div class="bento-grid">
@@ -309,19 +424,73 @@
         <iframe src="" title="Tool"></iframe>
     </div>
 
-    <!-- Footer -->
     <div class="footer">
         Created by Paul Sharpe
     </div>
 
     <script>
-        const header = document.querySelector('.header');
+                const header = document.querySelector('.header');
         const headerTitle = document.querySelector('.header h1');
         const toolFrame = document.querySelector('.tool-frame');
         const mainView = document.querySelector('.main-view');
         const iframe = document.querySelector('iframe');
         const toolNav = document.querySelector('.tool-nav');
         const defaultTitle = 'Edu Tools';
+        const chevronIndicator = document.querySelector('.chevron-indicator');
+        const headerTriggerArea = document.querySelector('.header-trigger-area');
+        const pinButton = document.querySelector('.pin-button');
+
+        let headerTimeout;
+        let isPinned = true;
+
+        function showHeader() {
+            if (!isPinned && header.classList.contains('tool-active')) {
+                header.classList.remove('collapsed');
+                chevronIndicator.classList.remove('visible');
+                toolFrame.classList.remove('header-hidden');
+                clearTimeout(headerTimeout);
+            }
+        }
+
+        function hideHeader() {
+            if (!isPinned && header.classList.contains('tool-active')) {
+                headerTimeout = setTimeout(() => {
+                    if (!header.matches(':hover') && 
+                        !headerTriggerArea.matches(':hover') && 
+                        !chevronIndicator.matches(':hover')) {
+                        header.classList.add('collapsed');
+                        chevronIndicator.classList.add('visible');
+                        toolFrame.classList.add('header-hidden');
+                    }
+                }, 2000);
+            }
+        }
+
+
+        pinButton.addEventListener('click', () => {
+            isPinned = !isPinned;
+            pinButton.classList.toggle('unpinned');
+            header.classList.toggle('unpinned');
+            
+            if (isPinned) {
+                showHeader();
+                chevronIndicator.classList.remove('visible');
+            } else {
+                hideHeader();
+            }
+        });
+
+        header.addEventListener('mouseenter', showHeader);
+        header.addEventListener('mouseleave', hideHeader);
+        headerTriggerArea.addEventListener('mouseenter', showHeader);
+        chevronIndicator.addEventListener('click', showHeader);
+        chevronIndicator.addEventListener('mouseenter', showHeader);
+        chevronIndicator.addEventListener('mouseleave', () => {
+            // Only trigger hide if not hovering over header or trigger area
+            if (!header.matches(':hover') && !headerTriggerArea.matches(':hover')) {
+                hideHeader();
+            }
+        });
 
         function activateTool(toolUrl, toolName) {
             const toolElement = document.querySelector(`[data-tool="${toolUrl}"]`);
@@ -329,10 +498,8 @@
                 return;
             }
 
-            // Update page title
             document.title = `${toolName} | ${defaultTitle}`;
 
-            // Hide footer for tool1 and tool2
             const footer = document.querySelector('.footer');
             if (toolUrl === 'tool1.html' || toolUrl === 'tool2.html') {
                 footer.style.display = 'none';
@@ -340,8 +507,19 @@
                 footer.style.display = 'block';
             }
 
+            // Ensure tool frame starts with header spacing
+            toolFrame.classList.remove('header-hidden');
+            toolFrame.style.display = 'block';
+            
+            // Set other UI states
             header.classList.add('tool-active');
             toolNav.classList.add('visible');
+            mainView.style.display = 'none';
+            
+            // Load the tool URL
+            requestAnimationFrame(() => {
+                iframe.src = toolUrl;
+            });
             
             document.querySelectorAll('.tool-nav-item').forEach(item => {
                 if (item.dataset.tool === toolUrl) {
@@ -350,12 +528,38 @@
                     item.classList.remove('active');
                 }
             });
-            
-            mainView.style.display = 'none';
-            toolFrame.style.display = 'block';
-            iframe.src = toolUrl;
         }
 
+        headerTitle.addEventListener('click', () => {
+            document.title = defaultTitle;
+            
+            // Reset tool frame
+            toolFrame.style.display = 'none';
+            toolFrame.classList.remove('header-hidden');
+            
+            // Reset all header states
+            header.classList.remove('tool-active');
+            header.classList.remove('unpinned');
+            toolNav.classList.remove('visible');
+            mainView.style.display = 'block';
+            
+            // Clear iframe src
+            iframe.src = '';
+            
+            // Reset pin button state
+            isPinned = true;
+            pinButton.classList.remove('unpinned');
+            chevronIndicator.classList.remove('visible');
+            
+            const footer = document.querySelector('.footer');
+            footer.style.display = 'block';
+            
+            document.querySelectorAll('.tool-nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+        });
+
+        // Tool activation event listeners remain the same
         document.querySelectorAll('.tool-card').forEach(card => {
             card.addEventListener('click', () => {
                 if (!card.classList.contains('disabled')) {
@@ -374,25 +578,6 @@
                     const toolName = item.textContent;
                     activateTool(toolUrl, toolName);
                 }
-            });
-        });
-
-        headerTitle.addEventListener('click', () => {
-            // Reset page title
-            document.title = defaultTitle;
-            
-            header.classList.remove('tool-active');
-            toolNav.classList.remove('visible');
-            mainView.style.display = 'block';
-            toolFrame.style.display = 'none';
-            iframe.src = '';
-            
-            // Show footer when returning to main view
-            const footer = document.querySelector('.footer');
-            footer.style.display = 'block';
-            
-            document.querySelectorAll('.tool-nav-item').forEach(item => {
-                item.classList.remove('active');
             });
         });
     </script>
