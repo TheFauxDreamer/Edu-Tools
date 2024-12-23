@@ -30,11 +30,9 @@
             z-index: 1000;
         }
 
-        /* Only allow header collapse when a tool is active and header is unpinned */
         .header.tool-active.unpinned.collapsed {
             transform: translateY(-100%);
         }
-
 
         /* Pin button styles */
         .pin-button {
@@ -54,7 +52,6 @@
             visibility: hidden;
         }
 
-        /* Only show pin button when a tool is active */
         .header.tool-active .pin-button {
             opacity: 1;
             visibility: visible;
@@ -83,6 +80,44 @@
         .pin-button.unpinned:hover {
             background-color: rgba(220, 38, 38, 0.05);
             color: #64748b;
+        }
+
+        /* Tooltip styles */
+        .pin-button .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1001;
+            right: 100%;
+            top: 50%;
+            transform: translateY(-50%);
+            margin-right: 10px;
+            font-size: 0.875rem;
+            font-weight: normal;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            pointer-events: none;
+        }
+
+        .pin-button .tooltip-text::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 100%;
+            margin-top: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: transparent transparent transparent #333;
+        }
+
+        .pin-button:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
         }
 
         .header h1 {
@@ -211,12 +246,28 @@
         }
 
         [data-tool="tool5.html"] {
-            --tool-color: #FF9800;
-            /* #00BCD4 */
+           /* --tool-color: #FF9800;*/
+            -tool-color: #00BCD4;
             --tool-color-rgb: 255, 152, 0;
         }
 
         [data-tool="tool6.html"] {
+            /* --tool-color: #00BCD4;         Cyan
+            --tool-color-rgb: 0, 188, 212;*/
+            --tool-color: #ccc;
+            --tool-color-rgb: 204, 204, 204;
+        }
+
+        [data-tool="tool7.html"] {
+            /* --tool-color: #009688;         Teal
+            --tool-color-rgb: 0, 150, 136; */
+            --tool-color: #ccc;
+            --tool-color-rgb: 204, 204, 204;
+        }
+
+        [data-tool="tool8.html"] {
+            /* --tool-color: #795548;         Brown
+            --tool-color-rgb: 121, 85, 72; */
             --tool-color: #ccc;
             --tool-color-rgb: 204, 204, 204;
         }
@@ -300,7 +351,7 @@
             position: absolute;
             top: -10px;
             right: -10px;
-            background-color: #9C27B0;
+            background-color: var(--tool-color);
             color: white;
             padding: 4px 8px;
             border-radius: 12px;
@@ -361,6 +412,8 @@
             transition: color 0.3s ease;
             z-index: 1000;
         }
+
+
 
         @keyframes rainbow {
             0% {
@@ -423,10 +476,14 @@
             <a class="tool-nav-item" data-tool="tool2.html">Student Validator</a>
             <a class="tool-nav-item" data-tool="tool3.html">Year Calculator</a>
             <a class="tool-nav-item" data-tool="tool4.html">Interactive Map</a>
-            <a class="tool-nav-item disabled" data-tool="tool5.html">Phonebook (Coming Soon)</a>
+            <a class="tool-nav-item disabled" data-tool="tool5.html">Phonebook</a>
             <a class="tool-nav-item disabled" data-tool="tool6.html">Tool 6 (Coming Soon)</a>
+            <a class="tool-nav-item disabled" data-tool="tool7.html">Tool 7 (Coming Soon)</a>
+            <a class="tool-nav-item disabled" data-tool="tool8.html">Tool 8 (Coming Soon)</a>
+
         </nav>
-        <button class="pin-button" title="Toggle header pin">
+        <button class="pin-button">
+            <span class="tooltip-text">Toggle to minimise the header for extra space.</span>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                 stroke-linecap="round" stroke-linejoin="round">
                 <path class="pin-path" d="M16 2L16 7L18 9L18 13L12 13L12 22M12 13L6 13L6 9L8 7L8 2L16 2"></path>
@@ -470,6 +527,16 @@
             <div class="tool-card disabled" data-tool="tool6.html">
                 <span class="coming-soon-badge">COMING SOON</span>
                 <h2>Tool 6</h2>
+                <p>Additional tools coming in the future.</p>
+            </div>
+            <div class="tool-card disabled" data-tool="tool7.html">
+                <span class="coming-soon-badge">COMING SOON</span>
+                <h2>Tool 7</h2>
+                <p>Additional tools coming in the future.</p>
+            </div>
+            <div class="tool-card disabled" data-tool="tool8.html">
+                <span class="coming-soon-badge">COMING SOON</span>
+                <h2>Tool 8</h2>
                 <p>Additional tools coming in the future.</p>
             </div>
         </div>
