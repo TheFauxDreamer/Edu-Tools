@@ -1,11 +1,11 @@
 const DEMO_DATA = {
     csv: `"CC No.","StuAddL1","StuAddL2","StuAddL3","StuAddL4","StuAddPostCode","StuAddState","StuAddTown","DOB","EMail","EntryDate","FirstName","Form","House","LegalSurname","ParAdd1L1","ParAdd1L2","ParAdd1L3","ParAdd1L4","ParAdd1PostCode","ParAdd1State","ParAdd1Town","ParAdd2L1","ParAdd2L2","ParAdd2L3","ParAdd2L4","ParAdd2PostCode","ParAdd2State","ParAdd2Town","ParEmail1","ParEmail2","ParFMM1","ParFMM2","ParFirstName1","ParFirstName2","ParMobile1","ParMobile2","ParPhone1T1","ParPhone2T1","ParResp1","ParResp2","ParSR1","ParSR2","ParSurname1","ParSurname2","ParTitle1","ParTitle2","PreferredName","Reference","Surname","StuGender","Year","ConFirstName1","ConSurname1","ConMobile1","ConPhone1T1","ConTitle1","MedCon1","MedCon1Flagged","MedCon1Notes"
 "12345678","123 Smith Street","","","","6450","WA","ESPERANCE","15/05/2012","student@school.edu.au","29/01/2024","John","4A","Blue","Smith","123 Smith Street","","","","6450","WA","ESPERANCE","45 Jones Road","","","","6450","WA","ESPERANCE","parent1@email.com","parent2@email.com","YES","NO","Mary","Robert","0400111222","0400333444","","","YES","YES","YES","NO","Smith","Jones","Mrs","Mr","Johnny","ST12345","Smith","Male","4","Jane","Doe","0400555666","98765432","Mrs","**Allergic to peanuts","YES","Requires EpiPen"
-"854321","456 Brown Avenue","","","","6450","WA","ESPERANCE","22/09/2011","student2@school.edu.au","29/01/2024","Sarah","5B","Red","Brown","456 Brown Avenue","","","","6450","WA","ESPERANCE","456 Brown Avenue","","","","6450","WA","ESPERANCE","parent3@email.com","parent3@email.com","YES","YES","James","Linda","0400777888","0400777888","","","YES","YES","YES","YES","Brown","Brown","Mr","Mrs","Sarah","ST67890","Brown","Female","5","","","","","","Asthma","NO",""
+"87654321","456 Brown Avenue","","","","6450","WA","ESPERANCE","22/09/2011","student2@school.edu.au","29/01/2024","Sarah","5B","Red","Brown","456 Brown Avenue","","","","6450","WA","ESPERANCE","456 Brown Avenue","","","","6450","WA","ESPERANCE","parent3@email.com","parent3@email.com","YES","YES","James","Linda","0400777888","0400777888","","","YES","YES","YES","YES","Brown","Brown","Mr","Mrs","Sarah","ST67890","Brown","Female","5","","","","","","Asthma","NO",""
 "23456789","","","","","6450","WA","ESPERANCE","03/12/2013","","29/01/2024","Emma","","Green","Wilson","789 Oak Street","","","","6450","WA","ESPERANCE","789 Oak Street","","","","6450","WA","ESPERANCE","invalid.email","","YES","NO","Jennifer","","0412345678","","","","YES","NO","YES","NO","Wilson","","Mrs","","Emma","ST34567","Wilson","Female","3","","","","","","","",""
 "34567890","PO Box 123","","","","6450","WA","ESPERANCE","18/07/2012","alex@school.edu.au","29/01/2024","Alex","6C","Yellow","Taylor","Different Street 42","","","","6450","WA","ESPERANCE","","","","","","","","email@domain.com","","YES","NO","Jane","","0400999888","","04001112222","","YES","NO","YES","NO","Taylor","","Ms","","Alex","ST45678","Taylor","Male","6","Emergency","Contact","invalidmobile","12345678","Mr","**Severe Asthma","YES","Requires Ventolin"
 "45678901","Lot 7","Rural Road","Extra Info","More Info","6450","WA","ESPERANCE","25/04/2011","blake@school.edu.au","01/07/2024","Blake","2A","Blue","Johnson","1 First Street","","","","6450","WA","ESPERANCE","1 First Street","","","","6450","WA","ESPERANCE","parent4@email.com","parent5@email.com","YES","YES","Michael","Patricia","0400123456","0400123456","98765432","0400789012","YES","YES","YES","YES","Johnson","Johnson","Mr","Mrs","Blake","ST56789","Johnson","Male","2","","","","","","Diabetes","NO",""
-"","234 Pine Street","","","","6450","WA","ESPERANCE","30/11/2012","olivia@school.edu.au","29/01/2024","Olivia","4B","Red","Johnson","1 First Street","","","","6450","WA","ESPERANCE","1 First Street","","","","6450","WA","ESPERANCE","parent4@email.com","different@email.com","YES","YES","Michael","Patricia","0400123456","0400999999","98765432","98765432","YES","YES","YES","YES","Johnson","Johnson","Mr","Mrs","Olivia","ST67890","Johnson","Female","4","","","","","","**Anaphylaxis","YES","Severe peanut allergy"
+"56789012","234 Pine Street","","","","6450","WA","ESPERANCE","30/11/2012","olivia@school.edu.au","29/01/2024","Olivia","4B","Red","Johnson","1 First Street","","","","6450","WA","ESPERANCE","1 First Street","","","","6450","WA","ESPERANCE","parent4@email.com","different@email.com","YES","YES","Michael","Patricia","0400123456","0400999999","98765432","98765432","YES","YES","YES","YES","Johnson","Johnson","Mr","Mrs","Olivia","ST67890","Johnson","Female","4","","","","","","**Anaphylaxis","YES","Severe peanut allergy"
 "67890123","789 Maple Drive","","","","6450","WA","ESPERANCE","14/02/2013","max@school.edu.au","29/01/2024","Max","3C","Yellow","Parker","789 Maple Drive","","","","6450","WA","ESPERANCE","Different Address","","","","6450","WA","ESPERANCE","parent6@email.com","parent7@email.com","YES","YES","David","Sarah","0400","0401234567","98765432","","YES","YES","YES","NO","Parker","Parker","Mr","Mrs","Max","ST78901","Parker","Male","3","Emergency","Contact","0400445566","","Mrs","Heart Condition","NO",""
 "78901234","Unit 2/45 Oak Lane","","","","6450","WA","ESPERANCE","08/09/2012","sophie@school.edu.au","29/01/2024","Sophie","4D","Green","Martinez","Residential College","","","","6450","WA","ESPERANCE","","","","","","","","parent8@email.com","","YES","NO","Maria","","0400987654","","","","YES","NO","YES","NO","Martinez","","Mrs","","Sophie","ST89012","Martinez","Female","4","","","","","","**Medical Alert","YES","Regular medication required"
 "89012345","567 Beach Road","","","","6450","WA","ESPERANCE","19/06/2011","ethan@school.edu.au","29/01/2024","Ethan","5A","Blue","Anderson","567 Beach Road","","","","6450","WA","ESPERANCE","567 Beach Road","","","","6450","WA","ESPERANCE","same@email.com","same@email.com","YES","YES","Thomas","Rebecca","0400111111","0400111111","","","YES","YES","YES","YES","Anderson","Anderson","Mr","Mrs","Ethan","ST90123","Anderson","Male","5","","","","","","Epilepsy","NO","",""
@@ -13,10 +13,35 @@ const DEMO_DATA = {
 "11223344","15 Ocean View Drive","","","","6450","WA","ESPERANCE","05/08/2012","james@school.edu.au","29/01/2024","James","4C","Yellow","Williams","15 Ocean View Drive","","","","6450","WA","ESPERANCE","15 Ocean View Drive","","","","6450","WA","ESPERANCE","jwilliams@email.com","pwilliams@email.com","YES","YES","Peter","Lisa","0400111333","0400111444","98761111","98762222","YES","YES","YES","YES","Williams","Williams","Mr","Mrs","James","ST11223","Williams","Male","4","Robert","Williams","0400111555","98763333","Mr","**Mild Allergy","YES","Hayfever"
 "22334455","42 Valley Road","","","","6450","WA","ESPERANCE","17/03/2013","hannah@school.edu.au","29/01/2024","Hannah","3A","Green","Davis","42 Valley Road","","","","6450","WA","ESPERANCE","42 Valley Road","","","","6450","WA","ESPERANCE","mdavis@email.com","kdavis@email.com","YES","YES","Mark","Karen","0400222333","0400222444","98764444","98765555","YES","YES","YES","YES","Davis","Davis","Mr","Mrs","Hannah","ST22334","Davis","Female","3","John","Davis","0400222555","98766666","Mr","**Requires Glasses","YES","Short-sighted"
 "33445566","78 Sunset Lane","","","","6450","WA","ESPERANCE","29/09/2012","noah@school.edu.au","29/01/2024","Noah","4D","Blue","Roberts","78 Sunset Lane","","","","6450","WA","ESPERANCE","78 Sunset Lane","","","","6450","WA","ESPERANCE","aroberts@email.com","broberts@email.com","YES","YES","Andrew","Beth","0400333444","0400333555","98767777","98768888","YES","YES","YES","YES","Roberts","Roberts","Mr","Mrs","Noah","ST33445","Roberts","Male","4","Paul","Roberts","0400333666","98769999","Mr","**Mild Asthma","YES","Exercise induced"
-"44556677","91 Forest Street","","","","6450","WA","ESPERANCE","12/11/2012","mia@school.edu.au","29/01/2024","Mia","4E","Red","Cooper","91 Forest Street","","","","6450","WA","ESPERANCE","91 Forest Street","","","","6450","WA","ESPERANCE","jcooper@email.com","lcooper@email.com","YES","YES","Jack","Laura","0400444555","0400444666","98770000","98771111","YES","YES","YES","YES","Cooper","Cooper","Mr","Mrs","Mia","ST44556","Cooper","Female","4","Tom","Cooper","0400444777","98772222","Mr","Mild Allergy","NO","Hayfever"`,
+"44556677","91 Forest Street","","","","6450","WA","ESPERANCE","12/11/2012","mia@school.edu.au","29/01/2024","Mia","4E","Red","Cooper","91 Forest Street","","","","6450","WA","ESPERANCE","91 Forest Street","","","","6450","WA","ESPERANCE","jcooper@email.com","lcooper@email.com","YES","YES","Jack","Laura","0400444555","0400444666","98770000","98771111","YES","YES","YES","YES","Cooper","Cooper","Mr","Mrs","Mia","ST44556","Cooper","Female","4","Tom","Cooper","0400444777","98772222","Mr","Mild Allergy","NO","Hayfever"
+"55667788","7 Sunrise Court","","","","6450","WA","ESPERANCE","03/05/2012","lily@school.edu.au","29/01/2024","Lily","4F","Yellow","Baker","7 Sunrise Court","","","","6450","WA","ESPERANCE","7 Sunrise Court","","","","6450","WA","ESPERANCE","pbaker","sbaker@email.com","YES","YES","Paul","Sarah","0400555666","0400555777","98773333","98774444","YES","YES","YES","YES","Baker","Baker","Mr","Mrs","Lily","ST55667","Baker","Female","4","Dave","Baker","0400555888","98775555","Mr","**Anaphylaxis","YES","Severe nut allergy"
+"66778899","12 Mountain View","Apartment 3","","","6450","WA","ESPERANCE","21/07/2013","charlie@school.edu.au","25/06/2024","Charlie","2B","Red","Turner","12 Mountain View","Apartment 3","","","6450","WA","ESPERANCE","12 Mountain View","Apartment 3","","","6450","WA","ESPERANCE","kturner@email.com","rturner@email.com","YES","YES","Kevin","Rachel","0400666777","0400666888","98776666","98777777","YES","YES","YES","YES","Turner","Turner","Mr","Mrs","Charlie","ST66778","Turner","Male","2","","","","","","**Asthma","YES","Exercise induced"
+"77889900","25 River Road","","Line 3 Data","","6450","WA","ESPERANCE","14/10/2012","grace@school.edu.au","29/01/2024","Grace","4G","Green","Mitchell","25 River Road","","","","6450","WA","ESPERANCE","25 River Road","","","","6450","WA","ESPERANCE","dmitchell@email.com","dmitchell@email.com","YES","YES","Daniel","Emma","0400777888","0400777999","98778888","98779999","YES","YES","YES","YES","Mitchell","Mitchell","Mr","Mrs","Grace","ST77889","Mitchell","Female","4","Chris","Mitchell","0400777000","98770000","Mr","**Diabetes","YES","Type 1"
+"88990011","Lot 15","Coastal Road","","","6450","WA","ESPERANCE","08/12/2012","oliver@school.edu.au","29/01/2024","Oliver","4H","Blue","White","89 Beach Drive","","","","6450","WA","ESPERANCE","89 Beach Drive","","","","6450","WA","ESPERANCE","jwhite@email.com","cwhite@email.com","YES","YES","John","Catherine","0400888999","0400888000","98771111","98772222","YES","YES","NO","NO","White","White","Mr","Mrs","Oliver","ST88990","White","Male","4","Alice","White","0400888111","98773333","Mrs","**Epilepsy","YES","Controlled with medication"
+"10111213","PO Box 42","Extra Line","Data Here","More Data","","WA","ESPERANCE","01/06/2012","notanemail","01/07/2024","Alice","","Red","Adams","Residential College ERC","","","","6450","WA","ESPERANCE","Different Address","Extra Line","Data Here","More Data","6450","WA","ESPERANCE","invalid.email","sameemail@domain.com","YES","YES","","David","0400x","0400999888","0411222333","0422333444","YES","YES","YES","YES","Adams","Adams","","Mr","Alice","ST10111","Adams","Female","","Emergency","Contact","notamobile","0433444555","Mrs","Asthma","NO","Needs inhaler"`,
 
     xml: `<?xml version="1.0" encoding="UTF-8"?>
 <StudentExport>
+    <Pupil>
+        <StudentDetails>
+            <CCNumber>10111213</CCNumber>
+        </StudentDetails>
+        <Contact>
+            <Order>1</Order>
+            <RelLnkParentNo>1</RelLnkParentNo>
+            <Relationship>Mother</Relationship>
+        </Contact>
+        <Contact>
+            <Order>2</Order>
+            <RelLnkParentNo>2</RelLnkParentNo>
+            <Gender>M</Gender>
+            <Relationship>Father</Relationship>
+        </Contact>
+        <Contact>
+            <Order>1</Order>
+            <Relationship>Emergency</Relationship>
+        </Contact>
+    </Pupil>
     <Pupil>
         <StudentDetails>
             <CCNumber>12345678</CCNumber>
@@ -256,6 +281,89 @@ const DEMO_DATA = {
             <Order>1</Order>
             <Relationship>Emergency</Relationship>
             <Gender>M</Gender>
+        </Contact>
+    </Pupil>
+    <Pupil>
+        <StudentDetails>
+            <CCNumber>55667788</CCNumber>
+        </StudentDetails>
+        <Contact>
+            <Order>1</Order>
+            <RelLnkParentNo>1</RelLnkParentNo>
+            <Gender>M</Gender>
+            <Relationship>Father</Relationship>
+        </Contact>
+        <Contact>
+            <Order>2</Order>
+            <RelLnkParentNo>2</RelLnkParentNo>
+            <Gender>F</Gender>
+            <Relationship>Mother</Relationship>
+        </Contact>
+        <Contact>
+            <Order>1</Order>
+            <Relationship>Emergency</Relationship>
+            <Gender>M</Gender>
+        </Contact>
+    </Pupil>
+    <Pupil>
+        <StudentDetails>
+            <CCNumber>66778899</CCNumber>
+        </StudentDetails>
+        <Contact>
+            <Order>1</Order>
+            <RelLnkParentNo>1</RelLnkParentNo>
+            <Gender>M</Gender>
+            <Relationship>Father</Relationship>
+        </Contact>
+        <Contact>
+            <Order>2</Order>
+            <RelLnkParentNo>2</RelLnkParentNo>
+            <Gender>F</Gender>
+            <Relationship>Mother</Relationship>
+        </Contact>
+    </Pupil>
+    <Pupil>
+        <StudentDetails>
+            <CCNumber>77889900</CCNumber>
+        </StudentDetails>
+        <Contact>
+            <Order>1</Order>
+            <RelLnkParentNo>1</RelLnkParentNo>
+            <Gender>M</Gender>
+            <Relationship>Father</Relationship>
+        </Contact>
+        <Contact>
+            <Order>2</Order>
+            <RelLnkParentNo>2</RelLnkParentNo>
+            <Gender>F</Gender>
+            <Relationship>Mother</Relationship>
+        </Contact>
+        <Contact>
+            <Order>1</Order>
+            <Relationship>Emergency</Relationship>
+            <Gender>M</Gender>
+        </Contact>
+    </Pupil>
+    <Pupil>
+        <StudentDetails>
+            <CCNumber>88990011</CCNumber>
+        </StudentDetails>
+        <Contact>
+            <Order>1</Order>
+            <RelLnkParentNo>1</RelLnkParentNo>
+            <Gender>M</Gender>
+            <Relationship>Father</Relationship>
+        </Contact>
+        <Contact>
+            <Order>2</Order>
+            <RelLnkParentNo>2</RelLnkParentNo>
+            <Gender>F</Gender>
+            <Relationship>Mother</Relationship>
+        </Contact>
+        <Contact>
+            <Order>1</Order>
+            <Relationship>Emergency</Relationship>
+            <Gender>F</Gender>
         </Contact>
     </Pupil>
 </StudentExport>`
