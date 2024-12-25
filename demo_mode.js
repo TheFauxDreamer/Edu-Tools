@@ -28,8 +28,9 @@ function toggleDemoMode(button) {
         loadDemoData();
         button.querySelector('.demo-status').textContent = 'Enabled';
     } else {
-        // Clear demo data here if needed
-        button.querySelector('.demo-status').textContent = 'Disabled';
+        // Reload the page to clear demo data
+        // This is terrible and not best practice but I don't want to added redundant code for a proper implementation to the main html file.
+        location.reload();
     }
 }
 
