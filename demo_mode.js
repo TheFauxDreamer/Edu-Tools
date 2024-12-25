@@ -1,3 +1,6 @@
+// Track demo mode state
+let isDemoMode = false;
+
 // Function to load demo data
 function loadDemoData() {
     try {
@@ -18,6 +21,18 @@ function loadDemoData() {
     }
 }
 
+// Function to toggle demo mode
+function toggleDemoMode(button) {
+    isDemoMode = !isDemoMode;
+    if (isDemoMode) {
+        loadDemoData();
+        button.querySelector('.demo-status').textContent = 'Enabled';
+    } else {
+        // Clear demo data here if needed
+        button.querySelector('.demo-status').textContent = 'Disabled';
+    }
+}
+
 // Add a button to trigger demo mode
 function addDemoButton() {
     const headerControls = document.querySelector('.header-controls');
@@ -31,25 +46,27 @@ function addDemoButton() {
             <path d="M2 17l10 5 10-5"></path>
             <path d="M2 12l10 5 10-5"></path>
         </svg>
-        Demo Mode
+        Demo Mode<br/>
+        <span class="demo-status">Disabled</span>
     `;
-    demoButton.onclick = loadDemoData;
+    
+    demoButton.onclick = () => toggleDemoMode(demoButton);
 
-    // Insert before the upload areas
-    const uploadAreas = headerControls.querySelector('.upload-areas');
-    headerControls.insertBefore(demoButton, uploadAreas);
+    // Insert before the settings button instead of upload areas
+    const settingsButton = headerControls.querySelector('#settingsButton');
+    headerControls.insertBefore(demoButton, settingsButton);
+
+    // If URL has demo parameter, enable demo mode
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('demo')) {
+        toggleDemoMode(demoButton);
+    }
 }
 
 // Initialize demo mode
 document.addEventListener('DOMContentLoaded', () => {
     // Add demo button
     addDemoButton();
-
-    // Check URL parameters for auto-demo mode
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.has('demo')) {
-        loadDemoData();
-    }
 });
 
 // Add demo mode styles
@@ -57,6 +74,10 @@ const demoStyles = document.createElement('style');
 demoStyles.textContent = `
     .settings-button svg {
         margin-right: 0.5rem;
+    }
+    .settings-button .demo-status {
+        font-size: 0.8em;
+        opacity: 0.8;
     }
 `;
 document.head.appendChild(demoStyles);
