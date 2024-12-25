@@ -230,7 +230,7 @@
             --tool-color-rgb: 255, 75, 75;
         }
 
-        [data-tool="tool2.html?demo"] {
+        [data-tool="tool2.html"] {
             --tool-color: #4CAF50;
             --tool-color-rgb: 76, 175, 80;
         }
@@ -473,7 +473,7 @@
         <h1>Edu Tools</h1>
         <nav class="tool-nav">
             <a class="tool-nav-item" data-tool="tool1.html">Staff Validator</a>
-            <a class="tool-nav-item" data-tool="tool2.html?demo">Student Validator</a>
+            <a class="tool-nav-item" data-tool="tool2.html">Student Validator</a>
             <a class="tool-nav-item" data-tool="tool3.html">Year Calculator</a>
             <a class="tool-nav-item" data-tool="tool4.html">Interactive Map</a>
             <a class="tool-nav-item disabled" data-tool="tool5.html">Phonebook (Coming Soon)</a>
@@ -506,7 +506,7 @@
                 <h2>Staff Validator</h2>
                 <p>Used to check staff data for the Kaartdijin transition.</p>
             </div>
-            <div class="tool-card" data-tool="tool2.html?demo">
+            <div class="tool-card" data-tool="tool2.html">
                 <h2>Student Validator</h2>
                 <p>Helps when checking student & contact data for the Kaartdijin transition.</p>
             </div>
@@ -623,7 +623,7 @@
             document.title = `${toolName} | ${defaultTitle}`;
 
             const footer = document.querySelector('.footer');
-            if (toolUrl === 'tool1.html' || toolUrl === 'tool2.html?demo') {
+            if (toolUrl === 'tool1.html' || toolUrl === 'tool2.html') {
                 footer.style.display = 'none';
             } else {
                 footer.style.display = 'block';
