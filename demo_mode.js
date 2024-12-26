@@ -40,20 +40,22 @@ function addDemoButton() {
     if (!headerControls) return;
 
     const demoButton = document.createElement('button');
-    demoButton.className = 'settings-button';
+    demoButton.className = 'settings-button demo-button';
     demoButton.innerHTML = `
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
             <path d="M2 17l10 5 10-5"></path>
             <path d="M2 12l10 5 10-5"></path>
         </svg>
-        Demo Mode<br/>
-        <span class="demo-status">Disabled</span>
+        <div class="demo-text">
+            <span>Demo Mode</span>
+            <span class="demo-status">Disabled</span>
+        </div>
     `;
     
     demoButton.onclick = () => toggleDemoMode(demoButton);
 
-    // Insert before the settings button instead of upload areas
+    // Insert before the settings button
     const settingsButton = headerControls.querySelector('#settingsButton');
     headerControls.insertBefore(demoButton, settingsButton);
 
@@ -73,10 +75,16 @@ document.addEventListener('DOMContentLoaded', () => {
 // Add demo mode styles
 const demoStyles = document.createElement('style');
 demoStyles.textContent = `
-    .settings-button svg {
+.settings-button svg {
         margin-right: 0.5rem;
     }
-    .settings-button .demo-status {
+    .demo-button .demo-text {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        line-height: 1.2;
+    }
+    .demo-button .demo-status {
         font-size: 0.8em;
         opacity: 0.8;
     }
