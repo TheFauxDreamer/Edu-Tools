@@ -225,7 +225,7 @@
             transition: all 0.2s ease;
         }
 
-        [data-tool="1staff/1staff/tool1.html"] {
+        [data-tool="1staff/tool1.html"] {
             --tool-color: #FF4B4B;
             --tool-color-rgb: 255, 75, 75;
         }
@@ -245,7 +245,7 @@
             --tool-color-rgb: 156, 39, 176;
         }
 
-        [data-tool="5clio/5clio/5clio/tool5.html"] {
+        [data-tool="5clio/tool5.html"] {
            /* --tool-color: #FF9800;*/
             --tool-color: #ccc;
             --tool-color-rgb: 255, 152, 0;
@@ -472,11 +472,11 @@
     <header class="header">
         <h1>Edu Tools</h1>
         <nav class="tool-nav">
-            <a class="tool-nav-item" data-tool="1staff/1staff/tool1.html">Staff Validator</a>
+            <a class="tool-nav-item" data-tool="1staff/tool1.html">Staff Validator</a>
             <a class="tool-nav-item" data-tool="2student/tool2.html">Student Validator</a>
             <a class="tool-nav-item" data-tool="3calc/tool3.html">Year Calculator</a>
             <a class="tool-nav-item" data-tool="4map/tool4.html">Interactive Map</a>
-            <a class="tool-nav-item disabled" data-tool="5clio/5clio/5clio/tool5.html">Clio (Coming Soon)</a>
+            <a class="tool-nav-item disabled" data-tool="5clio/tool5.html">Clio (Coming Soon)</a>
             <!-- <a class="tool-nav-item disabled" data-tool="tool6.html">Tool 6 (Coming Soon)</a>
             <a class="tool-nav-item disabled" data-tool="tool7.html">Tool 7 (Coming Soon)</a>
             <a class="tool-nav-item disabled" data-tool="tool8.html">Tool 8 (Coming Soon)</a> -->
@@ -502,7 +502,7 @@
 
     <main class="main-view">
         <div class="bento-grid">
-            <div class="tool-card" data-tool="1staff/1staff/tool1.html">
+            <div class="tool-card" data-tool="1staff/tool1.html">
                 <h2>Staff Validator</h2>
                 <p>Used to check staff data for the Kaartdijin transition.</p>
             </div>
@@ -520,7 +520,7 @@
                 <h2>Interactive Map</h2>
                 <p>An example of using an SVG map with search, & multiple floors.</p>
             </div>
-            <div class="tool-card disabled" data-tool="5clio/5clio/5clio/tool5.html">
+            <div class="tool-card disabled" data-tool="5clio/tool5.html">
                 <span class="coming-soon-badge">COMING SOON</span>
                 <h2>Clio</h2>
                 <p>A proof of concept iOS app for a school based phone directory.</p>
@@ -624,7 +624,7 @@
             document.title = `${toolName} | ${defaultTitle}`;
 
             const footer = document.querySelector('.footer');
-            if (toolUrl === '1staff/1staff/tool1.html' || toolUrl === '2student/tool2.html') {
+            if (toolUrl === '1staff/tool1.html' || toolUrl === '2student/tool2.html') {
                 footer.style.display = 'none';
             } else {
                 footer.style.display = 'block';
