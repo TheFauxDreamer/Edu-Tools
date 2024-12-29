@@ -4985,11 +4985,6 @@ Finally happy with the new validator. Shown to staff for the first time.
                     ${admissionsTag} ${externalTag}
                 </div>
                 <div>${showWasn ? 'WASN: ' + cleanValue(student['CC No.']) : 'SIS Num: ' + cleanValue(student.Reference)}</div>
-                <div style="color: #6b7280; font-size: 0.9em;">
-                    Year ${cleanValue(student.Year)} - ${cleanValue(student.Form)}
-                    ${formError ? '<span class="error-text" style="margin-left: 0.5rem;">❌ Missing Form</span>' : ''}
-                    ${yearError ? '<span class="error-text" style="margin-left: 0.5rem;">❌ Missing Year</span>' : ''}
-                </div>
                 ${totalIssues > 0 ? `
                     <div class="validation-message">
                         ${relevantErrors.length && totalWarnings > 0 ?
