@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Validator v2.9.7</title>
+    <title>Student Validator v2.9.7a</title>
     <script src="demo_data.js"></script>
     <script src="demo_mode.js"></script>
     <style>
@@ -4852,66 +4852,72 @@ Finally happy with the new validator. Shown to staff for the first time.
         }
 
         // Function to show the year group modal
-        function showYearGroupModal() {
-            // Remove any existing modal
-            const existingModal = document.querySelector('.modal-overlay');
-            if (existingModal) existingModal.remove();
+        function showYearGroupsModal() {
+    // Get unique year groups and convert to proper format for sorting
+    const yearGroups = [...new Set(students.map(s => s.Year))]
+        .filter(year => year)
+        .sort((a, b) => {
+            // Custom sorting function for school years
+            const yearOrder = { 'K': -2, 'P': -1 }; // K comes before P
+            
+            // Convert years to comparable numbers
+            const yearA = yearOrder[a] !== undefined ? yearOrder[a] : parseInt(a);
+            const yearB = yearOrder[b] !== undefined ? yearOrder[b] : parseInt(b);
+            
+            return yearA - yearB;
+        });
 
-            // Get all unique year groups
-            const yearGroups = new Map();
-            students.forEach(student => {
-                const year = student.Year;
-                if (!year) return;
-
-                if (!yearGroups.has(year)) {
-                    yearGroups.set(year, 0);
-                }
-
-                // Only count students with issues
-                const hasIssues = student.validation.errors.length > 0 ||
-                    student.validation.warnings.length > 0;
-                if (hasIssues) {
-                    yearGroups.set(year, yearGroups.get(year) + 1);
-                }
-            });
-
-            // Create and add modal HTML
-            const modalHTML = `
+    const modalHTML = `
         <div class="modal-overlay" onclick="closeModal(event)">
-            <div class="modal">
+            <div class="modal year-group-modal">
                 <div class="modal-header">
-                    <div class="modal-title">Filter Year Groups</div>
+                    <div class="modal-title">Year Groups</div>
                     <button class="modal-close" onclick="closeModal(event)">×</button>
                 </div>
                 <div class="modal-content">
-                    ${Array.from(yearGroups.entries())
-                    .sort((a, b) => a[0] - b[0])
-                    .map(([year, count]) => `
-                            <div class="year-group-item ${hiddenYears.has(year) ? 'hidden-year' : ''}">
-                                <div class="year-group-content">
+                    <div class="section-header">
+                        <h3>Filter Year Groups</h3>
+                        <button class="show-all-btn year-group" onclick="showAllYearGroups()">
+                            Show All
+                        </button>
+                    </div>
+                    ${yearGroups.map(year => {
+                        const count = students.filter(s => {
+                            if (s.Year !== year) return false;
+                            const hasErrors = s.validation.errors.filter(error => !hiddenErrors.has(error)).length > 0;
+                            const hasWarnings = s.validation.warnings.filter(warning => !hiddenWarnings.has(warning)).length > 0;
+                            return hasErrors || hasWarnings;
+                        }).length;
+
+                        const isHidden = hiddenYearGroups.has(year);
+                        
+                        return `
+                            <div class="error-summary-item ${isHidden ? 'hidden-item' : ''}">
+                                <div class="summary-item-content">
                                     <span>Year ${year}</span>
-                                    <span class="year-count">${count}</span>
+                                    <span class="summary-count">${count}</span>
                                 </div>
-                                <div class="year-group-actions">
-                                    ${hiddenYears.has(year)
-                            ? `<button class="show-year-btn" onclick="toggleYearGroup('${year}', false)">Show</button>`
-                            : `<button class="hide-year-btn" onclick="toggleYearGroup('${year}', true)" 
-                                              title="These settings are not remembered between page loads">Hide</button>`
-                        }
+                                <div class="summary-item-actions">
+                                    <button class="${isHidden ? 'show-message-btn' : 'hide-message-btn'}"
+                                            onclick="${isHidden ? 
+                                                `showYearGroup('${year}')` : 
+                                                `hideYearGroup('${year}')`}">
+                                        ${isHidden ? 'Show' : 'Hide'}
+                                    </button>
                                 </div>
                             </div>
-                        `).join('')}
+                        `;
+                    }).join('')}
                 </div>
-                <div class="modal-footer">
-                    <button class="show-all-years" onclick="showAllYearGroups()">Show All Years</button>
-                </div>
+                ${yearGroups.length === 0 ? `
+                    <div class="no-items-message">No year groups to display</div>
+                ` : ''}
             </div>
         </div>
     `;
 
-            // Add modal to the page
-            document.body.insertAdjacentHTML('beforeend', modalHTML);
-        }
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+}
 
         // Remove the existing yearGroupModal from the HTML
         document.addEventListener('DOMContentLoaded', () => {
