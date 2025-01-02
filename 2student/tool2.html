@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Validator v2.9.7a</title>
+    <title>Student Validator v2.9.7b</title>
     <script src="demo_data.js"></script>
     <script src="demo_mode.js"></script>
     <style>
@@ -4919,6 +4919,90 @@ Finally happy with the new validator. Shown to staff for the first time.
     document.body.insertAdjacentHTML('beforeend', modalHTML);
 }
 
+function showYearGroup(year) {
+    hiddenYearGroups.delete(year);
+    localStorage.setItem('hiddenYearGroups', JSON.stringify([...hiddenYearGroups]));
+    
+    // Store scroll positions and selections
+    const studentsList = document.getElementById('studentsList');
+    const scrollPosition = studentsList.scrollTop;
+    const modalContent = document.querySelector('.modal-content');
+    const modalScrollPosition = modalContent?.scrollTop || 0;
+    const activeCard = document.querySelector('.student-card.active');
+    const currentStudentId = activeCard?.dataset.id;
+
+    // Update displays
+    filterStudents();
+    updateStats();
+
+    // Restore selections and scroll positions
+    if (currentStudentId) {
+        const updatedCard = document.querySelector(`.student-card[data-id="${currentStudentId}"]`);
+        if (updatedCard) {
+            updatedCard.classList.add('active');
+            showStudentDetails(currentStudentId);
+        }
+    }
+    studentsList.scrollTop = scrollPosition;
+
+    // Refresh the modal
+    const currentModal = document.querySelector('.modal-overlay');
+    if (currentModal) {
+        currentModal.remove();
+        showYearGroupsModal();
+        requestAnimationFrame(() => {
+            const newModalContent = document.querySelector('.modal-content');
+            if (newModalContent) {
+                newModalContent.scrollTop = modalScrollPosition;
+            }
+        });
+    }
+
+    showNotification(`Year ${year} shown`);
+}
+
+function hideYearGroup(year) {
+    hiddenYearGroups.add(year);
+    localStorage.setItem('hiddenYearGroups', JSON.stringify([...hiddenYearGroups]));
+    
+    // Store scroll positions and selections
+    const studentsList = document.getElementById('studentsList');
+    const scrollPosition = studentsList.scrollTop;
+    const modalContent = document.querySelector('.modal-content');
+    const modalScrollPosition = modalContent?.scrollTop || 0;
+    const activeCard = document.querySelector('.student-card.active');
+    const currentStudentId = activeCard?.dataset.id;
+
+    // Update displays
+    filterStudents();
+    updateStats();
+
+    // Restore selections and scroll positions
+    if (currentStudentId) {
+        const updatedCard = document.querySelector(`.student-card[data-id="${currentStudentId}"]`);
+        if (updatedCard) {
+            updatedCard.classList.add('active');
+            showStudentDetails(currentStudentId);
+        }
+    }
+    studentsList.scrollTop = scrollPosition;
+
+    // Refresh the modal
+    const currentModal = document.querySelector('.modal-overlay');
+    if (currentModal) {
+        currentModal.remove();
+        showYearGroupsModal();
+        requestAnimationFrame(() => {
+            const newModalContent = document.querySelector('.modal-content');
+            if (newModalContent) {
+                newModalContent.scrollTop = modalScrollPosition;
+            }
+        });
+    }
+
+    showNotification(`Year ${year} hidden`);
+}
+
         // Remove the existing yearGroupModal from the HTML
         document.addEventListener('DOMContentLoaded', () => {
             const yearGroupModal = document.getElementById('yearGroupModal');
@@ -4990,36 +5074,46 @@ Finally happy with the new validator. Shown to staff for the first time.
 
         // Function to show all year groups
         function showAllYearGroups() {
-            hiddenYears.clear();
-            localStorage.setItem('hiddenYears', '[]');
+    hiddenYearGroups.clear();
+    localStorage.setItem('hiddenYearGroups', JSON.stringify([...hiddenYearGroups]));
+    
+    // Store scroll positions and selections
+    const studentsList = document.getElementById('studentsList');
+    const scrollPosition = studentsList.scrollTop;
+    const modalContent = document.querySelector('.modal-content');
+    const modalScrollPosition = modalContent?.scrollTop || 0;
+    const activeCard = document.querySelector('.student-card.active');
+    const currentStudentId = activeCard?.dataset.id;
 
-            // Store current scroll position and selected student
-            const studentsList = document.getElementById('studentsList');
-            const scrollPosition = studentsList.scrollTop;
-            const activeCard = document.querySelector('.student-card.active');
-            const currentStudentId = activeCard?.dataset.id;
+    // Update displays
+    filterStudents();
+    updateStats();
 
-            // Update the display
-            filterStudents();
-            updateStats();
-
-            // Restore student selection and scroll position
-            if (currentStudentId) {
-                const updatedCard = document.querySelector(`.student-card[data-id="${currentStudentId}"]`);
-                if (updatedCard) {
-                    updatedCard.classList.add('active');
-                    showStudentDetails(currentStudentId);
-                }
-                studentsList.scrollTop = scrollPosition;
-            }
-
-            // Show notification
-            showNotification('All year groups are now visible');
-
-            // Close the modal
-            const modal = document.querySelector('.modal-overlay');
-            if (modal) modal.remove();
+    // Restore selections and scroll positions
+    if (currentStudentId) {
+        const updatedCard = document.querySelector(`.student-card[data-id="${currentStudentId}"]`);
+        if (updatedCard) {
+            updatedCard.classList.add('active');
+            showStudentDetails(currentStudentId);
         }
+    }
+    studentsList.scrollTop = scrollPosition;
+
+    // Refresh the modal
+    const currentModal = document.querySelector('.modal-overlay');
+    if (currentModal) {
+        currentModal.remove();
+        showYearGroupsModal();
+        requestAnimationFrame(() => {
+            const newModalContent = document.querySelector('.modal-content');
+            if (newModalContent) {
+                newModalContent.scrollTop = modalScrollPosition;
+            }
+        });
+    }
+
+    showNotification('All year groups shown');
+}
 
         function filterStudents() {
             const medicalVisible = document.getElementById('medicalToggle').checked;
