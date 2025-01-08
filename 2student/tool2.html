@@ -4,9 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Validator v2.9.7</title>
+    <title>Student Validator v3.0.0</title>
     <script src="demo_data.js"></script>
     <script src="demo_mode.js"></script>
+    <script src="debug_progress.js"></script>
     <style>
         /* Base Reset */
         * {
@@ -1996,6 +1997,254 @@
             background-color: #1d4ed8;
         }
 
+        .milestone-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .milestone-modal.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .milestone-content {
+            background: white;
+            border-radius: 0.5rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .milestone-modal.active .milestone-content {
+            transform: scale(1);
+        }
+
+        .milestone-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .milestone-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .milestone-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6b7280;
+            padding: 0.5rem;
+        }
+
+        .milestone-body {
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .milestone-message {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: #374151;
+        }
+
+        .milestone-stats {
+            background: #f3f4f6;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .milestone-footer {
+            padding: 1rem;
+            text-align: center;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .milestone-button {
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .milestone-button:hover {
+            background-color: #1d4ed8;
+        }
+
+        /* Confetti Animation */
+        .confetti-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 1999;
+            /* Behind modal overlay */
+        }
+
+        .confetti-foreground {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 2002;
+            /* Above modal */
+        }
+
+        .confetti-piece {
+            position: absolute;
+            width: 8px;
+            height: 16px;
+            background-color: #ffd700;
+            top: -20px;
+            opacity: 0;
+        }
+
+        /* Create multiple confetti colors */
+        .confetti-piece:nth-child(3n) {
+            background-color: #00f0ff;
+        }
+
+        .confetti-piece:nth-child(3n+1) {
+            background-color: #ff0000;
+        }
+
+        .confetti-piece:nth-child(3n+2) {
+            background-color: #00ff00;
+        }
+
+        .confetti-piece:nth-child(5n) {
+            background-color: #ffb300;
+        }
+
+        .confetti-piece:nth-child(5n+1) {
+            background-color: #ff69b4;
+        }
+
+        .confetti-piece:nth-child(5n+2) {
+            background-color: #9b59b6;
+        }
+
+        .confetti-piece:nth-child(5n+3) {
+            background-color: #3498db;
+        }
+
+        .confetti-piece:nth-child(5n+4) {
+            background-color: #e67e22;
+        }
+
+        /* Different fall patterns */
+        .confetti-piece {
+            animation: confettiFall linear infinite;
+        }
+
+        .confetti-piece:nth-child(5n) {
+            animation-duration: 2.7s;
+            animation-delay: 0s;
+        }
+
+        .confetti-piece:nth-child(5n+1) {
+            animation-duration: 2.9s;
+            animation-delay: 0.2s;
+        }
+
+        .confetti-piece:nth-child(5n+2) {
+            animation-duration: 2.3s;
+            animation-delay: 0.4s;
+        }
+
+        .confetti-piece:nth-child(5n+3) {
+            animation-duration: 2.5s;
+            animation-delay: 0.1s;
+        }
+
+        .confetti-piece:nth-child(5n+4) {
+            animation-duration: 2.8s;
+            animation-delay: 0.3s;
+        }
+
+        /* Different rotation patterns */
+        .confetti-piece:nth-child(3n) {
+            transform: rotate(0deg);
+        }
+
+        .confetti-piece:nth-child(3n+1) {
+            transform: rotate(45deg);
+        }
+
+        .confetti-piece:nth-child(3n+2) {
+            transform: rotate(-45deg);
+        }
+
+        @keyframes confettiFall {
+            0% {
+                transform: translateY(-20px) rotate(0deg);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0.3;
+            }
+        }
+
+        /* Confetti fall animation */
+        @keyframes fall {
+            0% {
+                transform: translate(var(--x), -10px) rotate(0deg);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translate(var(--x), 100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Special celebration modal styles */
+        .milestone-modal.celebration .milestone-content {
+            background: linear-gradient(135deg, #fff 0%, #f0f7ff 100%);
+            border: 2px solid #2563eb;
+        }
+
+        .milestone-modal.celebration .milestone-title {
+            background: linear-gradient(45deg, #2563eb, #3b82f6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-size: 1.5rem;
+        }
+
+        .milestone-modal.celebration .milestone-stats {
+            background: rgba(37, 99, 235, 0.1);
+            border: 1px solid rgba(37, 99, 235, 0.2);
+        }
+
         /* Rainbow Animation for Colourful Toggle */
         @keyframes rainbow {
             0% {
@@ -2102,6 +2351,22 @@
 </head>
 
 <body>
+
+    <div class="milestone-modal">
+        <div class="milestone-content">
+            <div class="milestone-header">
+                <div class="milestone-title">Milestone Reached! 🎉</div>
+                <button class="milestone-close" onclick="closeMilestoneModal()">×</button>
+            </div>
+            <div class="milestone-body">
+                <div class="milestone-message"></div>
+                <div class="milestone-stats"></div>
+            </div>
+            <div class="milestone-footer">
+                <button class="milestone-button" onclick="closeMilestoneModal()">Continue</button>
+            </div>
+        </div>
+    </div>
 
     <div id="patchNotesModal" class="patch-notes-modal">
         <div class="patch-notes-content">
@@ -2597,6 +2862,13 @@
         let hiddenWarnings = new Set();
         let hiddenYears = new Set();
 
+        let progressStats = {
+            initialErrorCount: 0,
+            initialWarningCount: 0,
+            dateStarted: null,
+            milestonesReached: new Set()
+        };
+
 
         const UNHIDEABLE_MESSAGES = [
             "Residential College can't be a contact",
@@ -2944,6 +3216,274 @@ Finally happy with the new validator. Shown to staff for the first time.
         };
 
 
+        // Function to initialize or load progress stats
+        function initializeProgressStats() {
+            const savedStats = localStorage.getItem('progressStats');
+            if (savedStats) {
+                progressStats = JSON.parse(savedStats);
+                progressStats.milestonesReached = new Set(progressStats.milestonesReached);
+            }
+        }
+
+        // Function to save progress stats
+        function saveProgressStats() {
+            localStorage.setItem('progressStats', JSON.stringify({
+                ...progressStats,
+                milestonesReached: Array.from(progressStats.milestonesReached)
+            }));
+        }
+
+        // Function to create confetti
+        function createConfetti() {
+            // Create two containers for different layers
+            const backgroundContainer = document.createElement('div');
+            backgroundContainer.className = 'confetti-background';
+
+            const foregroundContainer = document.createElement('div');
+            foregroundContainer.className = 'confetti-foreground';
+
+            document.body.appendChild(backgroundContainer);
+            document.body.appendChild(foregroundContainer);
+
+            // Calculate number of pieces based on screen width
+            const screenWidth = window.innerWidth;
+            const backgroundPiecesCount = Math.floor(screenWidth / 15); // One piece every ~15px
+            const foregroundPiecesCount = Math.floor(screenWidth / 100); // Much fewer pieces in foreground
+
+            // Function to create a single piece of confetti
+            const createPiece = (container) => {
+                const piece = document.createElement('div');
+                piece.className = 'confetti-piece';
+
+                // Distribute across screen width with some randomness
+                piece.style.left = `${Math.random() * 100}%`;
+
+                // Random initial delay
+                piece.style.animationDelay = `${Math.random() * 3}s`;
+
+                // Size variation
+                const scale = 0.8 + Math.random() * 0.4;
+                piece.style.transform = `scale(${scale})`;
+
+                container.appendChild(piece);
+            };
+
+            // Create initial pieces
+            for (let i = 0; i < backgroundPiecesCount; i++) {
+                createPiece(backgroundContainer);
+            }
+
+            for (let i = 0; i < foregroundPiecesCount; i++) {
+                createPiece(foregroundContainer);
+            }
+
+            // Create a continuous stream by periodically adding new pieces
+            const addNewPieces = () => {
+                // 90% chance to add to background, 10% to foreground
+                if (Math.random() < 0.9) {
+                    const piece = document.createElement('div');
+                    piece.className = 'confetti-piece';
+                    piece.style.left = `${Math.random() * 100}%`;
+                    piece.style.transform = `scale(${0.8 + Math.random() * 0.4})`;
+                    backgroundContainer.appendChild(piece);
+
+                    // Remove piece after animation ends
+                    piece.addEventListener('animationend', () => {
+                        piece.remove();
+                    });
+                } else {
+                    const piece = document.createElement('div');
+                    piece.className = 'confetti-piece';
+                    piece.style.left = `${Math.random() * 100}%`;
+                    piece.style.transform = `scale(${0.8 + Math.random() * 0.4})`;
+                    foregroundContainer.appendChild(piece);
+
+                    // Remove piece after animation ends
+                    piece.addEventListener('animationend', () => {
+                        piece.remove();
+                    });
+                }
+            };
+
+            // Add new pieces periodically
+            const confettiInterval = setInterval(addNewPieces, 100);
+
+            // Return all elements that need cleanup
+            return {
+                containers: [backgroundContainer, foregroundContainer],
+                interval: confettiInterval
+            };
+        }
+
+
+        // Function to show the special completion milestone
+        function showCompletionMilestone(stats) {
+            const modal = document.querySelector('.milestone-modal');
+            const messageEl = modal.querySelector('.milestone-message');
+            const statsEl = modal.querySelector('.milestone-stats');
+            const button = modal.querySelector('.milestone-button');
+
+            modal.classList.add('celebration');
+
+            messageEl.innerHTML = `
+        <div style="font-size: 2em; margin-bottom: 0.5rem">🎊 Perfect! 🎊</div>
+        <div>All issues have been resolved!</div>
+    `;
+
+            statsEl.innerHTML = `
+        <p>You started with ${stats.initialTotal} issues</p>
+        <p>Time taken: ${stats.daysElapsed} days</p>
+        ${stats.daysElapsed > 0 ?
+                    `<p>Average: ${(stats.initialTotal / stats.daysElapsed).toFixed(1)} issues fixed per day</p>`
+                    : ''}
+        <p style="margin-top: 1rem; font-weight: bold; color: #2563eb">
+            Good job! I doubt many others will achieve this! 🏆
+        </p>
+    `;
+
+            button.textContent = "Thanks?";
+
+            const confetti = createConfetti();
+            modal.classList.add('active');
+
+            const closeModal = () => {
+                modal.classList.remove('active');
+                modal.classList.remove('celebration');
+                // Clean up all confetti containers
+                confetti.containers.forEach(container => container.remove());
+                clearInterval(confetti.interval);
+                button.textContent = "Continue";
+            };
+
+            modal.querySelector('.milestone-close').onclick = closeModal;
+            button.onclick = closeModal;
+        }
+
+        // Function to update progress tracking
+        function updateProgressTracking() {
+            // Only proceed if both files are uploaded
+            if (!csvUploaded || !xmlUploaded) {
+                return;
+            }
+
+            const errorSummary = getErrorSummary();
+            const warningSummary = getWarningSummaryWithHidden();
+
+            const currentErrorCount = Object.values(errorSummary).reduce((a, b) => a + b, 0);
+            const currentWarningCount = Object.values(warningSummary).reduce((a, b) => a + b.count, 0);
+            const currentTotal = currentErrorCount + currentWarningCount;
+
+            // Check if this is a new upload
+            if (progressStats.dateStarted) {
+                const totalInitial = progressStats.initialErrorCount + progressStats.initialWarningCount;
+                // If current total is higher than initial, this is likely new data
+                if (currentTotal > totalInitial) {
+                    progressStats.dateStarted = new Date().toISOString();
+                    progressStats.initialErrorCount = currentErrorCount;
+                    progressStats.initialWarningCount = currentWarningCount;
+                    progressStats.milestonesReached = new Set();
+                    saveProgressStats();
+                    return;
+                }
+            } else {
+                // First time initialization
+                progressStats.dateStarted = new Date().toISOString();
+                progressStats.initialErrorCount = currentErrorCount;
+                progressStats.initialWarningCount = currentWarningCount;
+                saveProgressStats();
+                return;
+            }
+
+            // Check for complete resolution (0 issues)
+            if (currentTotal === 0 && !progressStats.milestonesReached.has('complete')) {
+                const totalInitial = progressStats.initialErrorCount + progressStats.initialWarningCount;
+                const daysElapsed = Math.floor((new Date() - new Date(progressStats.dateStarted)) / (1000 * 60 * 60 * 24));
+
+                showCompletionMilestone({
+                    initialTotal: totalInitial,
+                    daysElapsed: daysElapsed
+                });
+                progressStats.milestonesReached.add('complete');
+                saveProgressStats();
+                return;
+            }
+
+            // Calculate progress
+            const totalInitial = progressStats.initialErrorCount + progressStats.initialWarningCount;
+            const remainingPercentage = (currentTotal / totalInitial) * 100;
+
+            // Define milestones with ranges
+            const milestones = [
+                {
+                    name: 'milestone50',
+                    range: { min: 21, max: 50 },
+                    message: 'Wow! You\'ve reduced issues to 50% or less! 🌟',
+                    order: 1
+                },
+                {
+                    name: 'milestone20',
+                    range: { min: 6, max: 20 },
+                    message: 'Amazing work! Only 20% or less issues remain! 🎯',
+                    order: 2
+                },
+                {
+                    name: 'milestone5',
+                    range: { min: 1, max: 5 },
+                    message: 'Outstanding! 5% or less issues remain! 🏆',
+                    order: 3
+                }
+            ];
+
+            // Sort milestones by order and filter out already achieved ones
+            const sortedMilestones = milestones
+                .filter(milestone => !progressStats.milestonesReached.has(milestone.name))
+                .sort((a, b) => b.order - a.order);
+
+
+            // Check each unachieved milestone in order
+            for (const milestone of sortedMilestones) {
+                if (remainingPercentage <= milestone.range.max &&
+                    remainingPercentage >= milestone.range.min) {  // Changed to >= to include the minimum value
+                    showMilestonePopup(milestone, {
+                        initialTotal: totalInitial,
+                        currentTotal,
+                        remainingPercentage: remainingPercentage.toFixed(1),
+                        daysElapsed: Math.floor((new Date() - new Date(progressStats.dateStarted)) / (1000 * 60 * 60 * 24))
+                    });
+                    progressStats.milestonesReached.add(milestone.name);
+                    saveProgressStats();
+                    break;
+                }
+            }
+        }
+
+        // Function to show milestone popup
+        function showMilestonePopup(milestone, stats) {
+            const modal = document.querySelector('.milestone-modal');
+            const messageEl = modal.querySelector('.milestone-message');
+            const statsEl = modal.querySelector('.milestone-stats');
+
+            messageEl.textContent = milestone.message;
+            statsEl.innerHTML = `
+        <p>Started with ${stats.initialTotal} issues</p>
+        <p>Now down to ${stats.currentTotal} issues</p>
+        <p>${stats.remainingPercentage}% remaining</p>
+        <p>Time elapsed: ${stats.daysElapsed} days</p>
+        ${stats.daysElapsed > 0 ?
+                    `<p>Average: ${((stats.initialTotal - stats.currentTotal) / stats.daysElapsed).toFixed(1)} issues fixed per day</p>`
+                    : ''}
+    `;
+
+            modal.classList.add('active');
+        }
+
+        // Function to close milestone popup
+        function closeMilestoneModal() {
+            const modal = document.querySelector('.milestone-modal');
+            modal.classList.remove('active');
+        }
+
+
         // Function to get version and title components with sub-version support
         function getVersionInfo() {
             const title = document.title;  // e.g. "Student Validator v2.8.3" or "Student Validator v0.0.0a"
@@ -2965,7 +3505,6 @@ Finally happy with the new validator. Shown to staff for the first time.
 
         let updateAvailable = false;
 
-        // Function to check for updates
 
         // Function to fetch multiple releases from GitHub
         async function fetchGitHubReleases() {
@@ -4680,6 +5219,11 @@ Finally happy with the new validator. Shown to staff for the first time.
                 updateUploadAreas();
                 updateStats();
                 filterStudents();
+
+                // Check if both files are uploaded
+                if (csvUploaded && xmlUploaded) {
+                    updateProgressTracking();
+                }
             };
             reader.readAsText(file);
         }
@@ -4721,6 +5265,11 @@ Finally happy with the new validator. Shown to staff for the first time.
 
                 if (currentStudentId) {
                     showStudentDetails(currentStudentId);
+                }
+
+                // Check if both files are uploaded
+                if (csvUploaded && xmlUploaded) {
+                    updateProgressTracking();
                 }
             };
             reader.readAsText(file);
@@ -4849,6 +5398,7 @@ Finally happy with the new validator. Shown to staff for the first time.
             </div>
         `;
             }
+            updateProgressTracking();
         }
 
         // Function to show the year group modal
@@ -4913,7 +5463,6 @@ Finally happy with the new validator. Shown to staff for the first time.
             document.body.insertAdjacentHTML('beforeend', modalHTML);
         }
 
-        // Remove the existing yearGroupModal from the HTML
         document.addEventListener('DOMContentLoaded', () => {
             const yearGroupModal = document.getElementById('yearGroupModal');
             if (yearGroupModal) {
@@ -6719,6 +7268,7 @@ Finally happy with the new validator. Shown to staff for the first time.
             // Load saved settings
             loadSettings();
             unhideAllMessages();
+            initializeProgressStats();
         });
 
     </script>
