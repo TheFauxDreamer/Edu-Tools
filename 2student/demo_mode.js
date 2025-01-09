@@ -25,14 +25,22 @@ function loadDemoData() {
 function toggleDemoMode(button) {
     isDemoMode = !isDemoMode;
     if (isDemoMode) {
+        // If any data is currently loaded, reload page first
+        if (csvUploaded || xmlUploaded) {
+            localStorage.setItem('enableDemoMode', 'true');
+            location.reload();
+            return;
+        }
         loadDemoData();
         button.querySelector('.demo-status').textContent = 'Enabled';
     } else {
-        // Reload the page to clear demo data
+        // Clear the flag and reload
         // This is terrible and not best practice but I don't want to added redundant code for a proper implementation to the main html file.
+        localStorage.removeItem('enableDemoMode');
         location.reload();
     }
 }
+
 
 // Add a button to trigger demo mode
 function addDemoButton() {
@@ -70,6 +78,17 @@ function addDemoButton() {
 document.addEventListener('DOMContentLoaded', () => {
     // Add demo button
     addDemoButton();
+
+    // Check if we should enable demo mode
+    if (localStorage.getItem('enableDemoMode')) {
+        localStorage.removeItem('enableDemoMode');
+        const demoButton = document.querySelector('.demo-button');
+        if (demoButton) {
+            demoButton.querySelector('.demo-status').textContent = 'Enabled';
+            loadDemoData();
+            isDemoMode = true;
+        }
+    }
 });
 
 // Add demo mode styles
