@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Validator v3.0.0</title>
+    <title>Student Validator v3.0.0a</title>
     <script src="demo_data.js"></script>
     <script src="demo_mode.js"></script>
     <script src="debug_progress.js"></script>
@@ -3694,42 +3694,69 @@ Finally happy with the new validator. Shown to staff for the first time.
         function convertMarkdownToHtml(markdown) {
             if (!markdown) return '';
 
-            let html = markdown
-                // Update heading hierarchy - make ### smaller than Version header
-                .replace(/### (.*)/g, '</ul><h3>$1</h3><ul>')
-                .replace(/## (.*)/g, '</ul><h2>$1</h2><ul>')
-                .replace(/# (.*)/g, '</ul><h1>$1</h1><ul>')
+            // First, split content into blocks separated by double newlines
+            const blocks = markdown.split(/\n\s*\n/);
+            
+            let html = '';
+            let inList = false;
 
-                // Links - handle [text](url) format
-                .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>')
+            blocks.forEach(block => {
+                const trimmedBlock = block.trim();
+                if (!trimmedBlock) return;
 
-                // Bold and italic
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                // Check if block contains list items
+                const containsList = /^[\s]*[-*] /m.test(trimmedBlock);
 
-                // List items - handle both - and * for bullet points
-                .replace(/^[\s]*[-*] (.*?)$/gm, '<li>$1</li>')
-
-                // Paragraphs
-                .split(/\n\s*\n/)
-                .map(paragraph => paragraph.trim())
-                .filter(paragraph => paragraph.length > 0)
-                .map(paragraph => {
-                    if (paragraph.startsWith('<h') || paragraph.startsWith('</ul>')) {
-                        return paragraph;
+                if (containsList) {
+                    // Process list block
+                    const listItems = trimmedBlock
+                        .split('\n')
+                        .map(line => {
+                            if (/^[\s]*[-*] /.test(line)) {
+                                return `<li>${line.replace(/^[\s]*[-*] /, '')}</li>`;
+                            }
+                            return line;
+                        })
+                        .join('\n');
+                    
+                    if (!inList) {
+                        html += '<ul>';
+                        inList = true;
                     }
-                    if (paragraph.includes('<li>')) {
-                        return `<ul>${paragraph}</ul>`;
+                    html += listItems;
+                } else {
+                    // Close any open list
+                    if (inList) {
+                        html += '</ul>';
+                        inList = false;
                     }
-                    return `<p>${paragraph}</p>`;
-                })
-                .join('\n');
 
-            // Clean up empty lists
-            html = html
-                .replace(/<ul>\s*<\/ul>/g, '')
-                .replace(/^<\/ul>/, '')
-                .replace(/<ul>\s*$/, '');
+                    // Process headings
+                    if (trimmedBlock.startsWith('###')) {
+                        html += `<h3>${trimmedBlock.slice(3).trim()}</h3>`;
+                    } else if (trimmedBlock.startsWith('##')) {
+                        html += `<h2>${trimmedBlock.slice(2).trim()}</h2>`;
+                    } else if (trimmedBlock.startsWith('#')) {
+                        html += `<h1>${trimmedBlock.slice(1).trim()}</h1>`;
+                    } else {
+                        // Process regular paragraph with other markdown elements
+                        let processedBlock = trimmedBlock
+                            // Links
+                            .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>')
+                            // Bold
+                            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                            // Italic
+                            .replace(/\*(.*?)\*/g, '<em>$1</em>');
+                        
+                        html += `<p>${processedBlock}</p>`;
+                    }
+                }
+            });
+
+            // Close any remaining open list
+            if (inList) {
+                html += '</ul>';
+            }
 
             return html;
         }
