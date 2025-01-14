@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Staff Kaartdijin Validator v0.5</title>
+    <title>Staff Kaartdijin Validator v0.6</title>
     <style>
         .back-button {
             position: fixed;
@@ -480,6 +480,20 @@
             border-left: 4px solid #ed6c02;
         }
 
+        .error,
+        .warning,
+        .success {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .total-summary {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
         /* Responsive adjustments */
         @media (max-width: 1024px) {
             .staff-grid {
@@ -551,7 +565,7 @@
     </noscript>
 
     <div class="header-container">
-        <h1>Staff Kaartdijin Validator v0.5</h1><button class="help-button" onclick="openModal()">Help </button>
+        <h1>Staff Kaartdijin Validator v0.6</h1><button class="help-button" onclick="openModal()">Help </button>
     </div>
     <div id="helpModal" class="modal">
         <div class="modal-content"><span class="close-modal" onclick="closeModal()">&times;
@@ -603,13 +617,33 @@
         <div id="errorList"></div>
     </div>
 
-    <script> // Global validation results storage
+    <script>
         // Global validation results storage
         let globalValidationResults = {
-            errors: {},
-            warnings: {},
+            errors: {
+                'E-Number Format Errors': [],
+                'Date Validation Errors': [],
+                'Staff Type Errors': []
+            },
+            warnings: {
+                'Name Mismatch Warnings': []
+            },
             staffMap: new Map()
         };
+
+        function getMessagePrefix(category) {
+            const prefixes = {
+                // Error categories
+                'E-Number Format Errors': '🆔 ',
+                'Date Validation Errors': '📅 ',
+                'Staff Type Errors': '👤 ',
+                'System Errors': '⚠️ ',
+                'Upload Errors': '📁 ',
+                // Warning categories
+                'Name Mismatch Warnings': '📝 '
+            };
+            return prefixes[category] || '❓ ';
+        }
 
         // Define required columns for each file type
         const requiredColumns = {
@@ -672,11 +706,11 @@
                 const missingColumns = requiredCols.filter(col => !headers.includes(col));
 
                 if (missingColumns.length > 0) {
-                    return {
-                        isValid: false,
-                        error: `Missing required columns: ${missingColumns.join(', ')}`
-                    };
-                }
+    return {
+        isValid: false,
+        error: `Not the correct file!\r\nMissing required columns: ${missingColumns.join(', ')}`
+    };
+}
 
                 return { isValid: true };
             } catch (error) {
@@ -696,24 +730,35 @@
         }
 
         async function handleFileUpload(file, areaId, errorId, fileType) {
-            const dropArea = document.getElementById(areaId);
-            const errorDiv = document.getElementById(errorId);
+    const dropArea = document.getElementById(areaId);
+    const errorDiv = document.getElementById(errorId);
 
-            dropArea.classList.remove('valid', 'invalid');
-            errorDiv.textContent = '';
+    // Reset styles
+    dropArea.classList.remove('valid', 'invalid');
+    errorDiv.textContent = '';
 
-            if (file) {
-                const validation = await validateFileFormat(file, fileType);
-                if (validation.isValid) {
-                    dropArea.classList.add('valid');
-                } else {
-                    dropArea.classList.add('invalid');
-                    errorDiv.textContent = validation.error;
+    if (file) {
+        const validation = await validateFileFormat(file, fileType);
+        if (validation.isValid) {
+            dropArea.classList.add('valid');
+        } else {
+            dropArea.classList.add('invalid');
+            // Split the error message on newline and create multiple div elements
+            const errorLines = validation.error.split('\r\n');
+            errorLines.forEach((line, index) => {
+                const lineDiv = document.createElement('div');
+                lineDiv.textContent = line;
+                if (index < errorLines.length - 1) {
+                    lineDiv.style.marginBottom = '4px';
                 }
-                return validation.isValid;
-            }
-            return false;
+                errorDiv.appendChild(lineDiv);
+            });
         }
+        return validation.isValid;
+    }
+    return false;
+}
+
 
         function setupDragAndDrop(dropAreaId, fileInputId, fileNameId, errorId, fileType) {
             const dropArea = document.getElementById(dropAreaId);
@@ -854,7 +899,8 @@
             const categoryDiv = document.getElementById(category) || createCategory(category, type);
             const messageDiv = document.createElement('div');
             messageDiv.className = type;
-            messageDiv.textContent = message;
+            const prefix = getMessagePrefix(category);
+            messageDiv.textContent = prefix + message;
             categoryDiv.querySelector('.message-list').appendChild(messageDiv);
         }
 
@@ -865,7 +911,7 @@
             categoryDiv.className = `${type}-category`;
 
             const title = document.createElement('h3');
-            title.textContent = category;
+            title.textContent = getMessagePrefix(category) + category;
 
             const messageListDiv = document.createElement('div');
             messageListDiv.className = 'message-list';
@@ -877,11 +923,12 @@
             return categoryDiv;
         }
 
+
         function addSuccess(message) {
             const errorList = document.getElementById('errorList');
             const success = document.createElement('div');
             success.className = 'success';
-            success.textContent = message;
+            success.textContent = '✅ ' + message;
             errorList.appendChild(success);
         }
 
@@ -938,15 +985,17 @@
                         });
                     }
 
+                    // E-Number validation
                     if (!validateENumber(idNumber)) {
                         const error = `Invalid E-Number format: ${idNumber} (Invalid format or erroneous space)`;
                         globalValidationResults.errors['E-Number Format Errors'].push(error);
                         globalValidationResults.staffMap.get(idNumber).errors.push({
-                            category: 'E-Number Format',
+                            category: 'E-Number Format Errors',
                             message: error
                         });
                     }
 
+                    // Name match validation
                     const phonebookEntry = phonebookMap.get(idNumber);
                     if (phonebookEntry) {
                         const staffFirstName = normalizeString(staff.FirstName);
@@ -956,7 +1005,7 @@
                             const warning = `Name mismatch for ${idNumber}: First name in staff export (${staff.FirstName}) doesn't match phonebook (${phonebookEntry.firstName})`;
                             globalValidationResults.warnings['Name Mismatch Warnings'].push(warning);
                             globalValidationResults.staffMap.get(idNumber).warnings.push({
-                                category: 'Name Mismatch',
+                                category: 'Name Mismatch Warnings',
                                 message: warning
                             });
                         }
@@ -965,17 +1014,18 @@
                             const warning = `Name mismatch for ${idNumber}: Surname in staff export (${staff.Surname}) doesn't match phonebook (${phonebookEntry.surname})`;
                             globalValidationResults.warnings['Name Mismatch Warnings'].push(warning);
                             globalValidationResults.staffMap.get(idNumber).warnings.push({
-                                category: 'Name Mismatch',
+                                category: 'Name Mismatch Warnings',
                                 message: warning
                             });
                         }
                     }
 
+                    // Date validation
                     if (staff.JoinDate && !validateDate(staff.JoinDate)) {
                         const error = `Invalid Join Date for ${idNumber}: ${staff.JoinDate} (must be in the past)`;
                         globalValidationResults.errors['Date Validation Errors'].push(error);
                         globalValidationResults.staffMap.get(idNumber).errors.push({
-                            category: 'Date Validation',
+                            category: 'Date Validation Errors',
                             message: error
                         });
                     }
@@ -984,28 +1034,29 @@
                         const error = `Leave Date present for ${idNumber}: ${staff.LeaveDate} (Can't have a leave date.)`;
                         globalValidationResults.errors['Date Validation Errors'].push(error);
                         globalValidationResults.staffMap.get(idNumber).errors.push({
-                            category: 'Date Validation',
+                            category: 'Date Validation Errors',
                             message: error
                         });
                     }
 
+                    // Staff Type validation
                     if (!staff.StaffType || staff.StaffType.trim() === '') {
                         const error = `Staff Type is blank for ${idNumber}`;
                         globalValidationResults.errors['Staff Type Errors'].push(error);
                         globalValidationResults.staffMap.get(idNumber).errors.push({
-                            category: 'Staff Type',
+                            category: 'Staff Type Errors',
                             message: error
                         });
                     }
                 });
 
                 displayResults();
+
             } catch (error) {
                 addMessage('Error processing files: ' + error.message, 'error', 'System Errors');
                 console.error(error);
             }
         }
-
 
         function initializeViewMode() {
             const savedView = localStorage.getItem('validatorViewMode');
@@ -1015,29 +1066,32 @@
                 viewModeSelect.value = savedView;
             }
 
-            // Initial display using saved or default view
             displayResults();
         }
 
+
         function displayResults() {
-            const viewMode = document.getElementById('viewMode').value || 'category'; // Default to category if not set
+            const viewMode = document.getElementById('viewMode').value || 'category';
             const errorList = document.getElementById('errorList');
             errorList.innerHTML = '';
 
-            // Check if validation has been performed (i.e., if files have been uploaded)
-            const hasValidationResults = Object.keys(globalValidationResults.errors).length > 0 ||
-                Object.keys(globalValidationResults.warnings).length > 0 ||
-                globalValidationResults.staffMap.size > 0;
+            const hasFiles = document.getElementById('phonebookFile').files.length > 0 &&
+                document.getElementById('staffExportFile').files.length > 0;
 
-            if (!hasValidationResults) {
-                // Don't show any message if no validation has been performed
+            // Only proceed with validation display if files have been uploaded
+            if (!hasFiles) {
                 return;
             }
 
             const totalErrors = Object.values(globalValidationResults.errors).reduce((sum, arr) => sum + arr.length, 0);
             const totalWarnings = Object.values(globalValidationResults.warnings).reduce((sum, arr) => sum + arr.length, 0);
 
-            if (totalErrors === 0 && totalWarnings === 0) {
+            // Only show success message if files have been validated
+            const hasBeenValidated = Object.keys(globalValidationResults.errors).length > 0 ||
+                Object.keys(globalValidationResults.warnings).length > 0 ||
+                globalValidationResults.staffMap.size > 0;
+
+            if (hasBeenValidated && totalErrors === 0 && totalWarnings === 0) {
                 addSuccess('No validation issues found! All records are valid.');
                 return;
             }
@@ -1049,14 +1103,14 @@
             if (totalErrors > 0) {
                 const totalErrorsDiv = document.createElement('div');
                 totalErrorsDiv.className = 'total-summary total-errors';
-                totalErrorsDiv.textContent = `Total errors found: ${totalErrors}`;
+                totalErrorsDiv.textContent = `❌ Total errors found: ${totalErrors}`;
                 summaryContainer.appendChild(totalErrorsDiv);
             }
 
             if (totalWarnings > 0) {
                 const totalWarningsDiv = document.createElement('div');
                 totalWarningsDiv.className = 'total-summary total-warnings';
-                totalWarningsDiv.textContent = `Total warnings found: ${totalWarnings}`;
+                totalWarningsDiv.textContent = `⚠️ Total warnings found: ${totalWarnings}`;
                 summaryContainer.appendChild(totalWarningsDiv);
             }
 
@@ -1092,23 +1146,16 @@
         function displayStaffView() {
             const errorList = document.getElementById('errorList');
 
-            // Create grid container
             const staffGrid = document.createElement('div');
             staffGrid.className = 'staff-grid';
             errorList.appendChild(staffGrid);
 
-            // Sort staff members prioritizing those with errors, then by total issues
             const sortedStaff = Array.from(globalValidationResults.staffMap.entries()).sort((a, b) => {
-                // First prioritize staff with errors
                 if (a[1].errors.length > 0 && b[1].errors.length === 0) return -1;
                 if (a[1].errors.length === 0 && b[1].errors.length > 0) return 1;
-
-                // If both have errors or both don't have errors, sort by total number of issues
                 const aTotal = a[1].errors.length + a[1].warnings.length;
                 const bTotal = b[1].errors.length + b[1].warnings.length;
                 if (aTotal !== bTotal) return bTotal - aTotal;
-
-                // If same total, prioritize the one with more errors
                 return b[1].errors.length - a[1].errors.length;
             });
 
@@ -1119,13 +1166,12 @@
                 staffGroup.className = 'staff-group';
 
                 const staffHeader = document.createElement('h3');
-                staffHeader.textContent = `${staffData.name} (${idNumber})`;
+                staffHeader.textContent = `👤 ${staffData.name} (${idNumber})`;
                 staffGroup.appendChild(staffHeader);
 
                 const staffIssues = document.createElement('div');
                 staffIssues.className = 'staff-issues';
 
-                // First add errors section if there are errors
                 if (staffData.errors.length > 0) {
                     const errorsSection = document.createElement('div');
                     errorsSection.className = 'staff-issues-section';
@@ -1133,14 +1179,14 @@
                     staffData.errors.forEach(error => {
                         const errorDiv = document.createElement('div');
                         errorDiv.className = 'error';
-                        errorDiv.textContent = error.message;
+                        const prefix = getMessagePrefix(error.category);
+                        errorDiv.textContent = prefix + error.message;
                         errorsSection.appendChild(errorDiv);
                     });
 
                     staffIssues.appendChild(errorsSection);
                 }
 
-                // Then add warnings section if there are warnings
                 if (staffData.warnings.length > 0) {
                     const warningsSection = document.createElement('div');
                     warningsSection.className = 'staff-issues-section';
@@ -1148,7 +1194,8 @@
                     staffData.warnings.forEach(warning => {
                         const warningDiv = document.createElement('div');
                         warningDiv.className = 'warning';
-                        warningDiv.textContent = warning.message;
+                        const prefix = getMessagePrefix(warning.category);
+                        warningDiv.textContent = prefix + warning.message;
                         warningsSection.appendChild(warningDiv);
                     });
 
@@ -1160,13 +1207,12 @@
             });
         }
 
+
         function switchView() {
             const viewMode = document.getElementById('viewMode').value;
-            // Save the selection to localStorage
             localStorage.setItem('validatorViewMode', viewMode);
             displayResults();
         }
-
 
         function openModal() {
             document.getElementById('helpModal').style.display = 'block';
@@ -1198,6 +1244,7 @@
         document.addEventListener('DOMContentLoaded', function () {
             initializeViewMode();
         });
+
     </script>
 </body>
 
