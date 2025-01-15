@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student BYOD Guide</title>
+    <style>
+        :root {
+            /* Base colors */
+            --background-color: #f8fafc;
+            --text-color: #1f2937;
+
+            /* Certificate colors - Pastel Blue */
+            --cert-primary: #60a5fa;
+            --cert-secondary: #3b82f6;
+            --cert-bg: #dbeafe;
+
+            /* PaperCut colors - Pastel Orange */
+            --papercut-primary: #f97316;
+            --papercut-secondary: #ea580c;
+            --papercut-bg: #ffedd5;
+
+            /* Office colors - Pastel Purple */
+            --office-primary: #8b5cf6;
+            --office-secondary: #7c3aed;
+            --office-bg: #f3e8ff;
+        }
+
+        /* Ensure unsupported notice stays distinct */
+        #unsupported-notice {
+            background-color: #fee2e2 !important;
+            border-left-color: #dc2626 !important;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1,
+        h2,
+        h3 {
+            margin-top: 0;
+        }
+
+        /* Custom Select Styles */
+        .custom-select {
+            position: relative;
+            display: inline-block;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        .select-selected {
+            color: var(--cert-primary);
+            font-weight: 600;
+            cursor: pointer;
+            padding: 0 16px 0 4px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .select-selected:after {
+            content: '▼';
+            font-size: 0.7em;
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .select-items {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            z-index: 99;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            margin-top: 8px;
+            display: none;
+            min-width: 200px;
+        }
+
+        .select-items div {
+            padding: 8px 16px;
+            cursor: pointer;
+            color: var(--text-color);
+        }
+
+        .select-items .optgroup-label {
+            font-weight: 600;
+            color: var(--text-color);
+            padding: 8px 12px 4px;
+            font-size: 0.9em;
+            cursor: default;
+            background: var(--background-color);
+        }
+
+        .select-items .option-item {
+            padding: 8px 24px;
+        }
+
+        .select-items .option-item:hover {
+            background-color: var(--cert-bg);
+            color: var(--cert-primary);
+        }
+
+        .select-hide {
+            display: none;
+        }
+
+        .select-items-visible {
+            display: block;
+        }
+
+        .software-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid transparent;
+            display: flex;
+            gap: 20px;
+        }
+
+        .section-icon {
+            flex-shrink: 0;
+            width: 48px;
+            height: 48px;
+        }
+
+        .section-content {
+            flex-grow: 1;
+        }
+
+        /* Certificate specific styles */
+        .cert-section {
+            background-color: var(--cert-bg);
+            border-left-color: var(--cert-primary);
+        }
+
+        .cert-section .download-button {
+            background-color: var(--cert-primary);
+        }
+
+        .cert-section .download-button:hover {
+            background-color: var(--cert-secondary);
+        }
+
+        .cert-section h2 {
+            color: var(--cert-primary);
+        }
+
+        /* PaperCut specific styles */
+        .papercut-section {
+            background-color: var(--papercut-bg);
+            border-left-color: var(--papercut-primary);
+        }
+
+        .papercut-section .download-button {
+            background-color: var(--papercut-primary);
+        }
+
+        .papercut-section .download-button:hover {
+            background-color: var(--papercut-secondary);
+        }
+
+        .papercut-section h2 {
+            color: var(--papercut-primary);
+        }
+
+        /* Office specific styles */
+        .office-section {
+            background-color: var(--office-bg);
+            border-left-color: var(--office-primary);
+        }
+
+        .office-section .download-button {
+            background-color: var(--office-primary);
+        }
+
+        .office-section .download-button:hover {
+            background-color: var(--office-secondary);
+        }
+
+        .office-section h2 {
+            color: var(--office-primary);
+        }
+
+        .download-button {
+            display: inline-block;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            text-decoration: none;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .instructions {
+            margin-top: 15px;
+        }
+
+        .instructions ol {
+            padding-left: 20px;
+            margin: 0;
+        }
+
+        .faq {
+            margin-top: 40px;
+        }
+
+        .faq-item {
+            margin-bottom: 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .faq-question {
+            font-weight: 600;
+            color: var(--cert-primary);
+            padding: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: white;
+            transition: background-color 0.2s;
+        }
+
+        .faq-question:hover {
+            background-color: #f8fafc;
+        }
+
+        .faq-question::after {
+            content: '›';
+            font-size: 20px;
+            transform: rotate(90deg);
+            transition: transform 0.3s ease;
+        }
+
+        .faq-question.collapsed::after {
+            transform: rotate(0deg);
+        }
+
+        .faq-answer {
+            padding: 0 16px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out, padding 0.3s ease;
+            background-color: white;
+        }
+
+        .faq-answer.expanded {
+            padding: 0 16px 16px 16px;
+            max-height: 800px;
+        }
+
+        .system-info {
+            background: white;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid var(--cert-primary);
+            display: flex;
+            align-items: flex-start;
+            /* Changed from align-items: center */
+            gap: 12px;
+        }
+
+        .system-info svg {
+            width: 24px;
+            height: 24px;
+            color: var(--cert-primary);
+            margin-top: 2px;
+            /* Added to align with the first line of text */
+        }
+
+        .system-info-text {
+            font-size: 1.1em;
+            color: var(--text-color);
+        }
+
+        .system-info-text strong {
+            color: var(--cert-primary);
+            font-weight: 600;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .section-header h2 {
+            margin: 0;
+        }
+
+        .os-badge {
+            display: inline-flex;
+            align-items: center;
+            background-color: #4b5563;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: 500;
+            height: fit-content;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .arch-specific {
+            display: none;
+        }
+
+        .note {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 8px;
+            font-style: italic;
+        }
+
+        .detection-note {
+            font-size: 0.8em;
+            color: #6b7280;
+            margin-top: 4px;
+            font-style: italic;
+        }
+
+        #phone-block-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 9999;
+            backdrop-filter: blur(5px);
+            /* Use padding to ensure content doesn't touch edges */
+            padding: 20px;
+            /* Improved centering with flexbox */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+        }
+
+        #phone-block-modal.hidden {
+            display: none;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 24px;
+            border-radius: 8px;
+            /* Set both max-width and width */
+            width: 100%;
+            max-width: 320px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            /* Prevent content from overflowing */
+            overflow-wrap: break-word;
+            margin: 0 auto;
+        }
+
+        .modal-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 16px;
+            color: #dc2626;
+        }
+
+        .modal-content h2 {
+            color: #dc2626;
+            margin: 0 0 16px 0;
+            font-size: 1.5em;
+            /* Prevent text from overflowing */
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+            hyphens: auto;
+        }
+
+        .modal-content p {
+            margin: 0;
+            color: #4b5563;
+            font-size: 1.1em;
+            line-height: 1.5;
+            /* Prevent text from overflowing */
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+            hyphens: auto;
+        }
+
+        .modal-message {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            color: #4b5563;
+            font-size: 1.1em;
+            line-height: 1.5;
+        }
+
+        .modal-message span {
+            display: block;
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+        }
+
+        .tooltip::after {
+            content: "Bring Your Own Device";
+            position: absolute;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 14px;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            margin-bottom: 5px;
+        }
+
+        .tooltip:hover::after {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="phone-block-modal" class="hidden">
+        <div class="modal-content">
+            <div class="modal-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+            </div>
+            <h2>Mobile Phone Access Not Allowed</h2>
+            <div class="modal-message">
+                <span class="primary-message">Please use a computer or iPad to access the software installation
+                    guide.</span>
+                <span class="policy-message">Mobile phones are not supported or allowed during the school day under the
+                    Electronic Devices Policy.</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>Student <span class="tooltip">BYOD</span> Guide</h1>
+        <div id="os-detected" class="system-info">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <!-- Screen bezel -->
+                <rect x="2" y="3" width="20" height="12" rx="1" />
+                <!-- Screen inner -->
+                <rect x="3" y="4" width="18" height="10" />
+                <!-- Base/keyboard section -->
+                <path d="M2 15h20v2a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-2z" />
+                <!-- Trackpad -->
+                <rect x="8" y="16" width="8" height="1" />
+                <!-- Keyboard hint lines -->
+                <line x1="4" y1="16" x2="6" y2="16" />
+                <line x1="18" y1="16" x2="20" y2="16" />
+            </svg>
+            <div class="system-info-text">
+                <span id="os-status">Looks like you're currently using</span>
+                <div class="custom-select" id="os-custom-select">
+                    <div class="select-selected" id="selected-os">Windows (x64)</div>
+                    <div class="select-items">
+                        <div class="optgroup-label">Windows</div>
+                        <div class="option-item" data-value="windows-x64">Windows (x64)</div>
+                        <div class="option-item" data-value="windows-arm">Windows (ARM64)</div>
+                        <div class="optgroup-label">macOS</div>
+                        <div class="option-item" data-value="mac-intel">macOS (Intel)</div>
+                        <div class="option-item" data-value="mac-arm">macOS (Apple Silicon)</div>
+                        <div class="optgroup-label">Mobile</div>
+                        <div class="option-item" data-value="ios">iPadOS</div>
+                        <div class="optgroup-label">Other</div>
+                        <div class="option-item" data-value="android">Android</div>
+                        <div class="option-item" data-value="chrome">ChromeOS</div>
+                        <div class="option-item" data-value="linux">Linux</div>
+                        <div class="option-item" data-value="other">Other OS</div>
+                    </div>
+                </div>
+                <div class="detection-note">Note: We try our best to detect what computer you're using, if we've made a
+                    mistake you can select the correct device above.</div>
+            </div>
+        </div>
+
+        <!-- Unsupported OS message section -->
+        <div id="unsupported-notice" class="software-section"
+            style="display: none; background-color: #fee2e2; border-left-color: #dc2626;">
+            <div class="section-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #dc2626">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+            </div>
+            <div class="section-content">
+                <h2 style="color: #dc2626">Unsupported Operating System</h2>
+                <p>It looks like you're using an unsupported operating system. We can't guarantee if this device will
+                    function correctly on the school network.</br></br>Please use one of the following supported
+                    systems:</p>
+                <ul style="margin-top: 10px;">
+                    <li>Windows (x64 or ARM64)</li>
+                    <li>macOS (Intel or Apple Silicon)</li>
+                    <li>iPadOS</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Internet Certificate Section -->
+        <div class="software-section cert-section">
+            <div class="section-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-12 h-12"
+                    style="color: var(--cert-primary)">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                </svg>
+            </div>
+            <div class="section-content">
+                <!-- Windows Instructions -->
+                <div class="os-specific windows">
+                    <div class="section-header">
+                        <h2>Internet Certificate</h2>
+                        <span class="os-badge">Windows</span>
+                    </div>
+                    <div class="instructions">
+                        <ol>
+                            <li>Download the certificate file</li>
+                            <li>Double-click the downloaded certificate file</li>
+                            <li>Click "Install Certificate"</li>
+                            <li>Select "Local Machine" and click "Next"</li>
+                            <li>Select "Place all certificates in the following store" and click "Browse"</li>
+                            <li>Select "Trusted Root Certification Authorities" and click "OK"</li>
+                            <li>Click "Next" and then "Finish"</li>
+                        </ol>
+                        <div class="arch-specific windows-x64">
+                            <a href="#" class="download-button">Download Certificate (x64)</a>
+                        </div>
+                        <div class="arch-specific windows-arm">
+                            <a href="#" class="download-button">Download Certificate (ARM64)</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- macOS Instructions -->
+                <div class="os-specific macos">
+                    <div class="section-header">
+                        <h2>Internet Certificate</h2>
+                        <span class="os-badge">macOS</span>
+                    </div>
+                    <div class="instructions">
+                        <ol>
+                            <li>Download the certificate file</li>
+                            <li>Double-click the downloaded certificate file</li>
+                            <li>Select "System" in the Keychain dropdown</li>
+                            <li>Click "Add"</li>
+                            <li>Enter your administrator password</li>
+                            <li>Double-click the certificate in Keychain Access</li>
+                            <li>Expand the "Trust" section and set "When using this certificate" to "Always Trust"</li>
+                        </ol>
+                        <div class="arch-specific mac-intel">
+                            <a href="#" class="download-button">Download Certificate (Intel)</a>
+                        </div>
+                        <div class="arch-specific mac-arm">
+                            <a href="#" class="download-button">Download Certificate (Apple Silicon)</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- iPadOS Instructions -->
+                <div class="os-specific ios">
+                    <div class="section-header">
+                        <h2>Internet Certificate</h2>
+                        <span class="os-badge">iPadOS</span>
+                    </div>
+                    <div class="instructions">
+                        <ol>
+                            <li>Download the configuration profile</li>
+                            <li>Go to Settings</li>
+                            <li>Tap on "Profile Downloaded"</li>
+                            <li>Tap "Install" in the top right corner</li>
+                            <li>Enter your device passcode</li>
+                            <li>Tap "Install" again to confirm</li>
+                        </ol>
+                        <a href="#" class="download-button">Download Certificate for iPadOS</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PaperCut Client Section -->
+        <div class="software-section papercut-section">
+            <div class="section-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-12 h-12"
+                    style="color: var(--papercut-primary)">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+            </div>
+            <div class="section-content">
+                <!-- Windows Instructions -->
+                <div class="os-specific windows">
+                    <div class="section-header">
+                        <h2>PaperCut Client</h2>
+                        <span class="os-badge">Windows</span>
+                    </div>
+                    <div class="instructions">
+                        <ol>
+                            <li>Download the PaperCut Client installer for your architecture</li>
+                            <li>Run the installer as administrator</li>
+                            <li>Follow the installation wizard</li>
+                            <li>Click "Finish" to complete installation</li>
+                        </ol>
+                        <div class="arch-specific windows-x64">
+                            <a href="#" class="download-button">Download PaperCut (x64)</a>
+                        </div>
+                        <div class="arch-specific windows-arm">
+                            <a href="#" class="download-button">Download PaperCut (ARM64)</a>
+                            <p class="note">Note: ARM64 version runs through Windows' x86 emulation</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- iPadOS Instructions -->
+                <div class="os-specific ios">
+                    <div class="section-header">
+                        <h2>PaperCut Client</h2>
+                        <span class="os-badge">iPadOS</span>
+                    </div>
+                    <div class="instructions">
+                        <p>iPadOS & iOS are able to print without the papercut client.<br>Simply print like normal and
+                            select the Virtual Queue.</p>
+                    </div>
+                </div>
+
+                <!-- macOS Instructions -->
+                <div class="os-specific macos">
+                    <div class="section-header">
+                        <h2>PaperCut Client</h2>
+                        <span class="os-badge">macOS</span>
+                    </div>
+                    <div class="instructions">
+                        <ol>
+                            <li>Download the PaperCut Client DMG file</li>
+                            <li>Open the DMG file</li>
+                            <li>Drag PaperCut Client to Applications folder</li>
+                            <li>Launch PaperCut Client from Applications</li>
+                        </ol>
+                        <div class="arch-specific mac-intel">
+                            <a href="#" class="download-button">Download PaperCut (Intel)</a>
+                        </div>
+                        <div class="arch-specific mac-arm">
+                            <a href="#" class="download-button">Download PaperCut (Apple Silicon)</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Microsoft Office Section -->
+        <div class="software-section office-section">
+            <div class="section-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-12 h-12"
+                    style="color: var(--office-primary)">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                    <polyline points="22,6 12,13 2,6" />
+                </svg>
+            </div>
+            <div class="section-content">
+                <!-- Windows Instructions -->
+                <div class="os-specific windows">
+                    <div class="section-header">
+                        <h2>Microsoft Office</h2>
+                        <span class="os-badge">Windows</span>
+                    </div>
+                    <div class="instructions">
+                        <ol>
+                            <li>Sign in to Office 365 portal</li>
+                            <li>Click "Install Office"</li>
+                            <li>Run the downloaded installer</li>
+                            <li>Sign in with your organization account</li>
+                        </ol>
+                        <div class="arch-specific windows-x64">
+                            <a href="https://www.office.com/" class="download-button">Go to Office 365 Portal (x64)</a>
+                        </div>
+                        <div class="arch-specific windows-arm">
+                            <a href="https://www.office.com/" class="download-button">Go to Office 365 Portal
+                                (ARM64)</a>
+                            <p class="note">Note: Make sure to select ARM64 version during installation</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- macOS Instructions -->
+                <div class="os-specific macos">
+                    <div class="section-header">
+                        <h2>Microsoft Office</h2>
+                        <span class="os-badge">macOS</span>
+                    </div>
+                    <div class="instructions">
+                        <ol>
+                            <li>Sign in to Office 365 portal</li>
+                            <li>Click "Install Office"</li>
+                            <li>Open the downloaded package</li>
+                            <li>Follow the installation wizard</li>
+                            <li>Sign in with your organization account</li>
+                        </ol>
+                        <div class="arch-specific mac-intel">
+                            <a href="https://www.office.com/" class="download-button">Go to Office 365 Portal
+                                (Intel)</a>
+                        </div>
+                        <div class="arch-specific mac-arm">
+                            <a href="https://www.office.com/" class="download-button">Go to Office 365 Portal (Apple
+                                Silicon)</a>
+                            <p class="note">Note: Office automatically detects and installs the appropriate version</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- iPadOS Instructions -->
+                <div class="os-specific ios">
+                    <div class="section-header">
+                        <h2>Microsoft Office</h2>
+                        <span class="os-badge">iPadOS</span>
+                    </div>
+                    <div class="instructions">
+                        <ol>
+                            <li>Open App Store</li>
+                            <li>Search for Microsoft Office apps</li>
+                            <li>Download required apps (Word, Excel, etc.)</li>
+                            <li>Open any Office app and sign in with your organization account</li>
+                        </ol>
+                        <a href="https://apps.apple.com/us/app/microsoft-office/id541164041"
+                            class="download-button">View in App Store</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FAQ Section -->
+        <div class="faq">
+            <h2>Frequently Asked Questions</h2>
+
+            <div class="faq-item">
+                <div class="faq-question collapsed">What devices and operating systems are officially supported?</div>
+                <div class="faq-answer">We officially support:
+                    <ul>
+                        <li><strong>Windows:</strong> The standard for most modern PCs, offering the most stable
+                            and secure experience</li>
+                        <li><strong>macOS:</strong> For Mac computers from 2006-2020, maintaining support for
+                            established hardware</li>
+                        <li><strong>iPadOS:</strong> For Apple mobile devices, providing secure access to essential
+                            services</li>
+                    </ul>
+                    These platforms are supported because they:
+                    <ul>
+                        <li>Meet our security requirements for enterprise network access</li>
+                        <li>Support our required authentication methods</li>
+                        <li>Have stable, tested versions of all required software</li>
+                        <li>Receive regular security updates from their manufacturers</li>
+                    </ul>
+                    Other platforms (Android, ChromeOS, Linux) aren't officially supported as they may lack certain
+                    security features or compatibility with our network infrastructure.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question collapsed">Why do I need to install the Internet Certificate?</div>
+                <div class="faq-answer">The Internet Certificate ensures secure connection to organizational resources
+                    and internal websites. Without it, you may experience security warnings or connection issues.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question collapsed">Do I need to install PaperCut on my mobile device?</div>
+                <div class="faq-answer">No, PaperCut Client is only required for desktop computers (Windows and macOS).
+                    Mobile printing is handled through different methods.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question collapsed">Can I install Microsoft Office on multiple devices?</div>
+                <div class="faq-answer">Yes, with your organization account, you can install Microsoft Office on up to 5
+                    devices simultaneously.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question collapsed">What should I do if I get an error during installation?</div>
+                <div class="faq-answer">First, try restarting your device and running the installer again. If the issue
+                    persists, contact IT Support for assistance.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question collapsed">Do I need administrator rights to install these applications?</div>
+                <div class="faq-answer">Yes, you need administrator rights to install the certificate and PaperCut
+                    Client. For Microsoft Office, standard user rights are sufficient.</div>
+            </div>
+        </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const customSelect = document.getElementById('os-custom-select');
+                const selectSelected = customSelect.querySelector('.select-selected');
+                const selectItems = customSelect.querySelector('.select-items');
+                const options = selectItems.querySelectorAll('.option-item');
+
+                // Toggle dropdown
+                selectSelected.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    selectItems.classList.toggle('select-items-visible');
+                    selectSelected.classList.toggle('select-arrow-active');
+                });
+
+                // Handle option selection
+                options.forEach(option => {
+                    option.addEventListener('click', function (e) {
+                        const value = this.getAttribute('data-value');
+                        const text = this.textContent;
+
+                        // Update selected text
+                        selectSelected.textContent = text;
+
+                        // Close dropdown
+                        selectItems.classList.remove('select-items-visible');
+
+                        // Update display
+                        updateDisplay(value);
+                    });
+                });
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function (e) {
+                    if (!customSelect.contains(e.target)) {
+                        selectItems.classList.remove('select-items-visible');
+                    }
+                });
+
+                async function detectSystem() {
+                    const userAgent = navigator.userAgent.toLowerCase();
+                    const platform = navigator.platform.toLowerCase();
+                    let osValue = "windows-x64"; // Default value
+                    let displayText = "Windows (x64)"; // Default display text
+                    let isUnsupported = false;
+
+                    // Improved iOS detection first
+                    // Check for iOS devices using multiple indicators
+                    const isIOS = /iphone|ipad|ipod/.test(userAgent) ||
+                        (platform === 'iphone') ||
+                        (platform === 'ipad') ||
+                        (platform === 'ipod') ||
+                        (navigator.maxTouchPoints > 0 &&
+                            /mac/.test(platform) &&
+                            /apple/.test(vendor));
+
+                    // Debug logging for iOS detection
+                    console.log('iOS Detection:', {
+                        userAgent,
+                        platform,
+                        maxTouchPoints: navigator.maxTouchPoints,
+                        vendor: navigator.vendor,
+                        isIOS
+                    });
+
+                    if (isIOS) {
+                        osValue = "ios";
+                        displayText = "iPadOS";
+                    }
+                    // Then check for Windows
+                    else if (userAgent.includes("win")) {
+                        if (userAgent.includes("arm64") || userAgent.includes("aarch64")) {
+                            osValue = "windows-arm";
+                            displayText = "Windows (ARM64)";
+                        } else {
+                            osValue = "windows-x64";
+                            displayText = "Windows (x64)";
+                        }
+                    }
+                    // Then check for Mac
+                    else if (userAgent.includes("mac")) {
+                        // Improved Mac detection function
+                        async function isMacAppleSilicon() {
+                            // Check if running on macOS
+                            if (!platform.includes('mac')) {
+                                return false;
+                            }
+
+                            // First try using newer navigator.deviceMemory API
+                            if ('deviceMemory' in navigator) {
+                                // Apple Silicon Macs typically report higher memory
+                                return navigator.deviceMemory >= 8;
+                            }
+
+                            // Try using performance API to detect characteristics typical of Apple Silicon
+                            if (typeof performance !== 'undefined' && performance.memory) {
+                                // Apple Silicon Macs typically show different memory limits
+                                return performance.memory.jsHeapSizeLimit > 4000000000;
+                            }
+
+                            // Use timing-based detection as fallback
+                            const start = performance.now();
+                            let result = 0;
+                            for (let i = 0; i < 1000000; i++) {
+                                result += Math.sqrt(i);
+                            }
+                            const duration = performance.now() - start;
+
+                            return duration < 15;
+                        }
+
+                        const isAppleSilicon = await isMacAppleSilicon();
+
+                        if (isAppleSilicon) {
+                            osValue = "mac-arm";
+                            displayText = "macOS (Apple Silicon)";
+                        } else {
+                            osValue = "mac-intel";
+                            displayText = "macOS (Intel)";
+                        }
+                    }
+                    // Handle other unsupported systems
+                    else if (userAgent.includes("android")) {
+                        osValue = "android";
+                        displayText = "Android";
+                        isUnsupported = true;
+                    }
+                    else if (userAgent.includes("cros")) {
+                        osValue = "chrome";
+                        displayText = "ChromeOS";
+                        isUnsupported = true;
+                    }
+                    else if (userAgent.includes("linux")) {
+                        osValue = "linux";
+                        displayText = "Linux";
+                        isUnsupported = true;
+                    }
+                    else {
+                        osValue = "other";
+                        displayText = "Other OS";
+                        isUnsupported = true;
+                    }
+
+                    // Update the custom select display
+                    const selectSelected = document.querySelector('.select-selected');
+                    if (selectSelected) {
+                        selectSelected.textContent = displayText;
+                    }
+
+                    // Update the status text and unsupported notice
+                    const osStatus = document.getElementById('os-status');
+                    if (osStatus) {
+                        osStatus.textContent = isUnsupported ? "Detected unsupported system:" : "Looks like you're currently using";
+                    }
+
+                    const unsupportedNotice = document.getElementById('unsupported-notice');
+                    if (unsupportedNotice) {
+                        unsupportedNotice.style.display = isUnsupported ? 'flex' : 'none';
+                    }
+
+                    // Update the visible sections
+                    updateDisplay(osValue);
+
+                    // Enhanced debug logging
+                    console.log('System Detection Results:', {
+                        userAgent,
+                        platform,
+                        osValue,
+                        displayText,
+                        isUnsupported,
+                        maxTouchPoints: navigator.maxTouchPoints,
+                        vendor: navigator.vendor
+                    });
+                }
+
+                function updateDisplay(osValue) {
+                    const isUnsupported = ['android', 'chrome', 'linux', 'other'].includes(osValue);
+
+                    // Show/hide unsupported notice
+                    document.getElementById('unsupported-notice').style.display = isUnsupported ? 'flex' : 'none';
+                    document.getElementById('os-status').textContent = isUnsupported ? "Detected unsupported system:" : "Looks like you're currently using";
+
+                    // Show/hide all software sections
+                    document.querySelectorAll('.software-section').forEach(el => {
+                        if (el.id !== 'unsupported-notice') {
+                            el.style.display = isUnsupported ? 'none' : 'flex';
+                        }
+                    });
+
+                    if (!isUnsupported) {
+                        // Hide all OS-specific sections first
+                        document.querySelectorAll('.os-specific').forEach(el => {
+                            el.classList.add('hidden');
+                        });
+
+                        // Hide all architecture-specific elements
+                        document.querySelectorAll('.arch-specific').forEach(el => {
+                            el.style.display = 'none';
+                        });
+
+                        // Show relevant sections based on OS and architecture
+                        if (osValue === 'windows-x64') {
+                            document.querySelectorAll('.windows').forEach(el => {
+                                el.classList.remove('hidden');
+                            });
+                            document.querySelectorAll('.windows-x64').forEach(el => {
+                                el.style.display = 'block';
+                            });
+                        } else if (osValue === 'windows-arm') {
+                            document.querySelectorAll('.windows').forEach(el => {
+                                el.classList.remove('hidden');
+                            });
+                            document.querySelectorAll('.windows-arm').forEach(el => {
+                                el.style.display = 'block';
+                            });
+                        } else if (osValue.startsWith('mac')) {
+                            document.querySelectorAll('.macos').forEach(el => {
+                                el.classList.remove('hidden');
+                            });
+                            document.querySelectorAll(`.${osValue}`).forEach(el => {
+                                el.style.display = 'block';
+                            });
+                        } else if (osValue === 'ios') {
+                            document.querySelectorAll('.ios').forEach(el => {
+                                el.classList.remove('hidden');
+                            });
+                        }
+                    }
+                }
+
+                function detectPhone() {
+                    const userAgent = navigator.userAgent.toLowerCase();
+                    const platform = navigator.platform;
+
+                    // Debug logging
+                    console.log('Device Detection:', {
+                        userAgent,
+                        platform,
+                        width: window.innerWidth,
+                        height: window.innerHeight,
+                        pixelRatio: window.devicePixelRatio,
+                        maxTouchPoints: navigator.maxTouchPoints,
+                        orientation: window.orientation,
+                        standalone: window.navigator.standalone,
+                        aspectRatio: window.innerWidth / window.innerHeight
+                    });
+
+                    // Check for iOS devices
+                    const isIOS = /iphone|ipod|ipad/.test(userAgent) ||
+                        (platform === 'MacIntel' && navigator.maxTouchPoints > 0);
+
+                    // Check for Android devices
+                    const isAndroid = /android/.test(userAgent);
+
+                    // If neither iOS nor Android, allow access
+                    if (!isIOS && !isAndroid) return false;
+
+                    // Improved iPad detection
+                    const isIPad =
+                        /ipad/.test(userAgent) ||
+                        /iPad|Macintosh/.test(navigator.platform) ||
+                        (platform === 'MacIntel' && navigator.maxTouchPoints > 0 && !/iPhone/.test(userAgent)) ||
+                        /iPad/.test(navigator.platform) ||
+                        (navigator.maxTouchPoints > 0 && /Mac/.test(platform) && !/iPhone/.test(userAgent));
+
+                    // Device dimensions
+                    const screenWidth = window.innerWidth;
+                    const screenHeight = window.innerHeight;
+                    const smallerDimension = Math.min(screenWidth, screenHeight);
+                    const largerDimension = Math.max(screenWidth, screenHeight);
+
+                    // New size detection logic
+                    const isPhoneSize = (
+                        // Either dimension smaller than minimum tablet width
+                        smallerDimension < 600 ||
+                        // Or larger dimension smaller than minimum tablet height
+                        largerDimension < 900 ||
+                        // Or has phone-like aspect ratio (typically between 0.4 and 0.6)
+                        (largerDimension / smallerDimension > 1.7 && smallerDimension < 800)
+                    );
+
+                    // Additional check for tablets based on aspect ratio and minimum size
+                    const isTabletSize = (
+                        largerDimension >= 900 &&
+                        smallerDimension >= 600 &&
+                        (largerDimension / smallerDimension <= 1.7 || smallerDimension >= 750)
+                    );
+
+                    // Allow access only if it's an iPad or a tablet-sized Android device
+                    return (isIOS && !isIPad) || (isAndroid && !isTabletSize);
+                }
+
+                function updateBlockerMessage(isAndroid) {
+                    const primaryMessage = document.querySelector('.modal-message .primary-message');
+                    const policyMessage = document.querySelector('.modal-message .policy-message');
+
+                    primaryMessage.textContent = 'Please use a computer or iPad to access the Student BYOD Guide.';
+                    policyMessage.textContent = 'Mobile phones are not supported or allowed during the school day under the Electronic Devices Policy.';
+                }
+
+                function checkAndBlockDevice() {
+                    const isPhone = detectPhone();
+                    const isAndroid = /android/.test(navigator.userAgent.toLowerCase());
+                    const modal = document.getElementById('phone-block-modal');
+
+                    if (isPhone) {
+                        updateBlockerMessage(isAndroid);
+                        modal.classList.remove('hidden');
+                        document.body.style.overflow = 'hidden';
+                        document.body.style.position = 'fixed';
+                        document.body.style.width = '100%';
+
+                        // Additional measures to prevent scrolling and interaction
+                        document.body.style.height = '100%';
+                        document.body.style.touchAction = 'none';
+                    } else {
+                        modal.classList.add('hidden');
+                        document.body.style.overflow = '';
+                        document.body.style.position = '';
+                        document.body.style.width = '';
+                        document.body.style.height = '';
+                        document.body.style.touchAction = '';
+                    }
+                }
+
+                document.addEventListener('DOMContentLoaded', checkAndBlockDevice);
+                window.addEventListener('resize', checkAndBlockDevice);
+                window.addEventListener('orientationchange', function () {
+                    // Small delay to ensure new dimensions are available
+                    setTimeout(checkAndBlockDevice, 100);
+                });
+
+                // Additional check for orientation changes through resize
+                let lastWidth = window.innerWidth;
+                window.addEventListener('resize', function () {
+                    if (window.innerWidth !== lastWidth) {
+                        lastWidth = window.innerWidth;
+                        checkAndBlockDevice();
+                    }
+                });
+
+                // Prevent modal from being removed
+                const observer = new MutationObserver((mutations) => {
+                    mutations.forEach((mutation) => {
+                        if (mutation.type === 'childList' && !document.contains(document.getElementById('phone-block-modal'))) {
+                            document.body.appendChild(modal.cloneNode(true));
+                        }
+                    });
+                });
+
+                observer.observe(document.body, {
+                    childList: true,
+                    subtree: true
+                });
+
+                // FAQ Functionality
+                document.querySelectorAll('.faq-question').forEach(question => {
+                    question.addEventListener('click', () => {
+                        question.classList.toggle('collapsed');
+                        const answer = question.nextElementSibling;
+                        answer.classList.toggle('expanded');
+                    });
+                });
+
+                // Run detection when page loads
+                detectSystem();
+                checkAndBlockDevice();
+            });
+        </script>
+</body>
+
+</html>
