@@ -7,25 +7,100 @@
     <title>Student BYOD Guide</title>
     <style>
         :root {
-            /* Base colors */
+            /* Base theme colors - Light Mode */
             --background-color: #f8fafc;
             --text-color: #1f2937;
+            --card-background: white;
+            --border-color: #e5e7eb;
+            --shadow-color: rgba(0, 0, 0, 0.1);
 
-            /* Certificate colors - Pastel Blue */
+            /* Certificate colors - Light Mode */
             --cert-primary: #60a5fa;
             --cert-secondary: #3b82f6;
             --cert-bg: #dbeafe;
 
-            /* PaperCut colors - Pastel Orange */
+            /* PaperCut colors - Light Mode */
             --papercut-primary: #f97316;
             --papercut-secondary: #ea580c;
             --papercut-bg: #ffedd5;
 
-            /* Office colors - Pastel Purple */
+            /* Office colors - Light Mode */
             --office-primary: #8b5cf6;
             --office-secondary: #7c3aed;
             --office-bg: #f3e8ff;
+
+            /* FAQ colors - Light Mode */
+            --faq-bg: white;
+            --faq-border: #e5e7eb;
+            --faq-hover: #f8fafc;
+
+            /* FAQ header colors */
+            --faq-program-color: #ffafcc;
+            /* Soft pastel blue */
+            --faq-technical-color: #57cc99;
+            /* Soft pastel purple/thistle */
         }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                /* Base theme colors - Dark Mode */
+                --background-color: #1a1a1a;
+                --text-color: #e5e7eb;
+                --card-background: #2d2d2d;
+                --border-color: #404040;
+                --shadow-color: rgba(0, 0, 0, 0.3);
+
+                /* Certificate colors - Dark Mode */
+                --cert-primary: #3b82f6;
+                --cert-secondary: #2563eb;
+                --cert-bg: rgba(59, 130, 246, 0.1);
+
+                /* PaperCut colors - Dark Mode */
+                --papercut-primary: #f97316;
+                --papercut-secondary: #ea580c;
+                --papercut-bg: rgba(249, 115, 22, 0.1);
+
+                /* Office colors - Dark Mode */
+                --office-primary: #8b5cf6;
+                --office-secondary: #7c3aed;
+                --office-bg: rgba(139, 92, 246, 0.1);
+
+                /* FAQ colors - Dark Mode */
+                --faq-bg: #2d2d2d;
+                --faq-border: #404040;
+                --faq-hover: #363636;
+
+                --faq-program-color: #ffafcc;
+                /* Soft pastel blue */
+                --faq-technical-color: #57cc99;
+                /* Soft pastel purple/thistle */
+            }
+        }
+
+        .site-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .site-title {
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .school-logo {
+            height: 48px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .school-logo.hidden {
+            display: none;
+        }
+
 
         /* Ensure unsupported notice stays distinct */
         #unsupported-notice {
@@ -52,6 +127,20 @@
         h2,
         h3 {
             margin-top: 0;
+        }
+
+        .faq-answer ol {
+            padding-left: 2.5rem;
+            margin: 1rem 0;
+        }
+
+        .faq-answer ol li {
+            padding-left: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .faq-answer ol li:last-child {
+            margin-bottom: 0;
         }
 
         /* Custom Select Styles */
@@ -85,7 +174,8 @@
             left: 0;
             right: 0;
             z-index: 99;
-            background: white;
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
             border-radius: 8px;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             margin-top: 8px;
@@ -126,11 +216,11 @@
         }
 
         .software-section {
-            background: white;
+            background: var(--card-background);
             border-radius: 8px;
             padding: 20px;
             margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 4px var(--shadow-color);
             border-left: 5px solid transparent;
             display: flex;
             gap: 20px;
@@ -223,11 +313,43 @@
             margin-top: 40px;
         }
 
+        .faq-section {
+            margin-bottom: 32px;
+        }
+
+        .faq-section-header {
+            font-size: 1.2em;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid;
+            font-weight: 600;
+        }
+
+        .faq-program .faq-section-header {
+            color: var(--faq-program-color);
+            border-color: var(--faq-program-color);
+        }
+
+        .faq-program .faq-item {
+            border-left: 3px solid var(--faq-program-color);
+        }
+
+        /* Technical section styling */
+        .faq-technical .faq-section-header {
+            color: var(--faq-technical-color);
+            border-color: var(--faq-technical-color);
+        }
+
+        .faq-technical .faq-item {
+            border-left: 3px solid var(--faq-technical-color);
+        }
+
         .faq-item {
             margin-bottom: 12px;
-            border: 1px solid #e5e7eb;
+            border: 1px solid var(--faq-border);
             border-radius: 8px;
             overflow: hidden;
+            background-color: var(--faq-bg);
         }
 
         .faq-question {
@@ -238,12 +360,13 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background-color: white;
+            background-color: var(--faq-bg);
+            color: var(--text-color);
             transition: background-color 0.2s;
         }
 
         .faq-question:hover {
-            background-color: #f8fafc;
+            background-color: var(--faq-hover);
         }
 
         .faq-question::after {
@@ -262,7 +385,8 @@
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.5s ease-out, padding 0.3s ease;
-            background-color: white;
+            background-color: var(--faq-bg);
+            color: var(--text-color);
         }
 
         .faq-answer.expanded {
@@ -271,7 +395,7 @@
         }
 
         .system-info {
-            background: white;
+            background: var(--card-background);
             border-radius: 8px;
             padding: 16px 20px;
             margin-bottom: 24px;
@@ -364,6 +488,17 @@
             box-sizing: border-box;
         }
 
+        @media (prefers-color-scheme: dark) {
+            #phone-block-modal {
+                background-color: rgba(0, 0, 0, 0.95);
+            }
+
+            .modal-content {
+                background-color: var(--card-background);
+                color: var(--text-color);
+            }
+        }
+
         #phone-block-modal.hidden {
             display: none;
         }
@@ -432,7 +567,7 @@
         .tooltip::after {
             content: "Bring Your Own Device";
             position: absolute;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.9);
             color: white;
             padding: 5px 10px;
             border-radius: 4px;
@@ -447,6 +582,13 @@
             margin-bottom: 5px;
         }
 
+        @media (prefers-color-scheme: dark) {
+            .tooltip::after {
+                background: rgba(255, 255, 255, 0.9);
+                color: black;
+            }
+        }
+
         .tooltip:hover::after {
             visibility: visible;
             opacity: 1;
@@ -455,6 +597,55 @@
 </head>
 
 <body>
+    <noscript>
+        <div style="
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.5);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 9999;
+        ">
+            <div style="
+            background: white;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            font-family: system-ui, -apple-system, sans-serif;
+          ">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                    stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    style="margin: 0 auto 1rem auto;">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="12" />
+                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+                <h2 style="
+              color: #111827;
+              font-size: 1.5rem;
+              margin-bottom: 1rem;
+            ">JavaScript Required</h2>
+                <p style="
+              color: #4b5563;
+              line-height: 1.5;
+              margin-bottom: 1rem;
+            ">This application requires JavaScript to function. Please enable JavaScript in your browser settings to
+                    continue.</p>
+                <p style="
+              color: #6b7280;
+              font-size: 0.875rem;
+            ">If you need assistance, please contact your on-site IT support team.</p>
+            </div>
+        </div>
+    </noscript>
+
     <div id="phone-block-modal" class="hidden">
         <div class="modal-content">
             <div class="modal-icon">
@@ -476,7 +667,12 @@
     </div>
 
     <div class="container">
-        <h1>Student <span class="tooltip">BYOD</span> Guide</h1>
+        <div class="site-header">
+            <img src="logo.png" alt="School Logo" class="school-logo" onerror="this.classList.add('hidden')">
+            <h1 class="site-title">
+                Student <span class="tooltip">BYOD</span> Guide
+            </h1>
+        </div>
         <div id="os-detected" class="system-info">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                 stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -779,428 +975,533 @@
         <div class="faq">
             <h2>Frequently Asked Questions</h2>
 
-            <div class="faq-item">
-                <div class="faq-question collapsed">What devices and operating systems are officially supported?</div>
-                <div class="faq-answer">We officially support:
-                    <ul>
-                        <li><strong>Windows:</strong> The standard for most modern PCs, offering the most stable
-                            and secure experience</li>
-                        <li><strong>macOS:</strong> For Mac computers from 2006-2020, maintaining support for
-                            established hardware</li>
-                        <li><strong>iPadOS:</strong> For Apple mobile devices, providing secure access to essential
-                            services</li>
-                    </ul>
-                    These platforms are supported because they:
-                    <ul>
-                        <li>Meet our security requirements for enterprise network access</li>
-                        <li>Support our required authentication methods</li>
-                        <li>Have stable, tested versions of all required software</li>
-                        <li>Receive regular security updates from their manufacturers</li>
-                    </ul>
-                    Other platforms (Android, ChromeOS, Linux) aren't officially supported as they may lack certain
-                    security features or compatibility with our network infrastructure.
+            <div class="faq-section faq-program">
+                <h3 class="faq-section-header">Program Information & School Support</h3>
+
+                <div class="faq-item">
+                    <div class="faq-question">When it comes to the technical support side of BYOD, what is the school
+                        able to help with?</div>
+                    <div class="faq-answer expanded">The school's IT department is responsible for:
+                        <ol>
+                            <li>Helping you connect your (compatible) BYOD device to the school internet.</li>
+                            <li>Providing instructions to get setup with the Department of Education provided copy of
+                                Microsoft Office (Word, PowerPoint, Excel) so you're ready to use the most common
+                                software at school.</li>
+                            <li>Giving you the ability to print at school using the PaperCut software. Just remember you
+                                have a monetary limit each term, and reaching this limit means you can't print until the
+                                following term.</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question collapsed">I've lost or accidentally deleted my work. Can you help?</div>
+                    <div class="faq-answer">Students are responsible for safely and securely saving their school work.
+                        The school IT Department isn't able to help you recover any lost work.<br><br>
+                        We recommend you save your work in the provided OneDrive storage solution, this way you can turn
+                        on autosave and access your work from another computer if you forget or damage your BYOD device.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question collapsed">There is something wrong with my device and it isn't working
+                        correctly.</div>
+                    <div class="faq-answer">Like with physical issues the school's IT department isn't able to assist
+                        with any issues that may arise from non-school software such as antivirus or third party
+                        software.<br><br>
+                        If these issues are stopping you from completing school work we have a limited number of
+                        short-term loan laptops you can borrow for the day.</div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question collapsed">My BYOD device was damaged. Can you fix it?</div>
+                    <div class="faq-answer">BYOD devices aren't covered under the school's insurance policy. As they're
+                        personal devices it's your responsibility for the maintenance and upkeep. We recommend you look
+                        at the manufacturers warranty options as well as home/personal insurance to cover the
+                        device.<br><br>
+                        If you suspect foul play in the damage of a device, the school's Student Services team will do
+                        their best to assist you.</div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question collapsed">What happens to the free software the school provides when I
+                        leave?</div>
+                    <div class="faq-answer">Microsoft Office and any other software provided by the school is provided
+                        for free by the Department of Education under the condition you're a currently enrolled
+                        student.<br><br>
+                        If you move to a non-public school, interstate or finish your schooling the software license
+                        will be automatically revoked. You will have the option after this to uninstall the software or
+                        purchase a license directly from Microsoft to continue using the product.<br><br>
+                        <i>KEEP IN MIND: Any documents saved in OneDrive will be automatically deleted at the end of
+                            your schooling for security reasons. We recommend moving these files to an external USB or
+                            another place on the computer if you wish to maintain access to them.</i>
+                    </div>
                 </div>
             </div>
 
-            <div class="faq-item">
-                <div class="faq-question collapsed">Why do I need to install the Internet Certificate?</div>
-                <div class="faq-answer">The Internet Certificate ensures secure connection to organizational resources
-                    and internal websites. Without it, you may experience security warnings or connection issues.</div>
-            </div>
+            <!-- Technical Information Section -->
+            <div class="faq-section faq-technical">
+                <h3 class="faq-section-header">Technical Details & Requirements</h3>
 
-            <div class="faq-item">
-                <div class="faq-question collapsed">Do I need to install PaperCut on my mobile device?</div>
-                <div class="faq-answer">No, PaperCut Client is only required for desktop computers (Windows and macOS).
-                    Mobile printing is handled through different methods.</div>
-            </div>
+                <div class="faq-item">
+                    <div class="faq-question">What devices and operating systems are officially supported?
+                    </div>
+                    <div class="faq-answer expanded" id="supported-versions">We officially support:
+                        <ul>
+                            <li><strong>Windows <span id="windows-version">10</span></strong>: Microsoft's current
+                                operating system receiving regular updates.</li>
+                            <li><strong>macOS <span id="macos-version">14</span>+</strong>: Apple's oldest desktop class
+                                operating system currently supported.</li>
+                            <li><strong>iPadOS <span id="ipados-version">17</span>+</strong>: Apple's oldest supported
+                                mobile operating system.</li>
+                        </ul>
+                        These platforms are supported because they:
+                        <ul>
+                            <li>Have been confirmed to work within our schools Enterprise Network</li>
+                            <li>Are still receiving regular security updates</li>
+                            <li>Support stable, tested versions of all required software</li>
+                        </ul>
+                        Older versions of these operating systems are not supported as they no longer receive security
+                        updates.
+                        Other platforms (Android, ChromeOS, Linux) aren't officially supported as they are not
+                        compatible with our network infrastructure.
+                    </div>
+                </div>
 
-            <div class="faq-item">
-                <div class="faq-question collapsed">Can I install Microsoft Office on multiple devices?</div>
-                <div class="faq-answer">Yes, with your organization account, you can install Microsoft Office on up to 5
-                    devices simultaneously.</div>
-            </div>
+                <div class="faq-item">
+                    <div class="faq-question collapsed">Why do I need to install the Internet Certificate?</div>
+                    <div class="faq-answer">The Internet Certificate ensures secure connection to organizational
+                        resources and internal websites. Without it, you may experience security warnings or connection
+                        issues.</div>
+                </div>
 
-            <div class="faq-item">
-                <div class="faq-question collapsed">What should I do if I get an error during installation?</div>
-                <div class="faq-answer">First, try restarting your device and running the installer again. If the issue
-                    persists, contact IT Support for assistance.</div>
-            </div>
+                <div class="faq-item">
+                    <div class="faq-question collapsed">Do I need to install PaperCut on my mobile device?</div>
+                    <div class="faq-answer">No, PaperCut Client is only required for desktop computers (Windows and
+                        macOS). Mobile printing is handled through different methods.</div>
+                </div>
 
-            <div class="faq-item">
-                <div class="faq-question collapsed">Do I need administrator rights to install these applications?</div>
-                <div class="faq-answer">Yes, you need administrator rights to install the certificate and PaperCut
-                    Client. For Microsoft Office, standard user rights are sufficient.</div>
+                <div class="faq-item">
+                    <div class="faq-question collapsed">Can I install Microsoft Office on multiple devices?</div>
+                    <div class="faq-answer">Yes, with your organization account, you can install Microsoft Office on up
+                        to 5 devices simultaneously.</div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question collapsed">What should I do if I get an error during installation?</div>
+                    <div class="faq-answer">First, try restarting your device and running the installer again. If the
+                        issue persists, contact IT Support for assistance.</div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question collapsed">Do I need administrator rights to install these applications?
+                    </div>
+                    <div class="faq-answer">Yes, you need administrator rights to install the certificate and PaperCut
+                        Client. For Microsoft Office, standard user rights are sufficient.</div>
+                </div>
             </div>
         </div>
+    </div>
 
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const customSelect = document.getElementById('os-custom-select');
-                const selectSelected = customSelect.querySelector('.select-selected');
-                const selectItems = customSelect.querySelector('.select-items');
-                const options = selectItems.querySelectorAll('.option-item');
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const customSelect = document.getElementById('os-custom-select');
+            const selectSelected = customSelect.querySelector('.select-selected');
+            const selectItems = customSelect.querySelector('.select-items');
+            const options = selectItems.querySelectorAll('.option-item');
 
-                // Toggle dropdown
-                selectSelected.addEventListener('click', function (e) {
-                    e.stopPropagation();
-                    selectItems.classList.toggle('select-items-visible');
-                    selectSelected.classList.toggle('select-arrow-active');
-                });
-
-                // Handle option selection
-                options.forEach(option => {
-                    option.addEventListener('click', function (e) {
-                        const value = this.getAttribute('data-value');
-                        const text = this.textContent;
-
-                        // Update selected text
-                        selectSelected.textContent = text;
-
-                        // Close dropdown
-                        selectItems.classList.remove('select-items-visible');
-
-                        // Update display
-                        updateDisplay(value);
-                    });
-                });
-
-                // Close dropdown when clicking outside
-                document.addEventListener('click', function (e) {
-                    if (!customSelect.contains(e.target)) {
-                        selectItems.classList.remove('select-items-visible');
-                    }
-                });
-
-                async function detectSystem() {
-                    const userAgent = navigator.userAgent.toLowerCase();
-                    const platform = navigator.platform.toLowerCase();
-                    let osValue = "windows-x64"; // Default value
-                    let displayText = "Windows (x64)"; // Default display text
-                    let isUnsupported = false;
-
-                    // Improved iOS detection first
-                    // Check for iOS devices using multiple indicators
-                    const isIOS = /iphone|ipad|ipod/.test(userAgent) ||
-                        (platform === 'iphone') ||
-                        (platform === 'ipad') ||
-                        (platform === 'ipod') ||
-                        (navigator.maxTouchPoints > 0 &&
-                            /mac/.test(platform) &&
-                            /apple/.test(vendor));
-
-                    // Debug logging for iOS detection
-                    console.log('iOS Detection:', {
-                        userAgent,
-                        platform,
-                        maxTouchPoints: navigator.maxTouchPoints,
-                        vendor: navigator.vendor,
-                        isIOS
-                    });
-
-                    if (isIOS) {
-                        osValue = "ios";
-                        displayText = "iPadOS";
-                    }
-                    // Then check for Windows
-                    else if (userAgent.includes("win")) {
-                        if (userAgent.includes("arm64") || userAgent.includes("aarch64")) {
-                            osValue = "windows-arm";
-                            displayText = "Windows (ARM64)";
-                        } else {
-                            osValue = "windows-x64";
-                            displayText = "Windows (x64)";
-                        }
-                    }
-                    // Then check for Mac
-                    else if (userAgent.includes("mac")) {
-                        // Improved Mac detection function
-                        async function isMacAppleSilicon() {
-                            // Check if running on macOS
-                            if (!platform.includes('mac')) {
-                                return false;
-                            }
-
-                            // First try using newer navigator.deviceMemory API
-                            if ('deviceMemory' in navigator) {
-                                // Apple Silicon Macs typically report higher memory
-                                return navigator.deviceMemory >= 8;
-                            }
-
-                            // Try using performance API to detect characteristics typical of Apple Silicon
-                            if (typeof performance !== 'undefined' && performance.memory) {
-                                // Apple Silicon Macs typically show different memory limits
-                                return performance.memory.jsHeapSizeLimit > 4000000000;
-                            }
-
-                            // Use timing-based detection as fallback
-                            const start = performance.now();
-                            let result = 0;
-                            for (let i = 0; i < 1000000; i++) {
-                                result += Math.sqrt(i);
-                            }
-                            const duration = performance.now() - start;
-
-                            return duration < 15;
-                        }
-
-                        const isAppleSilicon = await isMacAppleSilicon();
-
-                        if (isAppleSilicon) {
-                            osValue = "mac-arm";
-                            displayText = "macOS (Apple Silicon)";
-                        } else {
-                            osValue = "mac-intel";
-                            displayText = "macOS (Intel)";
-                        }
-                    }
-                    // Handle other unsupported systems
-                    else if (userAgent.includes("android")) {
-                        osValue = "android";
-                        displayText = "Android";
-                        isUnsupported = true;
-                    }
-                    else if (userAgent.includes("cros")) {
-                        osValue = "chrome";
-                        displayText = "ChromeOS";
-                        isUnsupported = true;
-                    }
-                    else if (userAgent.includes("linux")) {
-                        osValue = "linux";
-                        displayText = "Linux";
-                        isUnsupported = true;
-                    }
-                    else {
-                        osValue = "other";
-                        displayText = "Other OS";
-                        isUnsupported = true;
-                    }
-
-                    // Update the custom select display
-                    const selectSelected = document.querySelector('.select-selected');
-                    if (selectSelected) {
-                        selectSelected.textContent = displayText;
-                    }
-
-                    // Update the status text and unsupported notice
-                    const osStatus = document.getElementById('os-status');
-                    if (osStatus) {
-                        osStatus.textContent = isUnsupported ? "Detected unsupported system:" : "Looks like you're currently using";
-                    }
-
-                    const unsupportedNotice = document.getElementById('unsupported-notice');
-                    if (unsupportedNotice) {
-                        unsupportedNotice.style.display = isUnsupported ? 'flex' : 'none';
-                    }
-
-                    // Update the visible sections
-                    updateDisplay(osValue);
-
-                    // Enhanced debug logging
-                    console.log('System Detection Results:', {
-                        userAgent,
-                        platform,
-                        osValue,
-                        displayText,
-                        isUnsupported,
-                        maxTouchPoints: navigator.maxTouchPoints,
-                        vendor: navigator.vendor
-                    });
-                }
-
-                function updateDisplay(osValue) {
-                    const isUnsupported = ['android', 'chrome', 'linux', 'other'].includes(osValue);
-
-                    // Show/hide unsupported notice
-                    document.getElementById('unsupported-notice').style.display = isUnsupported ? 'flex' : 'none';
-                    document.getElementById('os-status').textContent = isUnsupported ? "Detected unsupported system:" : "Looks like you're currently using";
-
-                    // Show/hide all software sections
-                    document.querySelectorAll('.software-section').forEach(el => {
-                        if (el.id !== 'unsupported-notice') {
-                            el.style.display = isUnsupported ? 'none' : 'flex';
-                        }
-                    });
-
-                    if (!isUnsupported) {
-                        // Hide all OS-specific sections first
-                        document.querySelectorAll('.os-specific').forEach(el => {
-                            el.classList.add('hidden');
-                        });
-
-                        // Hide all architecture-specific elements
-                        document.querySelectorAll('.arch-specific').forEach(el => {
-                            el.style.display = 'none';
-                        });
-
-                        // Show relevant sections based on OS and architecture
-                        if (osValue === 'windows-x64') {
-                            document.querySelectorAll('.windows').forEach(el => {
-                                el.classList.remove('hidden');
-                            });
-                            document.querySelectorAll('.windows-x64').forEach(el => {
-                                el.style.display = 'block';
-                            });
-                        } else if (osValue === 'windows-arm') {
-                            document.querySelectorAll('.windows').forEach(el => {
-                                el.classList.remove('hidden');
-                            });
-                            document.querySelectorAll('.windows-arm').forEach(el => {
-                                el.style.display = 'block';
-                            });
-                        } else if (osValue.startsWith('mac')) {
-                            document.querySelectorAll('.macos').forEach(el => {
-                                el.classList.remove('hidden');
-                            });
-                            document.querySelectorAll(`.${osValue}`).forEach(el => {
-                                el.style.display = 'block';
-                            });
-                        } else if (osValue === 'ios') {
-                            document.querySelectorAll('.ios').forEach(el => {
-                                el.classList.remove('hidden');
-                            });
-                        }
-                    }
-                }
-
-                function detectPhone() {
-                    const userAgent = navigator.userAgent.toLowerCase();
-                    const platform = navigator.platform;
-
-                    // Debug logging
-                    console.log('Device Detection:', {
-                        userAgent,
-                        platform,
-                        width: window.innerWidth,
-                        height: window.innerHeight,
-                        pixelRatio: window.devicePixelRatio,
-                        maxTouchPoints: navigator.maxTouchPoints,
-                        orientation: window.orientation,
-                        standalone: window.navigator.standalone,
-                        aspectRatio: window.innerWidth / window.innerHeight
-                    });
-
-                    // Check for iOS devices
-                    const isIOS = /iphone|ipod|ipad/.test(userAgent) ||
-                        (platform === 'MacIntel' && navigator.maxTouchPoints > 0);
-
-                    // Check for Android devices
-                    const isAndroid = /android/.test(userAgent);
-
-                    // If neither iOS nor Android, allow access
-                    if (!isIOS && !isAndroid) return false;
-
-                    // Improved iPad detection
-                    const isIPad =
-                        /ipad/.test(userAgent) ||
-                        /iPad|Macintosh/.test(navigator.platform) ||
-                        (platform === 'MacIntel' && navigator.maxTouchPoints > 0 && !/iPhone/.test(userAgent)) ||
-                        /iPad/.test(navigator.platform) ||
-                        (navigator.maxTouchPoints > 0 && /Mac/.test(platform) && !/iPhone/.test(userAgent));
-
-                    // Device dimensions
-                    const screenWidth = window.innerWidth;
-                    const screenHeight = window.innerHeight;
-                    const smallerDimension = Math.min(screenWidth, screenHeight);
-                    const largerDimension = Math.max(screenWidth, screenHeight);
-
-                    // New size detection logic
-                    const isPhoneSize = (
-                        // Either dimension smaller than minimum tablet width
-                        smallerDimension < 600 ||
-                        // Or larger dimension smaller than minimum tablet height
-                        largerDimension < 900 ||
-                        // Or has phone-like aspect ratio (typically between 0.4 and 0.6)
-                        (largerDimension / smallerDimension > 1.7 && smallerDimension < 800)
-                    );
-
-                    // Additional check for tablets based on aspect ratio and minimum size
-                    const isTabletSize = (
-                        largerDimension >= 900 &&
-                        smallerDimension >= 600 &&
-                        (largerDimension / smallerDimension <= 1.7 || smallerDimension >= 750)
-                    );
-
-                    // Allow access only if it's an iPad or a tablet-sized Android device
-                    return (isIOS && !isIPad) || (isAndroid && !isTabletSize);
-                }
-
-                function updateBlockerMessage(isAndroid) {
-                    const primaryMessage = document.querySelector('.modal-message .primary-message');
-                    const policyMessage = document.querySelector('.modal-message .policy-message');
-
-                    primaryMessage.textContent = 'Please use a computer or iPad to access the Student BYOD Guide.';
-                    policyMessage.textContent = 'Mobile phones are not supported or allowed during the school day under the Electronic Devices Policy.';
-                }
-
-                function checkAndBlockDevice() {
-                    const isPhone = detectPhone();
-                    const isAndroid = /android/.test(navigator.userAgent.toLowerCase());
-                    const modal = document.getElementById('phone-block-modal');
-
-                    if (isPhone) {
-                        updateBlockerMessage(isAndroid);
-                        modal.classList.remove('hidden');
-                        document.body.style.overflow = 'hidden';
-                        document.body.style.position = 'fixed';
-                        document.body.style.width = '100%';
-
-                        // Additional measures to prevent scrolling and interaction
-                        document.body.style.height = '100%';
-                        document.body.style.touchAction = 'none';
-                    } else {
-                        modal.classList.add('hidden');
-                        document.body.style.overflow = '';
-                        document.body.style.position = '';
-                        document.body.style.width = '';
-                        document.body.style.height = '';
-                        document.body.style.touchAction = '';
-                    }
-                }
-
-                document.addEventListener('DOMContentLoaded', checkAndBlockDevice);
-                window.addEventListener('resize', checkAndBlockDevice);
-                window.addEventListener('orientationchange', function () {
-                    // Small delay to ensure new dimensions are available
-                    setTimeout(checkAndBlockDevice, 100);
-                });
-
-                // Additional check for orientation changes through resize
-                let lastWidth = window.innerWidth;
-                window.addEventListener('resize', function () {
-                    if (window.innerWidth !== lastWidth) {
-                        lastWidth = window.innerWidth;
-                        checkAndBlockDevice();
-                    }
-                });
-
-                // Prevent modal from being removed
-                const observer = new MutationObserver((mutations) => {
-                    mutations.forEach((mutation) => {
-                        if (mutation.type === 'childList' && !document.contains(document.getElementById('phone-block-modal'))) {
-                            document.body.appendChild(modal.cloneNode(true));
-                        }
-                    });
-                });
-
-                observer.observe(document.body, {
-                    childList: true,
-                    subtree: true
-                });
-
-                // FAQ Functionality
-                document.querySelectorAll('.faq-question').forEach(question => {
-                    question.addEventListener('click', () => {
-                        question.classList.toggle('collapsed');
-                        const answer = question.nextElementSibling;
-                        answer.classList.toggle('expanded');
-                    });
-                });
-
-                // Run detection when page loads
-                detectSystem();
-                checkAndBlockDevice();
+            // Toggle dropdown
+            selectSelected.addEventListener('click', function (e) {
+                e.stopPropagation();
+                selectItems.classList.toggle('select-items-visible');
+                selectSelected.classList.toggle('select-arrow-active');
             });
-        </script>
+
+            // Handle option selection
+            options.forEach(option => {
+                option.addEventListener('click', function (e) {
+                    const value = this.getAttribute('data-value');
+                    const text = this.textContent;
+
+                    // Update selected text
+                    selectSelected.textContent = text;
+
+                    // Close dropdown
+                    selectItems.classList.remove('select-items-visible');
+
+                    // Update display
+                    updateDisplay(value);
+                });
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function (e) {
+                if (!customSelect.contains(e.target)) {
+                    selectItems.classList.remove('select-items-visible');
+                }
+            });
+
+            async function detectSystem() {
+                const userAgent = navigator.userAgent.toLowerCase();
+                const platform = navigator.platform.toLowerCase();
+                let osValue = "windows-x64"; // Default value
+                let displayText = "Windows (x64)"; // Default display text
+                let isUnsupported = false;
+
+                // Improved iOS detection first
+                // Check for iOS devices using multiple indicators
+                const isIOS = /iphone|ipad|ipod/.test(userAgent) ||
+                    (platform === 'iphone') ||
+                    (platform === 'ipad') ||
+                    (platform === 'ipod') ||
+                    (navigator.maxTouchPoints > 0 &&
+                        /mac/.test(platform) &&
+                        /apple/.test(vendor));
+
+                // Debug logging for iOS detection
+                console.log('iOS Detection:', {
+                    userAgent,
+                    platform,
+                    maxTouchPoints: navigator.maxTouchPoints,
+                    vendor: navigator.vendor,
+                    isIOS
+                });
+
+                if (isIOS) {
+                    osValue = "ios";
+                    displayText = "iPadOS";
+                }
+                // Then check for Windows
+                else if (userAgent.includes("win")) {
+                    if (userAgent.includes("arm64") || userAgent.includes("aarch64")) {
+                        osValue = "windows-arm";
+                        displayText = "Windows (ARM64)";
+                    } else {
+                        osValue = "windows-x64";
+                        displayText = "Windows (x64)";
+                    }
+                }
+                // Then check for Mac
+                else if (userAgent.includes("mac")) {
+                    // Improved Mac detection function
+                    async function isMacAppleSilicon() {
+                        // Check if running on macOS
+                        if (!platform.includes('mac')) {
+                            return false;
+                        }
+
+                        // First try using newer navigator.deviceMemory API
+                        if ('deviceMemory' in navigator) {
+                            // Apple Silicon Macs typically report higher memory
+                            return navigator.deviceMemory >= 8;
+                        }
+
+                        // Try using performance API to detect characteristics typical of Apple Silicon
+                        if (typeof performance !== 'undefined' && performance.memory) {
+                            // Apple Silicon Macs typically show different memory limits
+                            return performance.memory.jsHeapSizeLimit > 4000000000;
+                        }
+
+                        // Use timing-based detection as fallback
+                        const start = performance.now();
+                        let result = 0;
+                        for (let i = 0; i < 1000000; i++) {
+                            result += Math.sqrt(i);
+                        }
+                        const duration = performance.now() - start;
+
+                        return duration < 15;
+                    }
+
+                    const isAppleSilicon = await isMacAppleSilicon();
+
+                    if (isAppleSilicon) {
+                        osValue = "mac-arm";
+                        displayText = "macOS (Apple Silicon)";
+                    } else {
+                        osValue = "mac-intel";
+                        displayText = "macOS (Intel)";
+                    }
+                }
+                // Handle other unsupported systems
+                else if (userAgent.includes("android")) {
+                    osValue = "android";
+                    displayText = "Android";
+                    isUnsupported = true;
+                }
+                else if (userAgent.includes("cros")) {
+                    osValue = "chrome";
+                    displayText = "ChromeOS";
+                    isUnsupported = true;
+                }
+                else if (userAgent.includes("linux")) {
+                    osValue = "linux";
+                    displayText = "Linux";
+                    isUnsupported = true;
+                }
+                else {
+                    osValue = "other";
+                    displayText = "Other OS";
+                    isUnsupported = true;
+                }
+
+                // Update the custom select display
+                const selectSelected = document.querySelector('.select-selected');
+                if (selectSelected) {
+                    selectSelected.textContent = displayText;
+                }
+
+                // Update the status text and unsupported notice
+                const osStatus = document.getElementById('os-status');
+                if (osStatus) {
+                    osStatus.textContent = isUnsupported ? "Detected unsupported system:" : "Looks like you're currently using";
+                }
+
+                const unsupportedNotice = document.getElementById('unsupported-notice');
+                if (unsupportedNotice) {
+                    unsupportedNotice.style.display = isUnsupported ? 'flex' : 'none';
+                }
+
+                // Update the visible sections
+                updateDisplay(osValue);
+
+                // Enhanced debug logging
+                console.log('System Detection Results:', {
+                    userAgent,
+                    platform,
+                    osValue,
+                    displayText,
+                    isUnsupported,
+                    maxTouchPoints: navigator.maxTouchPoints,
+                    vendor: navigator.vendor
+                });
+            }
+
+            function updateDisplay(osValue) {
+                const isUnsupported = ['android', 'chrome', 'linux', 'other'].includes(osValue);
+
+                // Show/hide unsupported notice
+                document.getElementById('unsupported-notice').style.display = isUnsupported ? 'flex' : 'none';
+                document.getElementById('os-status').textContent = isUnsupported ? "Detected unsupported system:" : "Looks like you're currently using";
+
+                // Show/hide all software sections
+                document.querySelectorAll('.software-section').forEach(el => {
+                    if (el.id !== 'unsupported-notice') {
+                        el.style.display = isUnsupported ? 'none' : 'flex';
+                    }
+                });
+
+                if (!isUnsupported) {
+                    // Hide all OS-specific sections first
+                    document.querySelectorAll('.os-specific').forEach(el => {
+                        el.classList.add('hidden');
+                    });
+
+                    // Hide all architecture-specific elements
+                    document.querySelectorAll('.arch-specific').forEach(el => {
+                        el.style.display = 'none';
+                    });
+
+                    // Show relevant sections based on OS and architecture
+                    if (osValue === 'windows-x64') {
+                        document.querySelectorAll('.windows').forEach(el => {
+                            el.classList.remove('hidden');
+                        });
+                        document.querySelectorAll('.windows-x64').forEach(el => {
+                            el.style.display = 'block';
+                        });
+                    } else if (osValue === 'windows-arm') {
+                        document.querySelectorAll('.windows').forEach(el => {
+                            el.classList.remove('hidden');
+                        });
+                        document.querySelectorAll('.windows-arm').forEach(el => {
+                            el.style.display = 'block';
+                        });
+                    } else if (osValue.startsWith('mac')) {
+                        document.querySelectorAll('.macos').forEach(el => {
+                            el.classList.remove('hidden');
+                        });
+                        document.querySelectorAll(`.${osValue}`).forEach(el => {
+                            el.style.display = 'block';
+                        });
+                    } else if (osValue === 'ios') {
+                        document.querySelectorAll('.ios').forEach(el => {
+                            el.classList.remove('hidden');
+                        });
+                    }
+                }
+            }
+
+            function detectPhone() {
+                const userAgent = navigator.userAgent.toLowerCase();
+                const platform = navigator.platform;
+
+                // Debug logging
+                console.log('Device Detection:', {
+                    userAgent,
+                    platform,
+                    width: window.innerWidth,
+                    height: window.innerHeight,
+                    pixelRatio: window.devicePixelRatio,
+                    maxTouchPoints: navigator.maxTouchPoints,
+                    orientation: window.orientation,
+                    standalone: window.navigator.standalone,
+                    aspectRatio: window.innerWidth / window.innerHeight
+                });
+
+                // Check for iOS devices
+                const isIOS = /iphone|ipod|ipad/.test(userAgent) ||
+                    (platform === 'MacIntel' && navigator.maxTouchPoints > 0);
+
+                // Check for Android devices
+                const isAndroid = /android/.test(userAgent);
+
+                // If neither iOS nor Android, allow access
+                if (!isIOS && !isAndroid) return false;
+
+                // Improved iPad detection
+                const isIPad =
+                    /ipad/.test(userAgent) ||
+                    /iPad|Macintosh/.test(navigator.platform) ||
+                    (platform === 'MacIntel' && navigator.maxTouchPoints > 0 && !/iPhone/.test(userAgent)) ||
+                    /iPad/.test(navigator.platform) ||
+                    (navigator.maxTouchPoints > 0 && /Mac/.test(platform) && !/iPhone/.test(userAgent));
+
+                // Device dimensions
+                const screenWidth = window.innerWidth;
+                const screenHeight = window.innerHeight;
+                const smallerDimension = Math.min(screenWidth, screenHeight);
+                const largerDimension = Math.max(screenWidth, screenHeight);
+
+                // New size detection logic
+                const isPhoneSize = (
+                    // Either dimension smaller than minimum tablet width
+                    smallerDimension < 600 ||
+                    // Or larger dimension smaller than minimum tablet height
+                    largerDimension < 900 ||
+                    // Or has phone-like aspect ratio (typically between 0.4 and 0.6)
+                    (largerDimension / smallerDimension > 1.7 && smallerDimension < 800)
+                );
+
+                // Additional check for tablets based on aspect ratio and minimum size
+                const isTabletSize = (
+                    largerDimension >= 900 &&
+                    smallerDimension >= 600 &&
+                    (largerDimension / smallerDimension <= 1.7 || smallerDimension >= 750)
+                );
+
+                // Allow access only if it's an iPad or a tablet-sized Android device
+                return (isIOS && !isIPad) || (isAndroid && !isTabletSize);
+            }
+
+            function updateBlockerMessage(isAndroid) {
+                const primaryMessage = document.querySelector('.modal-message .primary-message');
+                const policyMessage = document.querySelector('.modal-message .policy-message');
+
+                primaryMessage.textContent = 'Please use a computer or iPad to access the Student BYOD Guide.';
+                policyMessage.textContent = 'Mobile phones are not supported or allowed during the school day under the Electronic Devices Policy.';
+            }
+
+            function checkAndBlockDevice() {
+                const isPhone = detectPhone();
+                const isAndroid = /android/.test(navigator.userAgent.toLowerCase());
+                const modal = document.getElementById('phone-block-modal');
+
+                if (isPhone) {
+                    updateBlockerMessage(isAndroid);
+                    modal.classList.remove('hidden');
+                    document.body.style.overflow = 'hidden';
+                    document.body.style.position = 'fixed';
+                    document.body.style.width = '100%';
+
+                    // Additional measures to prevent scrolling and interaction
+                    document.body.style.height = '100%';
+                    document.body.style.touchAction = 'none';
+                } else {
+                    modal.classList.add('hidden');
+                    document.body.style.overflow = '';
+                    document.body.style.position = '';
+                    document.body.style.width = '';
+                    document.body.style.height = '';
+                    document.body.style.touchAction = '';
+                }
+            }
+
+            document.addEventListener('DOMContentLoaded', checkAndBlockDevice);
+            window.addEventListener('resize', checkAndBlockDevice);
+            window.addEventListener('orientationchange', function () {
+                // Small delay to ensure new dimensions are available
+                setTimeout(checkAndBlockDevice, 100);
+            });
+
+            // Additional check for orientation changes through resize
+            let lastWidth = window.innerWidth;
+            window.addEventListener('resize', function () {
+                if (window.innerWidth !== lastWidth) {
+                    lastWidth = window.innerWidth;
+                    checkAndBlockDevice();
+                }
+            });
+
+            // Prevent modal from being removed
+            const observer = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    if (mutation.type === 'childList' && !document.contains(document.getElementById('phone-block-modal'))) {
+                        document.body.appendChild(modal.cloneNode(true));
+                    }
+                });
+            });
+
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+
+            // FAQ Functionality
+            document.querySelectorAll('.faq-question').forEach(question => {
+                question.addEventListener('click', () => {
+                    question.classList.toggle('collapsed');
+                    const answer = question.nextElementSibling;
+                    answer.classList.toggle('expanded');
+                });
+            });
+
+            // OS Version Auto-updating
+            function calculateOSVersions() {
+                const baseVersions = {
+                    macOS: 14,
+                    iPadOS: 17,
+                    windows: 10
+                };
+
+                const sept2025 = new Date('2025-09-01');
+                const currentDate = new Date();
+
+                // Calculate years since 2024 (base year)
+                const yearsSince2024 = Math.floor((currentDate - new Date('2024-09-01')) / (365.25 * 24 * 60 * 60 * 1000));
+
+                return {
+                    macOS: baseVersions.macOS + Math.max(0, yearsSince2024),
+                    iPadOS: baseVersions.iPadOS + Math.max(0, yearsSince2024),
+                    windows: currentDate >= sept2025 ? 11 : 10
+                };
+            }
+
+            function updateOSVersions() {
+                const versions = calculateOSVersions();
+
+                // Update version numbers in the FAQ
+                document.getElementById('windows-version').textContent = versions.windows;
+                document.getElementById('macos-version').textContent = versions.macOS;
+                document.getElementById('ipados-version').textContent = versions.iPadOS;
+            }
+
+            // Run all initializations when page loads
+            detectSystem();
+            checkAndBlockDevice();
+            updateOSVersions();
+        });
+    </script>
 </body>
 
 </html>
