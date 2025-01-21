@@ -9,7 +9,7 @@
     <meta property="og:description" content="Get setup with the basics to get your BYOD device working at school!" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://checker.fauxprojects.xyz" />
-    <!-- <meta property="og:image" content="https://checker.fauxprojects.xyz/image.jpeg" /> -->
+    <!-- <meta property="og:image" content="https://test.fauxprojects.xyz/11655_20241201_141822_434025937_original.jpeg" /> -->
     <style>
         :root {
             /* Base theme colors - Light Mode */
@@ -44,6 +44,11 @@
             /* Soft pastel blue */
             --faq-technical-color: #57cc99;
             /* Soft pastel purple/thistle */
+
+            --error-bg: #fee2e2;
+            --error-border: #dc2626;
+            --error-text: #111827;
+            --error-heading: #dc2626;
         }
 
         @media (prefers-color-scheme: dark) {
@@ -79,6 +84,11 @@
                 /* Soft pastel blue */
                 --faq-technical-color: #57cc99;
                 /* Soft pastel purple/thistle */
+
+                --error-bg: #2d1f1f;
+                --error-border: #dc2626;
+                --error-text: #e5e7eb;
+                --error-heading: #fca5a5;
             }
         }
 
@@ -109,8 +119,30 @@
 
         /* Ensure unsupported notice stays distinct */
         #unsupported-notice {
-            background-color: #fee2e2 !important;
-            border-left-color: #dc2626 !important;
+            background-color: var(--error-bg) !important;
+            border-left-color: var(--error-border) !important;
+        }
+
+        #unsupported-notice .section-content h2 {
+            color: var(--error-heading);
+        }
+
+        #unsupported-notice .section-content p,
+        #unsupported-notice .section-content ul {
+            color: var(--error-text);
+        }
+
+        #unsupported-notice .section-content ul {
+            margin-top: 1rem;
+            padding-left: 1.5rem;
+        }
+
+        #unsupported-notice .section-content ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        #unsupported-notice .section-content ul li:last-child {
+            margin-bottom: 0;
         }
 
         body {
