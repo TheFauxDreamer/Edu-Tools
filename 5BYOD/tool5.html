@@ -683,6 +683,16 @@
         </div>
     </noscript>
 
+    <div id="debug-panel"
+        style="display: none; position: fixed; bottom: 20px; right: 20px; font-family: system-ui, -apple-system, sans-serif; padding: 20px; border-radius: 8px; z-index: 9999; width: 400px; background: var(--card-background); border-left: 5px solid #ffb703; box-shadow: 0 2px 4px var(--shadow-color);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h2 style="margin: 0; font-size: 1.2em; color: #ffb703;">System Details</h2>
+            <button onclick="closeDebugPanel()"
+                style="background: none; border: none; color: var(--text-color); cursor: pointer; font-size: 18px; padding: 4px;">×</button>
+        </div>
+        <div id="debug-content" style="display: grid; gap: 16px; color: var(--text-color); font-size: 0.9em;"></div>
+    </div>
+
     <!-- Enhanced phone blocking modal with accessibility -->
     <div id="phone-block-modal" class="hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title"
         aria-describedby="modal-description">
@@ -1216,6 +1226,165 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            // Add debug panel to DOM
+            const debugPanel = document.createElement('div');
+            debugPanel.id = 'debug-panel';
+            debugPanel.style.cssText = 'display: none; position: fixed; bottom: 20px; right: 20px; font-family: system-ui, -apple-system, sans-serif; padding: 20px; border-radius: 8px; z-index: 9999; max-width: 400px; background: var(--card-background); border-left: 5px solid var(--cert-primary); box-shadow: 0 2px 4px var(--shadow-color);';
+            debugPanel.innerHTML = `
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h2 style="margin: 0; font-size: 1.2em; color: var(--cert-primary);">System Details</h2>
+        <button onclick="closeDebugPanel()" style="background: none; border: none; color: var(--text-color); cursor: pointer; font-size: 18px; padding: 4px;">×</button>
+    </div>
+    <div id="debug-content" style="font-size: 0.9em; line-height: 1.5; color: var(--text-color); white-space: pre-wrap; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;"></div>
+`;
+            document.body.appendChild(debugPanel);
+
+            // Konami Code implementation
+            const KONAMI_CODE = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight'];
+            let currentSequence = [];
+
+            // Debug panel functions
+            window.closeDebugPanel = function () {
+                document.getElementById('debug-panel').style.display = 'none';
+            };
+
+            async function formatSystemInfo() {
+                // Get the current OS value from our select element
+                const currentOS = document.querySelector('.select-selected').textContent;
+
+                // Create each section as a div
+                const createSection = (title, items) => `
+        <div>
+            <div style="font-weight: 600; color: #ffb703; margin-bottom: 8px;">${title}</div>
+            <div style="display: grid; gap: 4px;">
+                ${items.map(item => `<div>${item}</div>`).join('')}
+            </div>
+        </div>
+    `;
+
+                // Device & OS Section
+                const deviceSection = createSection('Device & OS', [
+                    `Operating System: ${currentOS}`,
+                    `User Agent: ${navigator.userAgent}`
+                ]);
+
+                // Display Section
+                const displaySection = createSection('Display', [
+                    `Screen Resolution: ${window.screen.width}x${window.screen.height}`,
+                    `Window Size: ${window.innerWidth}x${window.innerHeight}`,
+                    `Pixel Ratio: ${window.devicePixelRatio}`,
+                    `Color Depth: ${window.screen.colorDepth}-bit`
+                ]);
+
+                // Hardware Section
+                const hardwareItems = [];
+                if (navigator.hardwareConcurrency) {
+                    hardwareItems.push(`CPU Cores: ${navigator.hardwareConcurrency}`);
+                }
+                if (navigator.deviceMemory) {
+                    hardwareItems.push(`System Memory: ${navigator.deviceMemory}GB`);
+                }
+                hardwareItems.push(`Touch Points: ${navigator.maxTouchPoints}`);
+
+                // Add GPU info
+                try {
+                    const canvas = document.createElement('canvas');
+                    const gl = canvas.getContext('webgl2');
+                    if (gl) {
+                        const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+                        if (debugInfo) {
+                            hardwareItems.push(`GPU: ${gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL)}`);
+                            hardwareItems.push(`GPU Vendor: ${gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL)}`);
+                        }
+                    }
+                } catch (e) {
+                    hardwareItems.push('GPU: Unable to detect');
+                }
+
+                const hardwareSection = createSection('Hardware', hardwareItems);
+
+                // System Settings Section
+                const settingsItems = [];
+
+                // Network Information
+                if ('connection' in navigator && navigator.connection) {
+                    const conn = navigator.connection;
+                    const networkInfo = [];
+
+                    // Add connection type if available
+                    if (conn.type && conn.type !== 'unknown') {
+                        networkInfo.push(conn.type);
+                    }
+
+                    // Add bandwidth and latency if available
+                    if (conn.downlink) {
+                        networkInfo.push(`${conn.downlink} Mb/s`);
+                    }
+                    if (conn.rtt) {
+                        networkInfo.push(`${conn.rtt}ms latency`);
+                    }
+
+                    if (networkInfo.length > 0) {
+                        settingsItems.push(`Network: ${networkInfo.join(', ')}`);
+                    } else {
+                        settingsItems.push(`Network: ${navigator.onLine ? 'Connected' : 'Offline'}`);
+                    }
+                } else {
+                    settingsItems.push(`Network: ${navigator.onLine ? 'Connected' : 'Offline'}`);
+                }
+
+                // Add remaining system settings
+                settingsItems.push(`Language: ${navigator.language}`);
+                settingsItems.push(`Cookies: ${navigator.cookieEnabled ? 'Enabled' : 'Disabled'}`);
+
+                const settingsSection = createSection('System Settings', settingsItems);
+
+                return deviceSection + displaySection + hardwareSection + settingsSection;
+            }
+
+            async function getConnectionInfo() {
+                if ('connection' in navigator) {
+                    const conn = navigator.connection;
+                    return {
+                        type: conn.type, // ethernet, wifi, cellular, etc.
+                        effectiveType: conn.effectiveType, // 4g, 3g, etc.
+                        downlink: conn.downlink, // Mb/s
+                        rtt: conn.rtt // Round trip time in ms
+                    };
+                }
+                // Fallback to basic online/offline
+                return {
+                    type: navigator.onLine ? 'connected' : 'offline'
+                };
+            }
+
+            async function showDebugPanel() {
+                const panel = document.getElementById('debug-panel');
+                const content = document.getElementById('debug-content');
+
+                content.innerHTML = await formatSystemInfo();
+
+                panel.style.display = 'block';
+                panel.style.opacity = '0';
+                setTimeout(() => {
+                    panel.style.transition = 'opacity 0.3s ease-in-out';
+                    panel.style.opacity = '1';
+                }, 10);
+            }
+
+            // Listen for Konami code
+            document.addEventListener('keydown', (e) => {
+                currentSequence.push(e.key);
+                if (currentSequence.length > KONAMI_CODE.length) {
+                    currentSequence.shift();
+                }
+                if (currentSequence.join(',') === KONAMI_CODE.join(',')) {
+                    showDebugPanel();
+                    currentSequence = [];
+                }
+            });
+
+            // Original website functionality
             const customSelect = document.getElementById('os-custom-select');
             const selectSelected = customSelect.querySelector('.select-selected');
             const selectItems = customSelect.querySelector('.select-items');
@@ -1260,29 +1429,18 @@
                 let isUnsupported = false;
 
                 // Improved iOS detection first
-                // Check for iOS devices using multiple indicators
                 const isIOS = /iphone|ipad|ipod/.test(userAgent) ||
                     (platform === 'iphone') ||
                     (platform === 'ipad') ||
                     (platform === 'ipod') ||
                     (navigator.maxTouchPoints > 0 &&
                         /mac/.test(platform) &&
-                        /apple/.test(vendor));
-
-                // Debug logging for iOS detection
-                console.log('iOS Detection:', {
-                    userAgent,
-                    platform,
-                    maxTouchPoints: navigator.maxTouchPoints,
-                    vendor: navigator.vendor,
-                    isIOS
-                });
+                        /apple/.test(navigator.vendor));
 
                 if (isIOS) {
                     osValue = "ios";
                     displayText = "iPadOS";
                 }
-                // Then check for Windows
                 else if (userAgent.includes("win")) {
                     if (userAgent.includes("arm64") || userAgent.includes("aarch64")) {
                         osValue = "windows-arm";
@@ -1292,28 +1450,20 @@
                         displayText = "Windows (x64)";
                     }
                 }
-                // Then check for Mac
                 else if (userAgent.includes("mac")) {
-                    // Improved Mac detection function
                     async function isMacAppleSilicon() {
-                        // Check if running on macOS
                         if (!platform.includes('mac')) {
                             return false;
                         }
 
-                        // First try using newer navigator.deviceMemory API
                         if ('deviceMemory' in navigator) {
-                            // Apple Silicon Macs typically report higher memory
                             return navigator.deviceMemory >= 8;
                         }
 
-                        // Try using performance API to detect characteristics typical of Apple Silicon
                         if (typeof performance !== 'undefined' && performance.memory) {
-                            // Apple Silicon Macs typically show different memory limits
                             return performance.memory.jsHeapSizeLimit > 4000000000;
                         }
 
-                        // Use timing-based detection as fallback
                         const start = performance.now();
                         let result = 0;
                         for (let i = 0; i < 1000000; i++) {
@@ -1334,7 +1484,6 @@
                         displayText = "macOS (Intel)";
                     }
                 }
-                // Handle other unsupported systems
                 else if (userAgent.includes("android")) {
                     osValue = "android";
                     displayText = "Android";
@@ -1375,17 +1524,6 @@
 
                 // Update the visible sections
                 updateDisplay(osValue);
-
-                // Enhanced debug logging
-                console.log('System Detection Results:', {
-                    userAgent,
-                    platform,
-                    osValue,
-                    displayText,
-                    isUnsupported,
-                    maxTouchPoints: navigator.maxTouchPoints,
-                    vendor: navigator.vendor
-                });
             }
 
             function updateDisplay(osValue) {
@@ -1447,30 +1585,13 @@
                 const userAgent = navigator.userAgent.toLowerCase();
                 const platform = navigator.platform;
 
-                // Debug logging
-                console.log('Device Detection:', {
-                    userAgent,
-                    platform,
-                    width: window.innerWidth,
-                    height: window.innerHeight,
-                    pixelRatio: window.devicePixelRatio,
-                    maxTouchPoints: navigator.maxTouchPoints,
-                    orientation: window.orientation,
-                    standalone: window.navigator.standalone,
-                    aspectRatio: window.innerWidth / window.innerHeight
-                });
-
-                // Check for iOS devices
                 const isIOS = /iphone|ipod|ipad/.test(userAgent) ||
                     (platform === 'MacIntel' && navigator.maxTouchPoints > 0);
 
-                // Check for Android devices
                 const isAndroid = /android/.test(userAgent);
 
-                // If neither iOS nor Android, allow access
                 if (!isIOS && !isAndroid) return false;
 
-                // Improved iPad detection
                 const isIPad =
                     /ipad/.test(userAgent) ||
                     /iPad|Macintosh/.test(navigator.platform) ||
@@ -1478,30 +1599,23 @@
                     /iPad/.test(navigator.platform) ||
                     (navigator.maxTouchPoints > 0 && /Mac/.test(platform) && !/iPhone/.test(userAgent));
 
-                // Device dimensions
                 const screenWidth = window.innerWidth;
                 const screenHeight = window.innerHeight;
                 const smallerDimension = Math.min(screenWidth, screenHeight);
                 const largerDimension = Math.max(screenWidth, screenHeight);
 
-                // New size detection logic
                 const isPhoneSize = (
-                    // Either dimension smaller than minimum tablet width
                     smallerDimension < 600 ||
-                    // Or larger dimension smaller than minimum tablet height
                     largerDimension < 900 ||
-                    // Or has phone-like aspect ratio (typically between 0.4 and 0.6)
                     (largerDimension / smallerDimension > 1.7 && smallerDimension < 800)
                 );
 
-                // Additional check for tablets based on aspect ratio and minimum size
                 const isTabletSize = (
                     largerDimension >= 900 &&
                     smallerDimension >= 600 &&
                     (largerDimension / smallerDimension <= 1.7 || smallerDimension >= 750)
                 );
 
-                // Allow access only if it's an iPad or a tablet-sized Android device
                 return (isIOS && !isIPad) || (isAndroid && !isTabletSize);
             }
 
@@ -1520,7 +1634,6 @@
                 const downloadButtons = document.querySelectorAll('.download-button');
 
                 if (isPhone) {
-                    // Show modal
                     modal.classList.remove('hidden');
                     document.body.style.overflow = 'hidden';
                     document.body.style.position = 'fixed';
@@ -1528,12 +1641,10 @@
                     document.body.style.height = '100%';
                     document.body.style.touchAction = 'none';
 
-                    // Hide all download buttons
                     downloadButtons.forEach(button => {
                         button.style.display = 'none';
                     });
 
-                    // Set up mutation observer to ensure buttons stay hidden
                     const buttonObserver = new MutationObserver((mutations) => {
                         mutations.forEach((mutation) => {
                             if (mutation.type === 'attributes' &&
@@ -1547,7 +1658,6 @@
                         });
                     });
 
-                    // Observe all download buttons
                     downloadButtons.forEach(button => {
                         buttonObserver.observe(button, {
                             attributes: true,
@@ -1555,12 +1665,11 @@
                         });
                     });
 
-                    // Also observe the container for any new buttons that might be added
                     const container = document.querySelector('.container');
                     const containerObserver = new MutationObserver((mutations) => {
                         mutations.forEach((mutation) => {
                             mutation.addedNodes.forEach((node) => {
-                                if (node.nodeType === 1) { // Check if it's an element node
+                                if (node.nodeType === 1) {
                                     const newButtons = node.querySelectorAll('.download-button');
                                     newButtons.forEach(button => {
                                         button.style.display = 'none';
@@ -1580,7 +1689,6 @@
                     });
 
                 } else {
-                    // Reset everything if not a phone
                     modal.classList.add('hidden');
                     document.body.style.overflow = '';
                     document.body.style.position = '';
@@ -1588,14 +1696,13 @@
                     document.body.style.height = '';
                     document.body.style.touchAction = '';
 
-                    // Show download buttons
                     downloadButtons.forEach(button => {
                         button.style.display = 'inline-block';
                     });
                 }
             }
 
-            document.addEventListener('DOMContentLoaded', checkAndBlockDevice);
+            // Event listeners for phone detection
             window.addEventListener('resize', checkAndBlockDevice);
             window.addEventListener('orientationchange', () => setTimeout(checkAndBlockDevice, 100));
             document.addEventListener('visibilitychange', checkAndBlockDevice);
@@ -1633,7 +1740,7 @@
                 });
             });
 
-            // OS Version Auto-updating
+            // OS Version calculations
             function calculateOSVersions() {
                 const baseVersions = {
                     macOS: 14,
@@ -1644,7 +1751,6 @@
                 const sept2025 = new Date('2025-09-01');
                 const currentDate = new Date();
 
-                // Calculate years since 2024 (base year)
                 const yearsSince2024 = Math.floor((currentDate - new Date('2024-09-01')) / (365.25 * 24 * 60 * 60 * 1000));
 
                 return {
@@ -1657,17 +1763,17 @@
             function updateOSVersions() {
                 const versions = calculateOSVersions();
 
-                // Update version numbers in the FAQ
                 document.getElementById('windows-version').textContent = versions.windows;
                 document.getElementById('macos-version').textContent = versions.macOS;
                 document.getElementById('ipados-version').textContent = versions.iPadOS;
             }
 
-            // Run all initializations when page loads
+            // Run all initializations
             detectSystem();
             checkAndBlockDevice();
             updateOSVersions();
         });
+
     </script>
 </body>
 
