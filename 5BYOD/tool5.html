@@ -1239,6 +1239,15 @@
 `;
             document.body.appendChild(debugPanel);
 
+            function handleHash() {
+                if (window.location.hash === '#debuginfo') {
+                    showDebugPanel();
+                }
+            }
+
+            window.addEventListener('hashchange', handleHash);
+
+
             // Konami Code implementation
             const KONAMI_CODE = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight'];
             let currentSequence = [];
@@ -1798,6 +1807,7 @@
             detectSystem();
             checkAndBlockDevice();
             updateOSVersions();
+            handleHash();
         });
 
     </script>
