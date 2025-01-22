@@ -1333,7 +1333,26 @@
                     settingsItems.push(`Network: ${navigator.onLine ? 'Connected' : 'Offline'}`);
                 }
 
-                // Add remaining system settings
+                // Battery Information
+                try {
+                    if ('getBattery' in navigator) {
+                        const battery = await navigator.getBattery();
+                        const level = Math.round(battery.level * 100);
+                        const status = battery.charging ? 'charging' : 'not charging';
+
+                        let batteryInfo = `Battery: ${level}%`;
+                        if (!battery.charging && battery.dischargingTime !== Infinity) {
+                            const minutesLeft = Math.round(battery.dischargingTime / 60);
+                            batteryInfo += ` (${minutesLeft} mins remaining)`;
+                        }
+                        batteryInfo += `, ${status}`;
+
+                        settingsItems.push(batteryInfo);
+                    }
+                } catch (e) {
+                    // Battery API not supported, skip battery info
+                }
+
                 settingsItems.push(`Language: ${navigator.language}`);
                 settingsItems.push(`Cookies: ${navigator.cookieEnabled ? 'Enabled' : 'Disabled'}`);
 
