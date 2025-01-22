@@ -643,8 +643,9 @@
 </head>
 
 <body>
+    <!-- Enhanced noscript message with accessibility -->
     <noscript>
-        <div style="
+        <div role="alert" aria-label="JavaScript requirement notice" style="
           position: fixed;
           top: 0;
           left: 0;
@@ -666,44 +667,37 @@
             text-align: center;
             font-family: system-ui, -apple-system, sans-serif;
           ">
-                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
-                    stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                    style="margin: 0 auto 1rem auto;">
+                <svg role="img" aria-label="Warning icon" xmlns="http://www.w3.org/2000/svg" width="48" height="48"
+                    viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round" style="margin: 0 auto 1rem auto;">
                     <circle cx="12" cy="12" r="10" />
                     <line x1="12" y1="8" x2="12" y2="12" />
                     <line x1="12" y1="16" x2="12.01" y2="16" />
                 </svg>
-                <h2 style="
-              color: #111827;
-              font-size: 1.5rem;
-              margin-bottom: 1rem;
-            ">JavaScript Required</h2>
-                <p style="
-              color: #4b5563;
-              line-height: 1.5;
-              margin-bottom: 1rem;
-            ">This application requires JavaScript to function. Please enable JavaScript in your browser settings to
+                <h2 id="noscript-title">JavaScript Required</h2>
+                <p id="noscript-message">This application requires JavaScript to function. Please enable JavaScript in
+                    your browser settings to
                     continue.</p>
-                <p style="
-              color: #6b7280;
-              font-size: 0.875rem;
-            ">If you need assistance, please contact your on-site IT support team.</p>
+                <p id="noscript-support">If you need assistance, please contact your on-site IT support team.</p>
             </div>
         </div>
     </noscript>
 
-    <div id="phone-block-modal" class="hidden">
+    <!-- Enhanced phone blocking modal with accessibility -->
+    <div id="phone-block-modal" class="hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title"
+        aria-describedby="modal-description">
         <div class="modal-content">
-            <div class="modal-icon">
+            <div class="modal-icon" aria-hidden="true">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img"
+                    aria-label="Warning icon">
                     <circle cx="12" cy="12" r="10"></circle>
                     <line x1="12" y1="8" x2="12" y2="12"></line>
                     <line x1="12" y1="16" x2="12.01" y2="16"></line>
                 </svg>
             </div>
-            <h2>Mobile Phone Access Not Allowed</h2>
-            <div class="modal-message">
+            <h2 id="modal-title">Mobile Phone Access Not Allowed</h2>
+            <div id="modal-description" class="modal-message">
                 <span class="primary-message">Please use a computer or iPad to access the software installation
                     guide.</span>
                 <span class="policy-message">Mobile phones are not supported or allowed during the school day under the
@@ -712,83 +706,85 @@
         </div>
     </div>
 
-    <div class="container">
-        <div class="site-header">
-            <img src="logo.png" alt="School Logo" class="school-logo" onerror="this.classList.add('hidden')">
+    <!-- Main content container with accessibility -->
+    <main class="container" role="main">
+        <header class="site-header" role="banner">
+            <img src="logo.png" alt="School Logo" class="school-logo" onerror="this.classList.add('hidden')"
+                aria-label="School Logo">
             <h1 class="site-title">
-                Student <span class="tooltip">BYOD</span> Guide
+                Student <span class="tooltip" aria-label="BYOD - Bring Your Own Device">BYOD</span> Guide
             </h1>
-        </div>
-        <div id="os-detected" class="system-info">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <!-- Screen bezel -->
+        </header>
+
+        <!-- System detection banner with accessibility -->
+        <div id="os-detected" class="system-info" role="status" aria-live="polite">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" role="img" aria-label="Computer icon"
+                fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="2" y="3" width="20" height="12" rx="1" />
-                <!-- Screen inner -->
                 <rect x="3" y="4" width="18" height="10" />
-                <!-- Base/keyboard section -->
                 <path d="M2 15h20v2a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-2z" />
-                <!-- Trackpad -->
                 <rect x="8" y="16" width="8" height="1" />
-                <!-- Keyboard hint lines -->
                 <line x1="4" y1="16" x2="6" y2="16" />
                 <line x1="18" y1="16" x2="20" y2="16" />
             </svg>
             <div class="system-info-text">
                 <span id="os-status">Looks like you're currently using</span>
-                <div class="custom-select" id="os-custom-select">
-                    <div class="select-selected" id="selected-os">Windows (x64)</div>
-                    <div class="select-items">
-                        <div class="optgroup-label">Windows</div>
-                        <div class="option-item" data-value="windows-x64">Windows (x64)</div>
-                        <div class="option-item" data-value="windows-arm">Windows (ARM64)</div>
-                        <div class="optgroup-label">macOS</div>
-                        <div class="option-item" data-value="mac-intel">macOS (Intel)</div>
-                        <div class="option-item" data-value="mac-arm">macOS (Apple Silicon)</div>
-                        <div class="optgroup-label">Mobile</div>
-                        <div class="option-item" data-value="ios">iPadOS</div>
-                        <div class="optgroup-label">Other</div>
-                        <div class="option-item" data-value="android">Android</div>
-                        <div class="option-item" data-value="chrome">ChromeOS</div>
-                        <div class="option-item" data-value="linux">Linux</div>
-                        <div class="option-item" data-value="other">Other OS</div>
+                <div class="custom-select" id="os-custom-select" role="combobox" aria-expanded="false"
+                    aria-haspopup="listbox" aria-controls="os-select-options">
+                    <div class="select-selected" id="selected-os" tabindex="0" role="button"
+                        aria-label="Currently selected operating system">Windows (x64)</div>
+                    <div id="os-select-options" class="select-items" role="listbox"
+                        aria-label="Operating system options">
+                        <div class="optgroup-label" role="group" aria-label="Windows options">Windows</div>
+                        <div class="option-item" role="option" data-value="windows-x64" aria-selected="true">Windows
+                            (x64)</div>
+                        <div class="option-item" role="option" data-value="windows-arm">Windows (ARM64)</div>
+                        <div class="optgroup-label" role="group" aria-label="macOS options">macOS</div>
+                        <div class="option-item" role="option" data-value="mac-intel">macOS (Intel)</div>
+                        <div class="option-item" role="option" data-value="mac-arm">macOS (Apple Silicon)</div>
+                        <div class="optgroup-label" role="group" aria-label="Mobile options">Mobile</div>
+                        <div class="option-item" role="option" data-value="ios">iPadOS</div>
+                        <div class="optgroup-label" role="group" aria-label="Other options">Other</div>
+                        <div class="option-item" role="option" data-value="android">Android</div>
+                        <div class="option-item" role="option" data-value="chrome">ChromeOS</div>
+                        <div class="option-item" role="option" data-value="linux">Linux</div>
+                        <div class="option-item" role="option" data-value="other">Other OS</div>
                     </div>
                 </div>
-                <div class="detection-note">Note: We try our best to detect what computer you're using, if we've made a
-                    mistake you can select the correct device above.</div>
+                <div class="detection-note" role="note">Note: We try our best to detect what computer you're using, if
+                    we've made a mistake you can select the correct device above.</div>
             </div>
         </div>
 
-        <!-- Unsupported OS message section -->
-        <div id="unsupported-notice" class="software-section"
-            style="display: none; background-color: #fee2e2; border-left-color: #dc2626;">
-            <div class="section-icon">
+        <!-- Unsupported OS notice with accessibility -->
+        <div id="unsupported-notice" class="software-section" role="alert"
+            aria-label="Unsupported operating system warning" style="display: none;">
+            <div class="section-icon" aria-hidden="true">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #dc2626">
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <line x1="12" y1="8" x2="12" y2="12"></line>
                     <line x1="12" y1="16" x2="12.01" y2="16"></line>
                 </svg>
             </div>
             <div class="section-content">
-                <h2 style="color: #dc2626">Unsupported Operating System</h2>
+                <h2>Unsupported Operating System</h2>
                 <p>It looks like you're using an unsupported operating system. We can't guarantee if this device will
-                    function correctly on the school network.</br></br>Please use one of the following supported
-                    systems:</p>
-                <ul style="margin-top: 10px;">
-                    <li>Windows (x64 or ARM64)</li>
-                    <li>macOS (Intel or Apple Silicon)</li>
-                    <li>iPadOS</li>
+                    function correctly on the school network.</p>
+                <p>Please use one of the following supported systems:</p>
+                <ul role="list">
+                    <li role="listitem">Windows (x64 or ARM64)</li>
+                    <li role="listitem">macOS (Intel or Apple Silicon)</li>
+                    <li role="listitem">iPadOS</li>
                 </ul>
             </div>
         </div>
 
-        <!-- Internet Certificate Section -->
-        <div class="software-section cert-section">
-            <div class="section-icon">
+        <!-- Internet Certificate Section with accessibility -->
+        <section class="software-section cert-section" role="region" aria-labelledby="cert-section-title">
+            <div class="section-icon" aria-hidden="true">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-12 h-12"
-                    style="color: var(--cert-primary)">
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                 </svg>
             </div>
@@ -796,24 +792,27 @@
                 <!-- Windows Instructions -->
                 <div class="os-specific windows">
                     <div class="section-header">
-                        <h2>Internet Certificate</h2>
-                        <span class="os-badge">Windows</span>
+                        <h2 id="cert-section-title">Internet Certificate</h2>
+                        <span class="os-badge" role="status">Windows</span>
                     </div>
-                    <div class="instructions">
+                    <div class="instructions" role="list" aria-label="Certificate installation instructions">
                         <ol>
-                            <li>Download the certificate file</li>
-                            <li>Double-click the downloaded certificate file</li>
-                            <li>Click "Install Certificate"</li>
-                            <li>Select "Local Machine" and click "Next"</li>
-                            <li>Select "Place all certificates in the following store" and click "Browse"</li>
-                            <li>Select "Trusted Root Certification Authorities" and click "OK"</li>
-                            <li>Click "Next" and then "Finish"</li>
+                            <li role="listitem">Download the certificate file</li>
+                            <li role="listitem">Double-click the downloaded certificate file</li>
+                            <li role="listitem">Click "Install Certificate"</li>
+                            <li role="listitem">Select "Local Machine" and click "Next"</li>
+                            <li role="listitem">Select "Place all certificates in the following store" and click
+                                "Browse"</li>
+                            <li role="listitem">Select "Trusted Root Certification Authorities" and click "OK"</li>
+                            <li role="listitem">Click "Next" and then "Finish"</li>
                         </ol>
                         <div class="arch-specific windows-x64">
-                            <a href="#" class="download-button">Download Certificate (x64)</a>
+                            <a href="#" class="download-button" role="button"
+                                aria-label="Download Certificate for Windows x64">Download Certificate (x64)</a>
                         </div>
                         <div class="arch-specific windows-arm">
-                            <a href="#" class="download-button">Download Certificate (ARM64)</a>
+                            <a href="#" class="download-button" role="button"
+                                aria-label="Download Certificate for Windows ARM64">Download Certificate (ARM64)</a>
                         </div>
                     </div>
                 </div>
@@ -822,23 +821,27 @@
                 <div class="os-specific macos">
                     <div class="section-header">
                         <h2>Internet Certificate</h2>
-                        <span class="os-badge">macOS</span>
+                        <span class="os-badge" role="status">macOS</span>
                     </div>
-                    <div class="instructions">
+                    <div class="instructions" role="list" aria-label="Certificate installation instructions for macOS">
                         <ol>
-                            <li>Download the certificate file</li>
-                            <li>Double-click the downloaded certificate file</li>
-                            <li>Select "System" in the Keychain dropdown</li>
-                            <li>Click "Add"</li>
-                            <li>Enter your administrator password</li>
-                            <li>Double-click the certificate in Keychain Access</li>
-                            <li>Expand the "Trust" section and set "When using this certificate" to "Always Trust"</li>
+                            <li role="listitem">Download the certificate file</li>
+                            <li role="listitem">Double-click the downloaded certificate file</li>
+                            <li role="listitem">Select "System" in the Keychain dropdown</li>
+                            <li role="listitem">Click "Add"</li>
+                            <li role="listitem">Enter your administrator password</li>
+                            <li role="listitem">Double-click the certificate in Keychain Access</li>
+                            <li role="listitem">Expand the "Trust" section and set "When using this certificate" to
+                                "Always Trust"</li>
                         </ol>
                         <div class="arch-specific mac-intel">
-                            <a href="#" class="download-button">Download Certificate (Intel)</a>
+                            <a href="#" class="download-button" role="button"
+                                aria-label="Download Certificate for Intel Mac">Download Certificate (Intel)</a>
                         </div>
                         <div class="arch-specific mac-arm">
-                            <a href="#" class="download-button">Download Certificate (Apple Silicon)</a>
+                            <a href="#" class="download-button" role="button"
+                                aria-label="Download Certificate for Apple Silicon Mac">
+                                Download Certificate (Apple Silicon)</a>
                         </div>
                     </div>
                 </div>
@@ -847,29 +850,28 @@
                 <div class="os-specific ios">
                     <div class="section-header">
                         <h2>Internet Certificate</h2>
-                        <span class="os-badge">iPadOS</span>
+                        <span class="os-badge" role="status">iPadOS</span>
                     </div>
-                    <div class="instructions">
+                    <div class="instructions" role="list" aria-label="Certificate installation instructions for iPadOS">
                         <ol>
-                            <li>Download the configuration profile</li>
-                            <li>Go to Settings</li>
-                            <li>Tap on "Profile Downloaded"</li>
-                            <li>Tap "Install" in the top right corner</li>
-                            <li>Enter your device passcode</li>
-                            <li>Tap "Install" again to confirm</li>
+                            <li role="listitem">Download the configuration profile</li>
+                            <li role="listitem">Go to Settings</li>
+                            <li role="listitem">Tap on "Profile Downloaded"</li>
+                            <li role="listitem">Tap "Install" in the top right corner</li>
+                            <li role="listitem">Enter your device passcode</li>
+                            <li role="listitem">Tap "Install" again to confirm</li>
                         </ol>
-                        <a href="#" class="download-button">Download Certificate for iPadOS</a>
+                        <a href="#" class="download-button" role="button"
+                            aria-label="Download Certificate for iPadOS">Download Certificate for iPadOS</a>
                     </div>
                 </div>
             </div>
-        </div>
-
-        <!-- PaperCut Client Section -->
-        <div class="software-section papercut-section">
-            <div class="section-icon">
+        </section>
+        <!-- PaperCut Client Section with accessibility -->
+        <section class="software-section papercut-section" role="region" aria-labelledby="papercut-section-title">
+            <div class="section-icon" aria-hidden="true">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-12 h-12"
-                    style="color: var(--papercut-primary)">
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
                     <circle cx="9" cy="7" r="4" />
                     <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
@@ -880,22 +882,24 @@
                 <!-- Windows Instructions -->
                 <div class="os-specific windows">
                     <div class="section-header">
-                        <h2>PaperCut Client</h2>
-                        <span class="os-badge">Windows</span>
+                        <h2 id="papercut-section-title">PaperCut Client</h2>
+                        <span class="os-badge" role="status">Windows</span>
                     </div>
-                    <div class="instructions">
+                    <div class="instructions" role="list" aria-label="PaperCut installation instructions for Windows">
                         <ol>
-                            <li>Download the PaperCut Client installer for your architecture</li>
-                            <li>Run the installer as administrator</li>
-                            <li>Follow the installation wizard</li>
-                            <li>Click "Finish" to complete installation</li>
+                            <li role="listitem">Download the PaperCut Client installer for your architecture</li>
+                            <li role="listitem">Run the installer as administrator</li>
+                            <li role="listitem">Follow the installation wizard</li>
+                            <li role="listitem">Click "Finish" to complete installation</li>
                         </ol>
                         <div class="arch-specific windows-x64">
-                            <a href="#" class="download-button">Download PaperCut (x64)</a>
+                            <a href="#" class="download-button" role="button"
+                                aria-label="Download PaperCut for Windows x64">Download PaperCut (x64)</a>
                         </div>
                         <div class="arch-specific windows-arm">
-                            <a href="#" class="download-button">Download PaperCut (ARM64)</a>
-                            <p class="note">Note: ARM64 version runs through Windows' x86 emulation</p>
+                            <a href="#" class="download-button" role="button"
+                                aria-label="Download PaperCut for Windows ARM64">Download PaperCut (ARM64)</a>
+                            <p class="note" role="note">Note: ARM64 version runs through Windows' x86 emulation</p>
                         </div>
                     </div>
                 </div>
@@ -904,9 +908,9 @@
                 <div class="os-specific ios">
                     <div class="section-header">
                         <h2>PaperCut Client</h2>
-                        <span class="os-badge">iPadOS</span>
+                        <span class="os-badge" role="status">iPadOS</span>
                     </div>
-                    <div class="instructions">
+                    <div class="instructions" aria-label="PaperCut printing information for iPadOS">
                         <p>iPadOS & iOS are able to print without the papercut client.<br>Simply print like normal and
                             select the Virtual Queue.</p>
                     </div>
@@ -916,32 +920,34 @@
                 <div class="os-specific macos">
                     <div class="section-header">
                         <h2>PaperCut Client</h2>
-                        <span class="os-badge">macOS</span>
+                        <span class="os-badge" role="status">macOS</span>
                     </div>
-                    <div class="instructions">
+                    <div class="instructions" role="list" aria-label="PaperCut installation instructions for macOS">
                         <ol>
-                            <li>Download the PaperCut Client DMG file</li>
-                            <li>Open the DMG file</li>
-                            <li>Drag PaperCut Client to Applications folder</li>
-                            <li>Launch PaperCut Client from Applications</li>
+                            <li role="listitem">Download the PaperCut Client DMG file</li>
+                            <li role="listitem">Open the DMG file</li>
+                            <li role="listitem">Drag PaperCut Client to Applications folder</li>
+                            <li role="listitem">Launch PaperCut Client from Applications</li>
                         </ol>
                         <div class="arch-specific mac-intel">
-                            <a href="#" class="download-button">Download PaperCut (Intel)</a>
+                            <a href="#" class="download-button" role="button"
+                                aria-label="Download PaperCut for Intel Mac">Download PaperCut (Intel)</a>
                         </div>
                         <div class="arch-specific mac-arm">
-                            <a href="#" class="download-button">Download PaperCut (Apple Silicon)</a>
+                            <a href="#" class="download-button" role="button"
+                                aria-label="Download PaperCut for Apple Silicon Mac">Download PaperCut (Apple
+                                Silicon)</a>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <!-- Microsoft Office Section -->
-        <div class="software-section office-section">
-            <div class="section-icon">
+        <!-- Microsoft Office Section with accessibility -->
+        <section class="software-section office-section" role="region" aria-labelledby="office-section-title">
+            <div class="section-icon" aria-hidden="true">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-12 h-12"
-                    style="color: var(--office-primary)">
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
                     <polyline points="22,6 12,13 2,6" />
                 </svg>
@@ -950,23 +956,26 @@
                 <!-- Windows Instructions -->
                 <div class="os-specific windows">
                     <div class="section-header">
-                        <h2>Microsoft Office</h2>
-                        <span class="os-badge">Windows</span>
+                        <h2 id="office-section-title">Microsoft Office</h2>
+                        <span class="os-badge" role="status">Windows</span>
                     </div>
-                    <div class="instructions">
+                    <div class="instructions" role="list"
+                        aria-label="Microsoft Office installation instructions for Windows">
                         <ol>
-                            <li>Sign in to Office 365 portal</li>
-                            <li>Click "Install Office"</li>
-                            <li>Run the downloaded installer</li>
-                            <li>Sign in with your organization account</li>
+                            <li role="listitem">Sign in to Office 365 portal</li>
+                            <li role="listitem">Click "Install Office"</li>
+                            <li role="listitem">Run the downloaded installer</li>
+                            <li role="listitem">Sign in with your organization account</li>
                         </ol>
                         <div class="arch-specific windows-x64">
-                            <a href="https://www.office.com/" class="download-button">Go to Office 365 Portal (x64)</a>
+                            <a href="https://www.office.com/" class="download-button" role="button"
+                                aria-label="Go to Office 365 Portal for Windows x64">Go to Office 365 Portal (x64)</a>
                         </div>
                         <div class="arch-specific windows-arm">
-                            <a href="https://www.office.com/" class="download-button">Go to Office 365 Portal
+                            <a href="https://www.office.com/" class="download-button" role="button"
+                                aria-label="Go to Office 365 Portal for Windows ARM64">Go to Office 365 Portal
                                 (ARM64)</a>
-                            <p class="note">Note: Make sure to select ARM64 version during installation</p>
+                            <p class="note" role="note">Note: Make sure to select ARM64 version during installation</p>
                         </div>
                     </div>
                 </div>
@@ -975,24 +984,27 @@
                 <div class="os-specific macos">
                     <div class="section-header">
                         <h2>Microsoft Office</h2>
-                        <span class="os-badge">macOS</span>
+                        <span class="os-badge" role="status">macOS</span>
                     </div>
-                    <div class="instructions">
+                    <div class="instructions" role="list"
+                        aria-label="Microsoft Office installation instructions for macOS">
                         <ol>
-                            <li>Sign in to Office 365 portal</li>
-                            <li>Click "Install Office"</li>
-                            <li>Open the downloaded package</li>
-                            <li>Follow the installation wizard</li>
-                            <li>Sign in with your organization account</li>
+                            <li role="listitem">Sign in to Office 365 portal</li>
+                            <li role="listitem">Click "Install Office"</li>
+                            <li role="listitem">Open the downloaded package</li>
+                            <li role="listitem">Follow the installation wizard</li>
+                            <li role="listitem">Sign in with your organization account</li>
                         </ol>
                         <div class="arch-specific mac-intel">
-                            <a href="https://www.office.com/" class="download-button">Go to Office 365 Portal
-                                (Intel)</a>
+                            <a href="https://www.office.com/" class="download-button" role="button"
+                                aria-label="Go to Office 365 Portal for Intel Mac">Go to Office 365 Portal (Intel)</a>
                         </div>
                         <div class="arch-specific mac-arm">
-                            <a href="https://www.office.com/" class="download-button">Go to Office 365 Portal (Apple
-                                Silicon)</a>
-                            <p class="note">Note: Office automatically detects and installs the appropriate version</p>
+                            <a href="https://www.office.com/" class="download-button" role="button"
+                                aria-label="Go to Office 365 Portal for Apple Silicon Mac">Go to Office 365 Portal
+                                (Apple Silicon)</a>
+                            <p class="note" role="note">Note: Office automatically detects and installs the appropriate
+                                version</p>
                         </div>
                     </div>
                 </div>
@@ -1001,153 +1013,206 @@
                 <div class="os-specific ios">
                     <div class="section-header">
                         <h2>Microsoft Office</h2>
-                        <span class="os-badge">iPadOS</span>
+                        <span class="os-badge" role="status">iPadOS</span>
                     </div>
-                    <div class="instructions">
+                    <div class="instructions" role="list"
+                        aria-label="Microsoft Office installation instructions for iPadOS">
                         <ol>
-                            <li>Open App Store</li>
-                            <li>Search for Microsoft Office apps</li>
-                            <li>Download required apps (Word, Excel, etc.)</li>
-                            <li>Open any Office app and sign in with your organization account</li>
+                            <li role="listitem">Open App Store</li>
+                            <li role="listitem">Search for Microsoft Office apps</li>
+                            <li role="listitem">Download required apps (Word, Excel, etc.)</li>
+                            <li role="listitem">Open any Office app and sign in with your organization account</li>
                         </ol>
-                        <a href="https://apps.apple.com/us/app/microsoft-office/id541164041"
-                            class="download-button">View in App Store</a>
+                        <a href="https://apps.apple.com/us/app/microsoft-office/id541164041" class="download-button"
+                            role="button" aria-label="View Microsoft Office in App Store">View in App Store</a>
                     </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Complete FAQ Section with all questions -->
+        <div class="faq-section faq-program" role="region" aria-labelledby="faq-program-header">
+            <h3 id="faq-program-header" class="faq-section-header">Program Information & School Support</h3>
+
+            <div class="faq-item" role="group">
+                <div class="faq-question" role="button" aria-expanded="true" aria-controls="faq-answer-1" tabindex="0">
+                    When it comes to the technical support side of BYOD, what is the school able to help with?
+                </div>
+                <div id="faq-answer-1" class="faq-answer expanded" role="region">
+                    The school's IT department is responsible for:
+                    <ol role="list">
+                        <li role="listitem">Helping you connect your (compatible) BYOD device to the school internet.
+                        </li>
+                        <li role="listitem">Providing instructions to get setup with the Department of Education
+                            provided copy of
+                            Microsoft Office (Word, PowerPoint, Excel) so you're ready to use the most common
+                            software at school.</li>
+                        <li role="listitem">Giving you the ability to print at school using the PaperCut software. Just
+                            remember you
+                            have a monetary limit each term, and reaching this limit means you can't print until the
+                            following term.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="faq-item" role="group">
+                <div class="faq-question collapsed" role="button" aria-expanded="false" aria-controls="faq-answer-2"
+                    tabindex="0">
+                    I've lost or accidentally deleted my work. Can you help?
+                </div>
+                <div id="faq-answer-2" class="faq-answer" role="region">
+                    Students are responsible for safely and securely saving their school work.
+                    The school IT Department isn't able to help you recover any lost work.<br><br>
+                    We recommend you save your work in the provided OneDrive storage solution, this way you can turn
+                    on autosave and access your work from another computer if you forget or damage your BYOD device.
+                </div>
+            </div>
+
+            <div class="faq-item" role="group">
+                <div class="faq-question collapsed" role="button" aria-expanded="false" aria-controls="faq-answer-3"
+                    tabindex="0">
+                    There is something wrong with my device and it isn't working correctly.
+                </div>
+                <div id="faq-answer-3" class="faq-answer" role="region">
+                    Like with physical issues the school's IT department isn't able to assist with any issues that may
+                    arise
+                    from non-school software such as antivirus or third party software.<br><br>
+                    If these issues are stopping you from completing school work we have a limited number of short-term
+                    loan
+                    laptops you can borrow for the day.
+                </div>
+            </div>
+
+            <div class="faq-item" role="group">
+                <div class="faq-question collapsed" role="button" aria-expanded="false" aria-controls="faq-answer-4"
+                    tabindex="0">
+                    My BYOD device was damaged. Can you fix it?
+                </div>
+                <div id="faq-answer-4" class="faq-answer" role="region">
+                    BYOD devices aren't covered under the school's insurance policy. As they're personal devices it's
+                    your
+                    responsibility for the maintenance and upkeep. We recommend you look at the manufacturers warranty
+                    options
+                    as well as home/personal insurance to cover the device.<br><br>
+                    If you suspect foul play in the damage of a device, the school's Student Services team will do their
+                    best
+                    to assist you.
+                </div>
+            </div>
+
+            <div class="faq-item" role="group">
+                <div class="faq-question collapsed" role="button" aria-expanded="false" aria-controls="faq-answer-5"
+                    tabindex="0">
+                    What happens to the free software the school provides when I leave?
+                </div>
+                <div id="faq-answer-5" class="faq-answer" role="region">
+                    Microsoft Office and any other software provided by the school is provided for free by the
+                    Department of
+                    Education under the condition you're a currently enrolled student.<br><br>
+                    If you move to a non-public school, interstate or finish your schooling the software license will be
+                    automatically revoked. You will have the option after this to uninstall the software or purchase a
+                    license directly from Microsoft to continue using the product.<br><br>
+                    <i>KEEP IN MIND: Any documents saved in OneDrive will be automatically deleted at the end of your
+                        schooling for security reasons. We recommend moving these files to an external USB or another
+                        place
+                        on the computer if you wish to maintain access to them.</i>
                 </div>
             </div>
         </div>
 
-        <!-- FAQ Section -->
-        <div class="faq">
-            <h2>Frequently Asked Questions</h2>
+        <!-- Technical Information Section -->
+        <div class="faq-section faq-technical" role="region" aria-labelledby="faq-technical-header">
+            <h3 id="faq-technical-header" class="faq-section-header">Technical Details & Requirements</h3>
 
-            <div class="faq-section faq-program">
-                <h3 class="faq-section-header">Program Information & School Support</h3>
-
-                <div class="faq-item">
-                    <div class="faq-question">When it comes to the technical support side of BYOD, what is the school
-                        able to help with?</div>
-                    <div class="faq-answer expanded">The school's IT department is responsible for:
-                        <ol>
-                            <li>Helping you connect your (compatible) BYOD device to the school internet.</li>
-                            <li>Providing instructions to get setup with the Department of Education provided copy of
-                                Microsoft Office (Word, PowerPoint, Excel) so you're ready to use the most common
-                                software at school.</li>
-                            <li>Giving you the ability to print at school using the PaperCut software. Just remember you
-                                have a monetary limit each term, and reaching this limit means you can't print until the
-                                following term.</li>
-                        </ol>
-                    </div>
+            <div class="faq-item" role="group">
+                <div class="faq-question" role="button" aria-expanded="true" aria-controls="faq-answer-tech-1"
+                    tabindex="0">
+                    What devices and operating systems are officially supported?
                 </div>
-
-                <div class="faq-item">
-                    <div class="faq-question collapsed">I've lost or accidentally deleted my work. Can you help?</div>
-                    <div class="faq-answer">Students are responsible for safely and securely saving their school work.
-                        The school IT Department isn't able to help you recover any lost work.<br><br>
-                        We recommend you save your work in the provided OneDrive storage solution, this way you can turn
-                        on autosave and access your work from another computer if you forget or damage your BYOD device.
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question collapsed">There is something wrong with my device and it isn't working
-                        correctly.</div>
-                    <div class="faq-answer">Like with physical issues the school's IT department isn't able to assist
-                        with any issues that may arise from non-school software such as antivirus or third party
-                        software.<br><br>
-                        If these issues are stopping you from completing school work we have a limited number of
-                        short-term loan laptops you can borrow for the day.</div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question collapsed">My BYOD device was damaged. Can you fix it?</div>
-                    <div class="faq-answer">BYOD devices aren't covered under the school's insurance policy. As they're
-                        personal devices it's your responsibility for the maintenance and upkeep. We recommend you look
-                        at the manufacturers warranty options as well as home/personal insurance to cover the
-                        device.<br><br>
-                        If you suspect foul play in the damage of a device, the school's Student Services team will do
-                        their best to assist you.</div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question collapsed">What happens to the free software the school provides when I
-                        leave?</div>
-                    <div class="faq-answer">Microsoft Office and any other software provided by the school is provided
-                        for free by the Department of Education under the condition you're a currently enrolled
-                        student.<br><br>
-                        If you move to a non-public school, interstate or finish your schooling the software license
-                        will be automatically revoked. You will have the option after this to uninstall the software or
-                        purchase a license directly from Microsoft to continue using the product.<br><br>
-                        <i>KEEP IN MIND: Any documents saved in OneDrive will be automatically deleted at the end of
-                            your schooling for security reasons. We recommend moving these files to an external USB or
-                            another place on the computer if you wish to maintain access to them.</i>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Technical Information Section -->
-            <div class="faq-section faq-technical">
-                <h3 class="faq-section-header">Technical Details & Requirements</h3>
-
-                <div class="faq-item">
-                    <div class="faq-question">What devices and operating systems are officially supported?
-                    </div>
-                    <div class="faq-answer expanded" id="supported-versions">We officially support:
-                        <ul>
-                            <li><strong>Windows <span id="windows-version">10</span></strong>: Microsoft's current
-                                operating system receiving regular updates.</li>
-                            <li><strong>macOS <span id="macos-version">14</span>+</strong>: Apple's oldest desktop class
-                                operating system currently supported.</li>
-                            <li><strong>iPadOS <span id="ipados-version">17</span>+</strong>: Apple's oldest supported
-                                mobile operating system.</li>
+                <div id="faq-answer-tech-1" class="faq-answer expanded" role="region">
+                    <div id="supported-versions">We officially support:
+                        <ul role="list">
+                            <li role="listitem"><strong>Windows <span id="windows-version">10</span></strong>:
+                                Microsoft's current operating system receiving regular updates.</li>
+                            <li role="listitem"><strong>macOS <span id="macos-version">14</span>+</strong>:
+                                Apple's oldest desktop class operating system currently supported.</li>
+                            <li role="listitem"><strong>iPadOS <span id="ipados-version">17</span>+</strong>:
+                                Apple's oldest supported mobile operating system.</li>
                         </ul>
                         These platforms are supported because they:
-                        <ul>
-                            <li>Have been confirmed to work within our schools Enterprise Network</li>
-                            <li>Are still receiving regular security updates</li>
-                            <li>Support stable, tested versions of all required software</li>
+                        <ul role="list">
+                            <li role="listitem">Have been confirmed to work within our schools Enterprise Network</li>
+                            <li role="listitem">Are still receiving regular security updates</li>
+                            <li role="listitem">Support stable, tested versions of all required software</li>
                         </ul>
                         Older versions of these operating systems are not supported as they no longer receive security
                         updates.
                         Other platforms (Android, ChromeOS, Linux) aren't officially supported as they are not
-                        compatible with our network infrastructure.
+                        compatible with
+                        our network infrastructure.
                     </div>
                 </div>
+            </div>
 
-                <div class="faq-item">
-                    <div class="faq-question collapsed">Why do I need to install the Internet Certificate?</div>
-                    <div class="faq-answer">The Internet Certificate ensures secure connection to organizational
-                        resources and internal websites. Without it, you may experience security warnings or connection
-                        issues.</div>
+            <div class="faq-item" role="group">
+                <div class="faq-question collapsed" role="button" aria-expanded="false"
+                    aria-controls="faq-answer-tech-2" tabindex="0">
+                    Why do I need to install the Internet Certificate?
                 </div>
-
-                <div class="faq-item">
-                    <div class="faq-question collapsed">Do I need to install PaperCut on my mobile device?</div>
-                    <div class="faq-answer">No, PaperCut Client is only required for desktop computers (Windows and
-                        macOS). Mobile printing is handled through different methods.</div>
+                <div id="faq-answer-tech-2" class="faq-answer" role="region">
+                    The Internet Certificate ensures secure connection to organizational resources and internal
+                    websites.
+                    Without it, you may experience security warnings or connection issues.
                 </div>
+            </div>
 
-                <div class="faq-item">
-                    <div class="faq-question collapsed">Can I install Microsoft Office on multiple devices?</div>
-                    <div class="faq-answer">Yes, with your organization account, you can install Microsoft Office on up
-                        to 5 devices simultaneously.</div>
+            <div class="faq-item" role="group">
+                <div class="faq-question collapsed" role="button" aria-expanded="false"
+                    aria-controls="faq-answer-tech-3" tabindex="0">
+                    Do I need to install PaperCut on my mobile device?
                 </div>
-
-                <div class="faq-item">
-                    <div class="faq-question collapsed">What should I do if I get an error during installation?</div>
-                    <div class="faq-answer">First, try restarting your device and running the installer again. If the
-                        issue persists, contact IT Support for assistance.</div>
+                <div id="faq-answer-tech-3" class="faq-answer" role="region">
+                    No, PaperCut Client is only required for desktop computers (Windows and macOS). Mobile printing is
+                    handled through different methods.
                 </div>
+            </div>
 
-                <div class="faq-item">
-                    <div class="faq-question collapsed">Do I need administrator rights to install these applications?
-                    </div>
-                    <div class="faq-answer">Yes, you need administrator rights to install the certificate and PaperCut
-                        Client. For Microsoft Office, standard user rights are sufficient.</div>
+            <div class="faq-item" role="group">
+                <div class="faq-question collapsed" role="button" aria-expanded="false"
+                    aria-controls="faq-answer-tech-4" tabindex="0">
+                    Can I install Microsoft Office on multiple devices?
+                </div>
+                <div id="faq-answer-tech-4" class="faq-answer" role="region">
+                    Yes, with your organization account, you can install Microsoft Office on up to 5 devices
+                    simultaneously.
+                </div>
+            </div>
+
+            <div class="faq-item" role="group">
+                <div class="faq-question collapsed" role="button" aria-expanded="false"
+                    aria-controls="faq-answer-tech-5" tabindex="0">
+                    What should I do if I get an error during installation?
+                </div>
+                <div id="faq-answer-tech-5" class="faq-answer" role="region">
+                    First, try restarting your device and running the installer again. If the issue persists, contact IT
+                    Support for assistance.
+                </div>
+            </div>
+
+            <div class="faq-item" role="group">
+                <div class="faq-question collapsed" role="button" aria-expanded="false"
+                    aria-controls="faq-answer-tech-6" tabindex="0">
+                    Do I need administrator rights to install these applications?
+                </div>
+                <div id="faq-answer-tech-6" class="faq-answer" role="region">
+                    Yes, you need administrator rights to install the certificate and PaperCut Client. For Microsoft
+                    Office,
+                    standard user rights are sufficient.
                 </div>
             </div>
         </div>
-    </div>
+        </section>
+    </main>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
