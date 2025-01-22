@@ -1350,9 +1350,9 @@
                         networkInfo.push(`${conn.downlink} Mb/s${conn.downlink >= 10 ? ' (limit)' : ''}`);
                     }
 
-                    // Add RTT (Round Trip Time) - API limit is 250ms
+                    // Add RTT (Round Trip Time) - API limit is 2000ms
                     if (conn.rtt !== undefined) {
-                        networkInfo.push(`${conn.rtt}ms latency${conn.rtt >= 250 ? ' (limit)' : ''}`);
+                        networkInfo.push(`${conn.rtt}ms latency${conn.rtt >= 2000 ? ' (limit)' : ''}`);
                     }
 
                     if (networkInfo.length > 0) {
