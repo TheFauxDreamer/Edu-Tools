@@ -1316,12 +1316,12 @@
                         networkInfo.push(conn.type);
                     }
 
-                    // Add bandwidth and latency if available
+                    // Add bandwidth and latency if available, noting maximums
                     if (conn.downlink) {
-                        networkInfo.push(`${conn.downlink} Mb/s`);
+                        networkInfo.push(`${conn.downlink} Mb/s${conn.downlink === 10 ? ' (max)' : ''}`);
                     }
                     if (conn.rtt) {
-                        networkInfo.push(`${conn.rtt}ms latency`);
+                        networkInfo.push(`${conn.rtt}ms latency${conn.rtt === 250 ? ' (max)' : ''}`);
                     }
 
                     if (networkInfo.length > 0) {
