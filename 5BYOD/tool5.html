@@ -1337,20 +1337,27 @@
                 try {
                     if ('getBattery' in navigator) {
                         const battery = await navigator.getBattery();
-                        const level = Math.round(battery.level * 100);
-                        const status = battery.charging ? 'charging' : 'not charging';
 
-                        let batteryInfo = `Battery: ${level}%`;
-                        if (!battery.charging && battery.dischargingTime !== Infinity) {
-                            const minutesLeft = Math.round(battery.dischargingTime / 60);
-                            batteryInfo += ` (${minutesLeft} mins remaining)`;
+                        // Check if device has a real battery
+                        // Desktop PCs will report level=1, charging=true
+                        if (battery.charging && battery.level === 1 && battery.chargingTime === 0) {
+                            // Skip battery info for desktop PCs
+                        } else {
+                            const level = Math.round(battery.level * 100);
+                            const status = battery.charging ? 'charging' : 'not charging';
+
+                            let batteryInfo = `Battery: ${level}%`;
+                            if (!battery.charging && battery.dischargingTime !== Infinity) {
+                                const minutesLeft = Math.round(battery.dischargingTime / 60);
+                                batteryInfo += ` (${minutesLeft} mins remaining)`;
+                            }
+                            batteryInfo += `, ${status}`;
+
+                            settingsItems.push(batteryInfo);
                         }
-                        batteryInfo += `, ${status}`;
-
-                        settingsItems.push(batteryInfo);
                     }
                 } catch (e) {
-                    // Battery API not supported, skip battery info
+                    // Battery API not supported or error occurred
                 }
 
                 settingsItems.push(`Language: ${navigator.language}`);
