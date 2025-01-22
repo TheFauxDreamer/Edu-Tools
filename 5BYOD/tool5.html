@@ -9,7 +9,7 @@
     <meta property="og:description" content="Get setup with the basics to get your BYOD device working at school!" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://checker.fauxprojects.xyz" />
-    <!-- <meta property="og:image" content="https://test.fauxprojects.xyz/11655_20241201_141822_434025937_original.jpeg" /> -->
+    <!-- <meta property="og:image" content="https://checker.fauxprojects.xyz/image.jpeg" /> -->
     <style>
         :root {
             /* Base theme colors - Light Mode */
@@ -629,6 +629,15 @@
         .tooltip:hover::after {
             visibility: visible;
             opacity: 1;
+        }
+
+        @media (max-width: 767px) {
+            .download-button {
+                display: none !important;
+                visibility: hidden !important;
+                opacity: 0 !important;
+                pointer-events: none !important;
+            }
         }
     </style>
 </head>
@@ -1443,33 +1452,89 @@
                 const isPhone = detectPhone();
                 const isAndroid = /android/.test(navigator.userAgent.toLowerCase());
                 const modal = document.getElementById('phone-block-modal');
+                const downloadButtons = document.querySelectorAll('.download-button');
 
                 if (isPhone) {
-                    updateBlockerMessage(isAndroid);
+                    // Show modal
                     modal.classList.remove('hidden');
                     document.body.style.overflow = 'hidden';
                     document.body.style.position = 'fixed';
                     document.body.style.width = '100%';
-
-                    // Additional measures to prevent scrolling and interaction
                     document.body.style.height = '100%';
                     document.body.style.touchAction = 'none';
+
+                    // Hide all download buttons
+                    downloadButtons.forEach(button => {
+                        button.style.display = 'none';
+                    });
+
+                    // Set up mutation observer to ensure buttons stay hidden
+                    const buttonObserver = new MutationObserver((mutations) => {
+                        mutations.forEach((mutation) => {
+                            if (mutation.type === 'attributes' &&
+                                (mutation.attributeName === 'style' ||
+                                    mutation.attributeName === 'class')) {
+                                const element = mutation.target;
+                                if (element.classList.contains('download-button')) {
+                                    element.style.display = 'none';
+                                }
+                            }
+                        });
+                    });
+
+                    // Observe all download buttons
+                    downloadButtons.forEach(button => {
+                        buttonObserver.observe(button, {
+                            attributes: true,
+                            attributeFilter: ['style', 'class']
+                        });
+                    });
+
+                    // Also observe the container for any new buttons that might be added
+                    const container = document.querySelector('.container');
+                    const containerObserver = new MutationObserver((mutations) => {
+                        mutations.forEach((mutation) => {
+                            mutation.addedNodes.forEach((node) => {
+                                if (node.nodeType === 1) { // Check if it's an element node
+                                    const newButtons = node.querySelectorAll('.download-button');
+                                    newButtons.forEach(button => {
+                                        button.style.display = 'none';
+                                        buttonObserver.observe(button, {
+                                            attributes: true,
+                                            attributeFilter: ['style', 'class']
+                                        });
+                                    });
+                                }
+                            });
+                        });
+                    });
+
+                    containerObserver.observe(container, {
+                        childList: true,
+                        subtree: true
+                    });
+
                 } else {
+                    // Reset everything if not a phone
                     modal.classList.add('hidden');
                     document.body.style.overflow = '';
                     document.body.style.position = '';
                     document.body.style.width = '';
                     document.body.style.height = '';
                     document.body.style.touchAction = '';
+
+                    // Show download buttons
+                    downloadButtons.forEach(button => {
+                        button.style.display = 'inline-block';
+                    });
                 }
             }
 
             document.addEventListener('DOMContentLoaded', checkAndBlockDevice);
             window.addEventListener('resize', checkAndBlockDevice);
-            window.addEventListener('orientationchange', function () {
-                // Small delay to ensure new dimensions are available
-                setTimeout(checkAndBlockDevice, 100);
-            });
+            window.addEventListener('orientationchange', () => setTimeout(checkAndBlockDevice, 100));
+            document.addEventListener('visibilitychange', checkAndBlockDevice);
+            setInterval(checkAndBlockDevice, 2000);
 
             // Additional check for orientation changes through resize
             let lastWidth = window.innerWidth;
