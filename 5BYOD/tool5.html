@@ -1278,22 +1278,40 @@
                 ]);
 
                 // Display Section
-                const displaySection = createSection('Display', [
+                const displayItems = [
                     `Screen Resolution: ${window.screen.width}x${window.screen.height}`,
-                    `Window Size: ${window.innerWidth}x${window.innerHeight}`,
-                    `Pixel Ratio: ${window.devicePixelRatio}`,
-                    `Color Depth: ${window.screen.colorDepth}-bit`
-                ]);
+                    `Window Size: ${window.innerWidth}x${window.innerHeight}`
+                ];
+
+                // Only add pixel ratio if available
+                if (window.devicePixelRatio) {
+                    displayItems.push(`Pixel Ratio: ${window.devicePixelRatio}`);
+                }
+
+                // Only add color depth if available
+                if (window.screen && window.screen.colorDepth) {
+                    displayItems.push(`Color Depth: ${window.screen.colorDepth}-bit`);
+                }
+
+                const displaySection = createSection('Display', displayItems);
 
                 // Hardware Section
                 const hardwareItems = [];
+
+                // CPU cores - reports cores available to browser
                 if (navigator.hardwareConcurrency) {
-                    hardwareItems.push(`CPU Cores: ${navigator.hardwareConcurrency}`);
+                    hardwareItems.push(`CPU Cores: ${navigator.hardwareConcurrency} (available to browser)`);
                 }
+
+                // Device memory - API limit is 8GB
                 if (navigator.deviceMemory) {
-                    hardwareItems.push(`System Memory: ${navigator.deviceMemory}GB`);
+                    hardwareItems.push(`System Memory: ${navigator.deviceMemory}GB${navigator.deviceMemory >= 8 ? ' (limit)' : ''}`);
                 }
-                hardwareItems.push(`Touch Points: ${navigator.maxTouchPoints}`);
+
+                // Touch points
+                if (navigator.maxTouchPoints !== undefined) {
+                    hardwareItems.push(`Touch Points: ${navigator.maxTouchPoints}`);
+                }
 
                 // Add GPU info
                 try {
@@ -1302,8 +1320,10 @@
                     if (gl) {
                         const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
                         if (debugInfo) {
-                            hardwareItems.push(`GPU: ${gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL)}`);
-                            hardwareItems.push(`GPU Vendor: ${gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL)}`);
+                            const gpuInfo = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+                            // Clean up ANGLE format if present
+                            const cleanGpuInfo = gpuInfo.replace(', Unspecified Version)', ')');
+                            hardwareItems.push(`GPU: ${cleanGpuInfo}`);
                         }
                     }
                 } catch (e) {
@@ -1320,17 +1340,19 @@
                     const conn = navigator.connection;
                     const networkInfo = [];
 
-                    // Add connection type if available
+                    // Add connection type if available (wifi, ethernet, etc)
                     if (conn.type && conn.type !== 'unknown') {
                         networkInfo.push(conn.type);
                     }
 
-                    // Add bandwidth and latency if available, noting maximums
-                    if (conn.downlink) {
-                        networkInfo.push(`${conn.downlink} Mb/s${conn.downlink === 10 ? ' (max)' : ''}`);
+                    // Add bandwidth - API limit is 10 Mb/s
+                    if (conn.downlink !== undefined) {
+                        networkInfo.push(`${conn.downlink} Mb/s${conn.downlink >= 10 ? ' (limit)' : ''}`);
                     }
-                    if (conn.rtt) {
-                        networkInfo.push(`${conn.rtt}ms latency${conn.rtt === 250 ? ' (max)' : ''}`);
+
+                    // Add RTT (Round Trip Time) - API limit is 250ms
+                    if (conn.rtt !== undefined) {
+                        networkInfo.push(`${conn.rtt}ms latency${conn.rtt >= 250 ? ' (limit)' : ''}`);
                     }
 
                     if (networkInfo.length > 0) {
@@ -1358,7 +1380,13 @@
                             let batteryInfo = `Battery: ${level}%`;
                             if (!battery.charging && battery.dischargingTime !== Infinity) {
                                 const minutesLeft = Math.round(battery.dischargingTime / 60);
-                                batteryInfo += ` (${minutesLeft} mins remaining)`;
+                                if (minutesLeft >= 90) {
+                                    const hours = Math.floor(minutesLeft / 60);
+                                    const minutes = minutesLeft % 60;
+                                    batteryInfo += ` (${hours}hr ${minutes}mins remaining)`;
+                                } else {
+                                    batteryInfo += ` (${minutesLeft} mins remaining)`;
+                                }
                             }
                             batteryInfo += `, ${status}`;
 
