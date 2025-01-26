@@ -20,19 +20,19 @@
             --shadow-color: rgba(0, 0, 0, 0.1);
 
             /* Certificate colors - Light Mode */
-            --cert-primary: #60a5fa;
-            --cert-secondary: #3b82f6;
-            --cert-bg: #dbeafe;
+            --cert-primary: #8b5cf6;
+            --cert-secondary: #7c3aed;
+            --cert-bg: #f3e8ff;
 
             /* PaperCut colors - Light Mode */
-            --papercut-primary: #f97316;
-            --papercut-secondary: #ea580c;
-            --papercut-bg: #ffedd5;
+            --papercut-primary: #16a34a;
+            --papercut-secondary: #15803d;
+            --papercut-bg: #dcfce7;
 
             /* Office colors - Light Mode */
-            --office-primary: #8b5cf6;
-            --office-secondary: #7c3aed;
-            --office-bg: #f3e8ff;
+            --office-primary: #60a5fa;
+            --office-secondary: #3b82f6;
+            --office-bg: #dbeafe;
 
             /* FAQ colors - Light Mode */
             --faq-bg: white;
@@ -40,10 +40,8 @@
             --faq-hover: #f8fafc;
 
             /* FAQ header colors */
-            --faq-program-color: #ffafcc;
-            /* Soft pastel blue */
-            --faq-technical-color: #57cc99;
-            /* Soft pastel purple/thistle */
+            --faq-program-color: #fb6f92;
+            --faq-technical-color: #f97316;
 
             --error-bg: #fee2e2;
             --error-border: #dc2626;
@@ -61,29 +59,27 @@
                 --shadow-color: rgba(0, 0, 0, 0.3);
 
                 /* Certificate colors - Dark Mode */
-                --cert-primary: #3b82f6;
-                --cert-secondary: #2563eb;
-                --cert-bg: rgba(59, 130, 246, 0.1);
+                --cert-primary: #8b5cf6;
+                --cert-secondary: #7c3aed;
+                --cert-bg: rgba(139, 92, 246, 0.1);
 
                 /* PaperCut colors - Dark Mode */
-                --papercut-primary: #f97316;
-                --papercut-secondary: #ea580c;
-                --papercut-bg: rgba(249, 115, 22, 0.1);
+                --papercut-primary: #16a34a;
+                --papercut-secondary: #15803d;
+                --papercut-bg: rgba(22, 163, 74, 0.1);
 
                 /* Office colors - Dark Mode */
-                --office-primary: #8b5cf6;
-                --office-secondary: #7c3aed;
-                --office-bg: rgba(139, 92, 246, 0.1);
+                --office-primary: #3b82f6;
+                --office-secondary: #2563eb;
+                --office-bg: rgba(59, 130, 246, 0.1);
 
                 /* FAQ colors - Dark Mode */
                 --faq-bg: #2d2d2d;
                 --faq-border: #404040;
                 --faq-hover: #363636;
 
-                --faq-program-color: #ffafcc;
-                /* Soft pastel blue */
-                --faq-technical-color: #57cc99;
-                /* Soft pastel purple/thistle */
+                --faq-program-color: #fb6f92;
+                --faq-technical-color: #ea580c;
 
                 --error-bg: #2d1f1f;
                 --error-border: #dc2626;
@@ -639,6 +635,20 @@
                 pointer-events: none !important;
             }
         }
+
+        .highlight-focus {
+            animation: highlightFade 2s ease-out;
+        }
+
+        @keyframes highlightFade {
+            0% {
+                background-color: var(--cert-bg);
+            }
+
+            100% {
+                background-color: transparent;
+            }
+        }
     </style>
 </head>
 
@@ -710,7 +720,7 @@
             <div id="modal-description" class="modal-message">
                 <span class="primary-message">Please use a computer or iPad to access the software installation
                     guide.</span>
-                <span class="policy-message">Mobile phones are not supported or allowed during the school day under the
+                <span class="policy-message">Mobile phones are not supported or allowed during the School day under the
                     Electronic Devices Policy.</span>
             </div>
         </div>
@@ -780,13 +790,16 @@
             <div class="section-content">
                 <h2>Unsupported Operating System</h2>
                 <p>It looks like you're using an unsupported operating system. We can't guarantee if this device will
-                    function correctly on the school network.</p>
+                    function correctly on the School network.</p>
                 <p>Please use one of the following supported systems:</p>
                 <ul role="list">
                     <li role="listitem">Windows (x64 or ARM64)</li>
                     <li role="listitem">macOS (Intel or Apple Silicon)</li>
                     <li role="listitem">iPadOS</li>
                 </ul>
+                <a href="#SupportedList" class="download-button"
+                    style="background-color: var(--office-secondary); margin-top: 20px; display: inline-block !important; visibility: visible !important; opacity: 1 !important; pointer-events: auto !important;">Learn
+                    about Supported Devices</a>
             </div>
         </div>
 
@@ -1046,12 +1059,12 @@
 
             <div class="faq-item" role="group">
                 <div class="faq-question" role="button" aria-expanded="true" aria-controls="faq-answer-1" tabindex="0">
-                    When it comes to the technical support side of BYOD, what is the school able to help with?
+                    When it comes to the technical support side of BYOD, what is the School able to help with?
                 </div>
                 <div id="faq-answer-1" class="faq-answer expanded" role="region">
-                    The school's IT department is responsible for:
+                    The School's IT department is responsible for:
                     <ol role="list">
-                        <li role="listitem">Helping you connect your (compatible) BYOD device to the school internet.
+                        <li role="listitem">Helping you connect your (compatible) BYOD device to the School internet.
                         </li>
                         <li role="listitem">Providing instructions to get setup with the Department of Education
                             provided copy of
@@ -1068,13 +1081,14 @@
             <div class="faq-item" role="group">
                 <div class="faq-question collapsed" role="button" aria-expanded="false" aria-controls="faq-answer-2"
                     tabindex="0">
-                    I've lost or accidentally deleted my work. Can you help?
+                    I've lost or accidentally deleted my work. Can the School help?
                 </div>
                 <div id="faq-answer-2" class="faq-answer" role="region">
                     Students are responsible for safely and securely saving their school work.
-                    The school IT Department isn't able to help you recover any lost work.<br><br>
+                    the School IT Department isn't able to help you recover any lost work.<br><br>
                     We recommend you save your work in the provided OneDrive storage solution, this way you can turn
-                    on autosave and access your work from another computer if you forget or damage your BYOD device.
+                    on autosave in Microsoft Office, and access your work from another computer if you forget or damage
+                    your BYOD device.
                 </div>
             </div>
 
@@ -1084,27 +1098,25 @@
                     There is something wrong with my device and it isn't working correctly.
                 </div>
                 <div id="faq-answer-3" class="faq-answer" role="region">
-                    Like with physical issues the school's IT department isn't able to assist with any issues that may
-                    arise
-                    from non-school software such as antivirus or third party software.<br><br>
+                    Like with physical issues the School's IT department isn't able to assist with any issues that may
+                    arise from non-school software such as antivirus or third party software.<br><br>
                     If these issues are stopping you from completing school work we have a limited number of short-term
-                    loan
-                    laptops you can borrow for the day.
+                    loan laptops you can borrow for the day.
                 </div>
             </div>
 
             <div class="faq-item" role="group">
                 <div class="faq-question collapsed" role="button" aria-expanded="false" aria-controls="faq-answer-4"
                     tabindex="0">
-                    My BYOD device was damaged. Can you fix it?
+                    My BYOD device was damaged. Can the School fix it?
                 </div>
                 <div id="faq-answer-4" class="faq-answer" role="region">
-                    BYOD devices aren't covered under the school's insurance policy. As they're personal devices it's
+                    BYOD devices aren't covered under the School's insurance policy. As they're personal devices it's
                     your
                     responsibility for the maintenance and upkeep. We recommend you look at the manufacturers warranty
                     options
                     as well as home/personal insurance to cover the device.<br><br>
-                    If you suspect foul play in the damage of a device, the school's Student Services team will do their
+                    If you suspect foul play in the damage of a device, the School's Student Services team will do their
                     best
                     to assist you.
                 </div>
@@ -1113,10 +1125,10 @@
             <div class="faq-item" role="group">
                 <div class="faq-question collapsed" role="button" aria-expanded="false" aria-controls="faq-answer-5"
                     tabindex="0">
-                    What happens to the free software the school provides when I leave?
+                    What happens to the free software the School provides when I leave?
                 </div>
                 <div id="faq-answer-5" class="faq-answer" role="region">
-                    Microsoft Office and any other software provided by the school is provided for free by the
+                    Microsoft Office and any other software provided by the School is provided for free by the
                     Department of
                     Education under the condition you're a currently enrolled student.<br><br>
                     If you move to a non-public school, interstate or finish your schooling the software license will be
@@ -1135,8 +1147,8 @@
             <h3 id="faq-technical-header" class="faq-section-header">Technical Details & Requirements</h3>
 
             <div class="faq-item" role="group">
-                <div class="faq-question" role="button" aria-expanded="true" aria-controls="faq-answer-tech-1"
-                    tabindex="0">
+                <div class="faq-question" id="SupportedList" role="button" aria-expanded="true"
+                    aria-controls="faq-answer-tech-1" tabindex="0">
                     What devices and operating systems are officially supported?
                 </div>
                 <div id="faq-answer-tech-1" class="faq-answer expanded" role="region">
@@ -1247,6 +1259,67 @@
 
             window.addEventListener('hashchange', handleHash);
 
+            // Smooth scroll functionality
+            const supportedDevicesLink = document.querySelector('#unsupported-notice .download-button');
+
+            if (supportedDevicesLink) {
+                supportedDevicesLink.addEventListener('click', function (e) {
+                    e.preventDefault();
+
+                    const targetId = this.getAttribute('href').substring(1);
+                    const targetElement = document.getElementById(targetId);
+
+                    if (targetElement) {
+                        // Calculate offset to account for any fixed headers
+                        const offset = 20;
+                        const targetPosition = targetElement.getBoundingClientRect().top + window.pageYOffset - offset;
+                        const startPosition = window.pageYOffset;
+                        const distance = targetPosition - startPosition;
+                        const duration = 1500; // Increased duration to 1.5 seconds
+                        let start = null;
+
+                        function animation(currentTime) {
+                            if (start === null) start = currentTime;
+                            const timeElapsed = currentTime - start;
+                            const progress = Math.min(timeElapsed / duration, 1);
+
+                            // Easing function for smoother animation
+                            const ease = easeInOutCubic(progress);
+
+                            window.scrollTo(0, startPosition + (distance * ease));
+
+                            if (timeElapsed < duration) {
+                                requestAnimationFrame(animation);
+                            } else {
+                                // After scrolling completes
+                                targetElement.setAttribute('tabindex', '-1');
+                                targetElement.focus({ preventScroll: true });
+
+                                // Expand FAQ if collapsed
+                                if (targetElement.classList.contains('collapsed')) {
+                                    targetElement.classList.remove('collapsed');
+                                    targetElement.nextElementSibling.classList.add('expanded');
+                                }
+
+                                // Add highlight effect
+                                targetElement.classList.add('highlight-focus');
+                                setTimeout(() => {
+                                    targetElement.classList.remove('highlight-focus');
+                                }, 2000);
+                            }
+                        }
+
+                        // Cubic easing function for smooth acceleration and deceleration
+                        function easeInOutCubic(t) {
+                            return t < 0.5
+                                ? 4 * t * t * t
+                                : 1 - Math.pow(-2 * t + 2, 3) / 2;
+                        }
+
+                        requestAnimationFrame(animation);
+                    }
+                });
+            }
 
             // Konami Code implementation
             const KONAMI_CODE = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight'];
@@ -1687,7 +1760,7 @@
                 const policyMessage = document.querySelector('.modal-message .policy-message');
 
                 primaryMessage.textContent = 'Please use a computer or iPad to access the Student BYOD Guide.';
-                policyMessage.textContent = 'Mobile phones are not supported or allowed during the school day under the Electronic Devices Policy.';
+                policyMessage.textContent = 'Mobile phones are not supported or allowed during the School day under the Electronic Devices Policy.';
             }
 
             function checkAndBlockDevice() {
