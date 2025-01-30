@@ -383,23 +383,21 @@
             border-radius: 8px;
             overflow: hidden;
             background-color: var(--faq-bg);
+            transition: background-color 0.2s;
         }
 
         .faq-question {
             font-weight: 600;
-            color: var(--cert-primary);
             padding: 16px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background-color: var(--faq-bg);
             color: var(--text-color);
-            transition: background-color 0.2s;
         }
 
         .faq-question:hover {
-            background-color: var(--faq-hover);
+            background-color: rgba(0, 0, 0, 0.05);
         }
 
         .faq-question::after {
@@ -418,13 +416,16 @@
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.5s ease-out, padding 0.3s ease;
-            background-color: var(--faq-bg);
             color: var(--text-color);
         }
 
         .faq-answer.expanded {
             padding: 0 16px 16px 16px;
             max-height: 800px;
+        }
+
+        .faq-item:nth-child(odd) {
+            background-color: rgba(0, 0, 0, 0.02);
         }
 
         .system-info {
@@ -530,6 +531,14 @@
                 background-color: var(--card-background);
                 color: var(--text-color);
             }
+
+            .faq-item:nth-child(odd) {
+                background-color: rgba(255, 255, 255, 0.02);
+            }
+
+            .faq-question:hover {
+                background-color: rgba(255, 255, 255, 0.05);
+            }
         }
 
         #phone-block-modal.hidden {
@@ -615,6 +624,26 @@
             margin-bottom: 5px;
         }
 
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            background-color: var(--cert-primary);
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 9999;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
         @media (prefers-color-scheme: dark) {
             .tooltip::after {
                 background: rgba(255, 255, 255, 0.9);
@@ -654,6 +683,11 @@
 
 <body>
     <!-- Enhanced noscript message with accessibility -->
+    
+    <div id="notification" class="notification" style="display: none;">
+        These links don't work on the demo but are easy to set up
+    </div>
+    
     <noscript>
         <div role="alert" aria-label="JavaScript requirement notice" style="
           position: fixed;
@@ -748,7 +782,9 @@
                 <line x1="18" y1="16" x2="20" y2="16" />
             </svg>
             <div class="system-info-text">
-                <span id="os-status">Looks like you're currently using</span>
+            <!-- THIS IS FOR THE ASPX when Windows Auth is enabled to show the current username. Doesn't work cause the other "Looks like" code throughout.
+            <span id="os-status">Hi! <span id="username">Loading...</span>, looks like you're currently using</span> -->
+		    <span id="os-status">Looks like you're currently using</span>
                 <div class="custom-select" id="os-custom-select" role="combobox" aria-expanded="false"
                     aria-haspopup="listbox" aria-controls="os-select-options">
                     <div class="select-selected" id="selected-os" tabindex="0" role="button"
@@ -758,7 +794,7 @@
                         <div class="optgroup-label" role="group" aria-label="Windows options">Windows</div>
                         <div class="option-item" role="option" data-value="windows-x64" aria-selected="true">Windows
                             (x64)</div>
-                        <div class="option-item" role="option" data-value="windows-arm">Windows (ARM64)</div>
+                        <div class="option-item" role="option" data-value="windows-arm">Windows (ARM)</div>
                         <div class="optgroup-label" role="group" aria-label="macOS options">macOS</div>
                         <div class="option-item" role="option" data-value="mac-intel">macOS (Intel)</div>
                         <div class="option-item" role="option" data-value="mac-arm">macOS (Apple Silicon)</div>
@@ -793,7 +829,7 @@
                     function correctly on the School network.</p>
                 <p>Please use one of the following supported systems:</p>
                 <ul role="list">
-                    <li role="listitem">Windows (x64 or ARM64)</li>
+                    <li role="listitem">Windows (x64 or ARM)</li>
                     <li role="listitem">macOS (Intel or Apple Silicon)</li>
                     <li role="listitem">iPadOS</li>
                 </ul>
@@ -820,22 +856,25 @@
                     </div>
                     <div class="instructions" role="list" aria-label="Certificate installation instructions">
                         <ol>
-                            <li role="listitem">Download the certificate file</li>
-                            <li role="listitem">Double-click the downloaded certificate file</li>
-                            <li role="listitem">Click "Install Certificate"</li>
-                            <li role="listitem">Select "Local Machine" and click "Next"</li>
+                            <li role="listitem">Download the certificate below</li>
+                            <li role="listitem">If you get a Security Warning click "Open"</li>
+                            <li role="listitem">Click "Install Certificate..."</li>
+                            <li role="listitem">Select "Local Machine" and click "Yes"</li>
+                            <li role="listitem">If you get a User Access Control pop-up click "Yes"</li>
                             <li role="listitem">Select "Place all certificates in the following store" and click
                                 "Browse"</li>
                             <li role="listitem">Select "Trusted Root Certification Authorities" and click "OK"</li>
                             <li role="listitem">Click "Next" and then "Finish"</li>
                         </ol>
                         <div class="arch-specific windows-x64">
-                            <a href="#" class="download-button" role="button"
-                                aria-label="Download Certificate for Windows x64">Download Certificate (x64)</a>
+                            <a href="#"
+                                class="download-button" target="_blank" role="button"
+                                aria-label="Download Certificate for Windows x64">Download Certificate</a>
                         </div>
                         <div class="arch-specific windows-arm">
-                            <a href="#" class="download-button" role="button"
-                                aria-label="Download Certificate for Windows ARM64">Download Certificate (ARM64)</a>
+                            <a href="#"
+                                class="download-button" target="_blank" role="button"
+                                aria-label="Download Certificate for Windows ARM">Download Certificate</a>
                         </div>
                     </div>
                 </div>
@@ -848,23 +887,25 @@
                     </div>
                     <div class="instructions" role="list" aria-label="Certificate installation instructions for macOS">
                         <ol>
-                            <li role="listitem">Download the certificate file</li>
-                            <li role="listitem">Double-click the downloaded certificate file</li>
-                            <li role="listitem">Select "System" in the Keychain dropdown</li>
-                            <li role="listitem">Click "Add"</li>
-                            <li role="listitem">Enter your administrator password</li>
-                            <li role="listitem">Double-click the certificate in Keychain Access</li>
-                            <li role="listitem">Expand the "Trust" section and set "When using this certificate" to
-                                "Always Trust"</li>
+                            <li role="listitem">Download the certificate below</li>
+                            <li role="listitem">Open “System Preferences” & search for “Device Management”</li>
+                            <li role="listitem">Click the “+” icon</li>
+                            <li role="listitem">Select the “Education-CA-Root-Certificate.mobileconfig” from your
+                                Downloads</li>
+                            <li role="listitem">Click “Continue”</li>
+                            <li role="listitem">Click “Install”</li>
+                            <li role="listitem">Enter your password</li>
                         </ol>
                         <div class="arch-specific mac-intel">
-                            <a href="#" class="download-button" role="button"
-                                aria-label="Download Certificate for Intel Mac">Download Certificate (Intel)</a>
+                            <a href="#"
+                                class="download-button" target="_blank" role="button"
+                                aria-label="Download Certificate for Intel Mac">Download Certificate</a>
                         </div>
                         <div class="arch-specific mac-arm">
-                            <a href="#" class="download-button" role="button"
+                            <a href="#"
+                                class="download-button" target="_blank" role="button"
                                 aria-label="Download Certificate for Apple Silicon Mac">
-                                Download Certificate (Apple Silicon)</a>
+                                Download Certificate</a>
                         </div>
                     </div>
                 </div>
@@ -884,7 +925,8 @@
                             <li role="listitem">Enter your device passcode</li>
                             <li role="listitem">Tap "Install" again to confirm</li>
                         </ol>
-                        <a href="#" class="download-button" role="button"
+                        <a href="#"
+                            class="download-button" target="_blank" role="button"
                             aria-label="Download Certificate for iPadOS">Download Certificate for iPadOS</a>
                     </div>
                 </div>
@@ -910,19 +952,20 @@
                     </div>
                     <div class="instructions" role="list" aria-label="PaperCut installation instructions for Windows">
                         <ol>
-                            <li role="listitem">Download the PaperCut Client installer for your architecture</li>
+                            <li role="listitem">Download the PaperCut Client installer</li>
                             <li role="listitem">Run the installer as administrator</li>
                             <li role="listitem">Follow the installation wizard</li>
                             <li role="listitem">Click "Finish" to complete installation</li>
                         </ol>
                         <div class="arch-specific windows-x64">
-                            <a href="#" class="download-button" role="button"
+                            <a href="#"
+                                class="download-button" target="_blank" role="button"
                                 aria-label="Download PaperCut for Windows x64">Download PaperCut (x64)</a>
                         </div>
                         <div class="arch-specific windows-arm">
-                            <a href="#" class="download-button" role="button"
-                                aria-label="Download PaperCut for Windows ARM64">Download PaperCut (ARM64)</a>
-                            <p class="note" role="note">Note: ARM64 version runs through Windows' x86 emulation</p>
+                            <a href="#"
+                                class="download-button" target="_blank" role="button"
+                                aria-label="Download PaperCut for Windows ARM">Download PaperCut (ARM)</a>
                         </div>
                     </div>
                 </div>
@@ -934,7 +977,7 @@
                         <span class="os-badge" role="status">iPadOS</span>
                     </div>
                     <div class="instructions" aria-label="PaperCut printing information for iPadOS">
-                        <p>iPadOS & iOS are able to print without the papercut client.<br>Simply print like normal and
+                        <p>iPads are able to print without the papercut client.<br>Simply print like normal and
                             select the Virtual Queue.</p>
                     </div>
                 </div>
@@ -946,21 +989,7 @@
                         <span class="os-badge" role="status">macOS</span>
                     </div>
                     <div class="instructions" role="list" aria-label="PaperCut installation instructions for macOS">
-                        <ol>
-                            <li role="listitem">Download the PaperCut Client DMG file</li>
-                            <li role="listitem">Open the DMG file</li>
-                            <li role="listitem">Drag PaperCut Client to Applications folder</li>
-                            <li role="listitem">Launch PaperCut Client from Applications</li>
-                        </ol>
-                        <div class="arch-specific mac-intel">
-                            <a href="#" class="download-button" role="button"
-                                aria-label="Download PaperCut for Intel Mac">Download PaperCut (Intel)</a>
-                        </div>
-                        <div class="arch-specific mac-arm">
-                            <a href="#" class="download-button" role="button"
-                                aria-label="Download PaperCut for Apple Silicon Mac">Download PaperCut (Apple
-                                Silicon)</a>
-                        </div>
+                        <p>Apple laptops are able to print without the papercut client!<br>Simply print like normal and select the Virtual Queue as the printer.</p>
                     </div>
                 </div>
             </div>
@@ -988,17 +1017,19 @@
                             <li role="listitem">Sign in to Office 365 portal</li>
                             <li role="listitem">Click "Install Office"</li>
                             <li role="listitem">Run the downloaded installer</li>
-                            <li role="listitem">Sign in with your organization account</li>
+                            <li role="listitem">Sign in with your school account</li>
                         </ol>
                         <div class="arch-specific windows-x64">
-                            <a href="https://www.office.com/" class="download-button" role="button"
-                                aria-label="Go to Office 365 Portal for Windows x64">Go to Office 365 Portal (x64)</a>
+                            <a href="#" target="_blank" class="download-button"
+                                role="button" aria-label="Go to Office 365 Portal for Windows x64">Go to Office 365
+                                Portal (x64)</a>
                         </div>
                         <div class="arch-specific windows-arm">
-                            <a href="https://www.office.com/" class="download-button" role="button"
-                                aria-label="Go to Office 365 Portal for Windows ARM64">Go to Office 365 Portal
-                                (ARM64)</a>
-                            <p class="note" role="note">Note: Make sure to select ARM64 version during installation</p>
+                            <a href="#" target="_blank" class="download-button"
+                                role="button" aria-label="Go to Office 365 Portal for Windows ARM">Go to Office 365
+                                Portal
+                                (ARM)</a>
+                            <!--<p class="note" role="note">Note: Make sure to select ARM version during installation</p>-->
                         </div>
                     </div>
                 </div>
@@ -1012,22 +1043,23 @@
                     <div class="instructions" role="list"
                         aria-label="Microsoft Office installation instructions for macOS">
                         <ol>
-                            <li role="listitem">Sign in to Office 365 portal</li>
-                            <li role="listitem">Click "Install Office"</li>
-                            <li role="listitem">Open the downloaded package</li>
-                            <li role="listitem">Follow the installation wizard</li>
-                            <li role="listitem">Sign in with your organization account</li>
+                            <li role="listitem">Use the button below to visit the Mac App Store</li>
+                            <li role="listitem">Click "Get" to start the download</li>
+                            <li role="listitem">Open Word from Applications</li>
+                            <li role="listitem">Log in with your school account</li>
+                            <li role="listitem">Open the other Office apps to check they've been signed in.</li>
                         </ol>
                         <div class="arch-specific mac-intel">
-                            <a href="https://www.office.com/" class="download-button" role="button"
-                                aria-label="Go to Office 365 Portal for Intel Mac">Go to Office 365 Portal (Intel)</a>
+                            <a href="#"
+                                target="_blank" class="download-button" role="button"
+                                aria-label="Download Office for Intel Mac">View in the Mac App Store</a>
                         </div>
                         <div class="arch-specific mac-arm">
-                            <a href="https://www.office.com/" class="download-button" role="button"
-                                aria-label="Go to Office 365 Portal for Apple Silicon Mac">Go to Office 365 Portal
-                                (Apple Silicon)</a>
-                            <p class="note" role="note">Note: Office automatically detects and installs the appropriate
-                                version</p>
+                            <a href="#"
+                                target="_blank" class="download-button" role="button"
+                                aria-label="Download Office for Intel Mac">View in the Mac App Store</a>
+                            <p class="note" role="note">Note: The Mac App Store will download the correct version for
+                                you</p>
                         </div>
                     </div>
                 </div>
@@ -1041,13 +1073,15 @@
                     <div class="instructions" role="list"
                         aria-label="Microsoft Office installation instructions for iPadOS">
                         <ol>
-                            <li role="listitem">Open App Store</li>
-                            <li role="listitem">Search for Microsoft Office apps</li>
-                            <li role="listitem">Download required apps (Word, Excel, etc.)</li>
-                            <li role="listitem">Open any Office app and sign in with your organization account</li>
+                            <li role="listitem">Use the button below to visit the App Store</li>
+                            <li role="listitem">Click "Get" to start the download</li>
+                            <li role="listitem">Open the Microsoft 365 app</li>
+                            <li role="listitem">Log in with your school account</li>
                         </ol>
-                        <a href="https://apps.apple.com/us/app/microsoft-office/id541164041" class="download-button"
-                            role="button" aria-label="View Microsoft Office in App Store">View in App Store</a>
+                        <a href="#" target="_blank"
+                            class="download-button" role="button" aria-label="View Microsoft Office in App Store">View
+                            in App Store</a>
+                            <p class="note" role="note">Note: Alternatively you can download the individual Word, Powerpoint, & Excel apps from the App Store</p>
                     </div>
                 </div>
             </div>
@@ -1085,7 +1119,7 @@
                 </div>
                 <div id="faq-answer-2" class="faq-answer" role="region">
                     Students are responsible for safely and securely saving their school work.
-                    the School IT Department isn't able to help you recover any lost work.<br><br>
+                    The School IT Department isn't able to help you recover any lost work.<br><br>
                     We recommend you save your work in the provided OneDrive storage solution, this way you can turn
                     on autosave in Microsoft Office, and access your work from another computer if you forget or damage
                     your BYOD device.
@@ -1098,7 +1132,7 @@
                     There is something wrong with my device and it isn't working correctly.
                 </div>
                 <div id="faq-answer-3" class="faq-answer" role="region">
-                    Like with physical issues the School's IT department isn't able to assist with any issues that may
+                    Like with physical issues, the School's IT department isn't able to assist with any issues that may
                     arise from non-school software such as antivirus or third party software.<br><br>
                     If these issues are stopping you from completing school work we have a limited number of short-term
                     loan laptops you can borrow for the day.
@@ -1113,7 +1147,7 @@
                 <div id="faq-answer-4" class="faq-answer" role="region">
                     BYOD devices aren't covered under the School's insurance policy. As they're personal devices it's
                     your
-                    responsibility for the maintenance and upkeep. We recommend you look at the manufacturers warranty
+                    responsibility for their maintenance and upkeep. We recommend you look at the manufacturers warranty
                     options
                     as well as home/personal insurance to cover the device.<br><br>
                     If you suspect foul play in the damage of a device, the School's Student Services team will do their
@@ -1134,10 +1168,10 @@
                     If you move to a non-public school, interstate or finish your schooling the software license will be
                     automatically revoked. You will have the option after this to uninstall the software or purchase a
                     license directly from Microsoft to continue using the product.<br><br>
-                    <i>KEEP IN MIND: Any documents saved in OneDrive will be automatically deleted at the end of your
+                    <i><strong>KEEP IN MIND: Any documents saved in OneDrive will be automatically deleted at the end of your
                         schooling for security reasons. We recommend moving these files to an external USB or another
                         place
-                        on the computer if you wish to maintain access to them.</i>
+                        on the computer if you wish to maintain access to them.</strong></i>
                 </div>
             </div>
         </div>
@@ -1152,23 +1186,23 @@
                     What devices and operating systems are officially supported?
                 </div>
                 <div id="faq-answer-tech-1" class="faq-answer expanded" role="region">
-                    <div id="supported-versions">We officially support:
+                    <div id="supported-versions">We officially support Windows laptops, Apple laptops, & Apple iPads with the operating system:
                         <ul role="list">
                             <li role="listitem"><strong>Windows <span id="windows-version">10</span></strong>:
                                 Microsoft's current operating system receiving regular updates.</li>
                             <li role="listitem"><strong>macOS <span id="macos-version">14</span>+</strong>:
-                                Apple's oldest desktop class operating system currently supported.</li>
+                                Apple's oldest supported desktop class operating system.</li>
                             <li role="listitem"><strong>iPadOS <span id="ipados-version">17</span>+</strong>:
                                 Apple's oldest supported mobile operating system.</li>
                         </ul>
                         These platforms are supported because they:
                         <ul role="list">
-                            <li role="listitem">Have been confirmed to work within our schools Enterprise Network</li>
+                            <li role="listitem">Have been confirmed to work within our School's Enterprise Network</li>
                             <li role="listitem">Are still receiving regular security updates</li>
                             <li role="listitem">Support stable, tested versions of all required software</li>
                         </ul>
                         Older versions of these operating systems are not supported as they no longer receive security
-                        updates.
+                        updates.<br><br>
                         Other platforms (Android, ChromeOS, Linux) aren't officially supported as they are not
                         compatible with
                         our network infrastructure.
@@ -1182,9 +1216,8 @@
                     Why do I need to install the Internet Certificate?
                 </div>
                 <div id="faq-answer-tech-2" class="faq-answer" role="region">
-                    The Internet Certificate ensures secure connection to organizational resources and internal
-                    websites.
-                    Without it, you may experience security warnings or connection issues.
+                    Yes, to ensure your safety online Department of Education schools perform additional checks, one of which is the device is authorised to use the school internet.
+                    <br><br>The Internet Certificate is <strong>required</strong> to continue using the internet as normal.
                 </div>
             </div>
 
@@ -1194,8 +1227,8 @@
                     Do I need to install PaperCut on my mobile device?
                 </div>
                 <div id="faq-answer-tech-3" class="faq-answer" role="region">
-                    No, PaperCut Client is only required for desktop computers (Windows and macOS). Mobile printing is
-                    handled through different methods.
+                    No, the PaperCut Client is only required for Windows computers.
+                    <br>Printing from an Apple laptop or iPad uses the built in printing.
                 </div>
             </div>
 
@@ -1205,8 +1238,7 @@
                     Can I install Microsoft Office on multiple devices?
                 </div>
                 <div id="faq-answer-tech-4" class="faq-answer" role="region">
-                    Yes, with your organization account, you can install Microsoft Office on up to 5 devices
-                    simultaneously.
+                    Yes, with your school account you can install Microsoft Office on up to 5 devices simultaneously.
                 </div>
             </div>
 
@@ -1216,8 +1248,7 @@
                     What should I do if I get an error during installation?
                 </div>
                 <div id="faq-answer-tech-5" class="faq-answer" role="region">
-                    First, try restarting your device and running the installer again. If the issue persists, contact IT
-                    Support for assistance.
+                    First, try restarting your device and running the installer again. If the issue persists, visit the school IT Support for assistance.
                 </div>
             </div>
 
@@ -1227,9 +1258,8 @@
                     Do I need administrator rights to install these applications?
                 </div>
                 <div id="faq-answer-tech-6" class="faq-answer" role="region">
-                    Yes, you need administrator rights to install the certificate and PaperCut Client. For Microsoft
-                    Office,
-                    standard user rights are sufficient.
+                    Yes, you need administrator rights to install the Internet Certificate and PaperCut Client. <br>For Microsoft
+                    Office, standard user rights are sufficient.
                 </div>
             </div>
         </div>
@@ -1243,12 +1273,12 @@
             debugPanel.id = 'debug-panel';
             debugPanel.style.cssText = 'display: none; position: fixed; bottom: 20px; right: 20px; font-family: system-ui, -apple-system, sans-serif; padding: 20px; border-radius: 8px; z-index: 9999; max-width: 400px; background: var(--card-background); border-left: 5px solid var(--cert-primary); box-shadow: 0 2px 4px var(--shadow-color);';
             debugPanel.innerHTML = `
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-        <h2 style="margin: 0; font-size: 1.2em; color: var(--cert-primary);">System Details</h2>
-        <button onclick="closeDebugPanel()" style="background: none; border: none; color: var(--text-color); cursor: pointer; font-size: 18px; padding: 4px;">×</button>
-    </div>
-    <div id="debug-content" style="font-size: 0.9em; line-height: 1.5; color: var(--text-color); white-space: pre-wrap; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;"></div>
-`;
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <h2 style="margin: 0; font-size: 1.2em; color: var(--cert-primary);">System Details</h2>
+                        <button onclick="closeDebugPanel()" style="background: none; border: none; color: var(--text-color); cursor: pointer; font-size: 18px; padding: 4px;">×</button>
+                    </div>
+                    <div id="debug-content" style="font-size: 0.9em; line-height: 1.5; color: var(--text-color); white-space: pre-wrap; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;"></div>
+                `;
             document.body.appendChild(debugPanel);
 
             function handleHash() {
@@ -1258,6 +1288,17 @@
             }
 
             window.addEventListener('hashchange', handleHash);
+
+            // Modify all download buttons to show notification instead
+            document.querySelectorAll('.download-button').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    showNotification();
+                });
+                // Remove href to prevent default behavior
+                button.removeAttribute('href');
+                button.style.cursor = 'pointer';
+            });
 
             // Smooth scroll functionality
             const supportedDevicesLink = document.querySelector('#unsupported-notice .download-button');
@@ -1336,13 +1377,13 @@
 
                 // Create each section as a div
                 const createSection = (title, items) => `
-        <div>
-            <div style="font-weight: 600; color: #ffb703; margin-bottom: 8px;">${title}</div>
-            <div style="display: grid; gap: 4px;">
-                ${items.map(item => `<div>${item}</div>`).join('')}
-            </div>
-        </div>
-    `;
+                        <div>
+                            <div style="font-weight: 600; color: #ffb703; margin-bottom: 8px;">${title}</div>
+                            <div style="display: grid; gap: 4px;">
+                                ${items.map(item => `<div>${item}</div>`).join('')}
+                            </div>
+                        </div>
+                    `;
 
                 // Device & OS Section
                 const deviceSection = createSection('Device & OS', [
@@ -1580,7 +1621,7 @@
                 else if (userAgent.includes("win")) {
                     if (userAgent.includes("arm64") || userAgent.includes("aarch64")) {
                         osValue = "windows-arm";
-                        displayText = "Windows (ARM64)";
+                        displayText = "Windows (ARM)";
                     } else {
                         osValue = "windows-x64";
                         displayText = "Windows (x64)";
@@ -1867,6 +1908,17 @@
                 subtree: true
             });
 
+            function showNotification() {
+            const notification = document.getElementById('notification');
+            notification.style.display = 'block';
+            setTimeout(() => notification.classList.add('show'), 10);
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.style.display = 'none', 300);
+            }, 3000);
+        }
+
             // FAQ Functionality
             document.querySelectorAll('.faq-question').forEach(question => {
                 question.addEventListener('click', () => {
@@ -1910,6 +1962,19 @@
             updateOSVersions();
             handleHash();
         });
+
+//        async function getAuthenticatedUser() {
+//            try {
+//                const response = await fetch('getuser.aspx');
+//                const username = await response.text();
+//                document.getElementById('username').textContent = username || 'Guest';
+//            } catch (error) {
+//                document.getElementById('username').textContent = 'Guest';
+//                console.error('Error:', error);
+//            }
+//        }
+//
+//        window.onload = getAuthenticatedUser;
 
     </script>
 </body>
