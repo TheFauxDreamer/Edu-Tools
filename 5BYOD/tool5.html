@@ -1282,7 +1282,7 @@
             document.body.appendChild(debugPanel);
 
             function handleHash() {
-                if (window.location.hash === '#debuginfo') {
+                if (window.location.hash === '#details') {
                     showDebugPanel();
                 }
             }
@@ -1432,9 +1432,9 @@
                     const canvas = document.createElement('canvas');
                     const gl = canvas.getContext('webgl2');
                     if (gl) {
-                        const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
-                        if (debugInfo) {
-                            const gpuInfo = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+                        const details = gl.getExtension('WEBGL_debug_renderer_info');
+                        if (details) {
+                            const gpuInfo = gl.getParameter(details.UNMASKED_RENDERER_WEBGL);
                             // Clean up ANGLE format if present
                             const cleanGpuInfo = gpuInfo.replace(', Unspecified Version)', ')');
                             hardwareItems.push(`GPU: ${cleanGpuInfo}`);
