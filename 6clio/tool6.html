@@ -9,13 +9,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Birthstone&display=swap" rel="stylesheet">
     <style>
-        .birthstone-regular {
-            font-family: "Birthstone", serif;
-            font-weight: 400;
-            font-style: normal;
-            font-size: 4.2rem;
-        }
-
         :root {
             --primary-color: #D35400;
             --secondary-color: #E67E22;
@@ -28,6 +21,13 @@
             padding: 0;
             box-sizing: border-box;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        .birthstone-regular {
+            font-family: "Birthstone", serif;
+            font-weight: 400;
+            font-style: normal;
+            font-size: 4.2rem;
         }
 
         body {
@@ -82,53 +82,205 @@
             margin-bottom: 1rem;
         }
 
-        .hero h1 .app-name {
-            font-family: 'Gelasio', serif;
-            font-weight: 700;
-            color: #fff;
-        }
-
-
         .hero p {
             font-size: 1.25rem;
-            max-width: 600px;
+            max-width: 700px;
             margin: 0 auto 2rem;
         }
 
-        .app-preview {
+        /* Device Showcase Styles */
+        .device-showcase {
             margin-top: -100px;
             padding: 2rem;
             display: flex;
             justify-content: center;
+            gap: 4rem;
+            flex-wrap: wrap;
         }
 
+        /* imac Device */
+        .imac-mockup {
+            position: relative;
+            width: 800px;
+            height: 500px;
+            background: #f0f0f0;
+            border-radius: 20px;
+            padding: 20px 20px 50px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .imac-screen {
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .imac-base {
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 20px;
+            background: #d0d0d0;
+            border-radius: 0 0 10px 10px;
+        }
+
+        .showcase-media .laptop-mockup {
+            position: relative;
+            width: 749px;
+            /* Base width for large screens */
+            /* Height calculated to match MacBook Pro aspect ratio (1.54:1) */
+            height: 508px;
+            /* 800px / 1.54 */
+            background: linear-gradient(to bottom, #c3c3c3, #b3b3b3);
+            border-radius: 12px;
+            padding: 12px 12px 25px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            transform-style: preserve-3d;
+            transform: perspective(1000px) rotateX(5deg);
+            margin: 20px auto;
+        }
+
+        .laptop-screen {
+            width: 100%;
+            height: 100%;
+            background: #000;
+            /* MacBook screens have black bezels */
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .laptop-screen .mockup-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: top center;
+        }
+
+        .showcase-media .laptop-screen {
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .laptop-base {
+            position: absolute;
+            bottom: -15px;
+            left: -2%;
+            width: 104%;
+            height: 15px;
+            background: linear-gradient(to bottom, #999, #888);
+            border-radius: 0 0 12px 12px;
+        }
+
+        .laptop-base::after {
+            content: '';
+            position: absolute;
+            bottom: 9px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30%;
+            height: 6px;
+            background: #777;
+            border-radius: 0 0 10px 10px;
+        }
+
+        @media (max-width: 768px) {
+            .showcase-media .laptop-mockup {
+                width: 90%;
+                height: 300px;
+                transform: perspective(1000px) rotateX(5deg) scale(0.9);
+            }
+        }
+
+        /* Phone Device */
         .phone-mockup {
             width: 300px;
             height: 600px;
-            background: #fff;
+            background: #f0f0f0;
             border-radius: 40px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
             position: relative;
             overflow: hidden;
         }
 
-        .screen {
+        .phone-screen {
             position: absolute;
             top: 20px;
             left: 20px;
             right: 20px;
             bottom: 20px;
-            background: var(--light-gray);
+            background: white;
             border-radius: 20px;
+            overflow: hidden;
         }
 
+        /* Iframe container styles */
+        .iframe-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        /* Desktop image styles */
+        .imac-screen .mockup-image,
+        .laptop-screen .mockup-image {
+            object-fit: contain;
+            background-color: white;
+        }
+
+        .mockup-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: top;
+        }
+
+        /* Desktop iframe styles */
+        .imac-screen .iframe-container {
+            transform-origin: 0 0;
+        }
+
+        .imac-screen .device-iframe {
+            width: 1440px;
+            /* Standard desktop width */
+            height: 820px;
+            /* Standard desktop height */
+            border: none;
+            transform-origin: 0 0;
+        }
+
+        /* Mobile iframe styles */
+        .phone-screen .iframe-container {
+            transform-origin: 0 0;
+        }
+
+        .phone-screen .device-iframe {
+            width: 390px;
+            /* iPhone 12/13/14 width */
+            height: 844px;
+            /* iPhone 12/13/14 height */
+            border: none;
+            transform-origin: 0 0;
+        }
+
+        /* Features Section */
+        /* CSS Changes */
         .features {
             max-width: 1200px;
             margin: 4rem auto;
             padding: 2rem;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            display: flex;
+            flex-wrap: wrap;
             gap: 2rem;
+            justify-content: center;
         }
 
         .feature-card {
@@ -137,6 +289,10 @@
             background: white;
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
             transition: transform 0.3s;
+            width: 300px;
+            /* Fixed width */
+            flex: 0 0 300px;
+            /* Don't grow, don't shrink, stay at 300px */
         }
 
         .feature-card:hover {
@@ -148,6 +304,7 @@
             margin-bottom: 1rem;
         }
 
+        /* Feature Showcase Section */
         .feature-showcase {
             padding: 4rem 2rem;
             background: white;
@@ -162,19 +319,19 @@
             margin: 0 auto;
             display: flex;
             align-items: center;
+            /* This ensures vertical centering */
             gap: 4rem;
-        }
-
-        .feature-showcase:nth-child(2) .showcase-container {
-            flex-direction: row;
-        }
-
-        .feature-showcase:nth-child(odd) .showcase-container {
-            flex-direction: row-reverse;
+            min-height: 600px;
+            /* This gives enough room for the content */
         }
 
         .showcase-content {
             flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            /* This helps with vertical centering */
+            max-width: 500px;
         }
 
         .showcase-content h2 {
@@ -188,40 +345,7 @@
             margin-bottom: 2rem;
         }
 
-        .showcase-media {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .showcase-phone {
-            width: 300px;
-            height: 600px;
-            background: #fff;
-            border-radius: 40px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .showcase-screen {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            right: 20px;
-            bottom: 20px;
-            border-radius: 20px;
-            overflow: hidden;
-        }
-
-        .showcase-screen img,
-        .showcase-screen video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
+        /* CTA Section */
         .cta {
             text-align: center;
             padding: 4rem 2rem;
@@ -255,10 +379,75 @@
             color: white;
         }
 
+        .showcase-media .imac-mockup {
+            width: 600px;
+            height: 375px;
+            margin: 0;
+        }
+
+        /* Enhanced spacing styles */
+        .showcase-container.enhanced-spacing {
+            gap: 6rem;
+            padding: 2rem 4rem;
+            align-items: center;
+        }
+
+        .showcase-container.enhanced-spacing .showcase-content {
+            padding: 2rem 0;
+            max-width: 500px;
+            /* Prevents text from stretching too wide */
+        }
+
+        .showcase-container.enhanced-spacing .showcase-content p {
+            margin-bottom: 3rem;
+            /* Increased bottom margin for more spacing */
+            line-height: 1.8;
+            /* Improved readability */
+        }
+
+        .showcase-container.enhanced-spacing .showcase-media {
+            margin-top: 2rem;
+            /* Additional top spacing */
+        }
+
         @media (max-width: 1024px) {
-            .showcase-phone {
-                width: 250px;
+            .imac-mockup {
+                width: 600px;
+                height: 400px;
+            }
+
+            .features {
+                grid-template-columns: repeat(2, 300px);
+            }
+
+            .showcase-media .laptop-mockup {
+                width: 800px;
+                /* Larger size for desktop */
                 height: 500px;
+                /* Maintaining 16:10 ratio */
+            }
+        }
+
+        @media screen and (max-width: 1023px) {
+            .showcase-media .laptop-mockup {
+                width: 600px;
+                height: 375px;
+            }
+        }
+
+        @media screen and (max-width: 1200px) {
+            .showcase-media .laptop-mockup {
+                width: 700px;
+                height: 455px;
+                /* 700px / 1.54 */
+            }
+        }
+
+        @media screen and (max-width: 992px) {
+            .showcase-media .laptop-mockup {
+                width: 600px;
+                height: 390px;
+                /* 600px / 1.54 */
             }
         }
 
@@ -275,18 +464,67 @@
                 font-size: 1rem;
             }
 
+            .imac-mockup {
+                width: 90%;
+                height: 300px;
+            }
+
             .phone-mockup {
                 width: 250px;
                 height: 500px;
             }
 
+            .features {
+                padding: 1rem;
+            }
+
+            .feature-card {
+                width: calc(100% - 2rem);
+                flex: 0 0 calc(100% - 2rem);
+            }
+
             .showcase-container {
                 flex-direction: column !important;
                 gap: 2rem;
+                min-height: auto;
+                /* Remove fixed height on mobile */
+            }
+
+            .showcase-content {
+                text-align: center;
+                padding: 2rem 0;
             }
 
             .showcase-content h2 {
                 font-size: 2rem;
+            }
+
+            .showcase-media .imac-mockup {
+                width: 90%;
+                height: 300px;
+            }
+
+            .showcase-media .laptop-mockup {
+                width: 90vw;
+                /* 90% of viewport width */
+                height: calc(90vw / 1.54);
+                /* Maintain aspect ratio */
+                transform: perspective(1000px) rotateX(5deg) scale(0.9);
+            }
+
+            .showcase-container.enhanced-spacing {
+                padding: 1rem 2rem;
+                gap: 4rem;
+            }
+
+            .showcase-container.enhanced-spacing .showcase-content p {
+                margin-bottom: 2rem;
+            }
+        }
+
+        @media (max-width: 680px) {
+            .features {
+                grid-template-columns: 300px;
             }
         }
     </style>
@@ -295,118 +533,146 @@
 <body>
     <header class="header">
         <nav class="nav">
-            <div class="logo">PhoneBook</div>
+            <div class="logo">Phonebook</div>
             <div class="nav-links">
                 <a href="#features">Features</a>
                 <a href="#showcase">Showcase</a>
-                <a href="#download">Download</a>
-                <a href="#about">About</a>
+                <a href="#download">Try Now</a>
+                <!--<a href="#about">About</a>-->
             </div>
         </nav>
     </header>
 
     <section class="hero">
         <h1>Say Hello to <span class="birthstone-regular">Clio</span></h1>
-        <p>Contact information for your school staff, in your pocket.</br> Intuitive, automatic, & simple.</p>
+        <p>Contact information for your school staff in an instant.</br> On any device, even in your pocket.</p>
+            <!--<p>Contact information for your school staff; on any device, even in your pocket.</br> Intuitive, automatic, &
+                simple.</p> -->
     </section>
 
-    <section class="app-preview">
+    <section class="device-showcase">
+        <div class="imac-mockup">
+            <div class="imac-screen">
+                <div class="iframe-container">
+                    <iframe class="device-iframe"></iframe>
+                </div>
+            </div>
+            <div class="imac-base"></div>
+        </div>
         <div class="phone-mockup">
-            <div class="screen">
-                <!-- App screenshot would go here -->
+            <div class="phone-screen">
+                <div class="iframe-container">
+                    <iframe class="device-iframe"></iframe>
+                </div>
             </div>
         </div>
     </section>
 
     <section class="features" id="features">
         <div class="feature-card">
-            <h3>Smart Organization</h3>
-            <p>Automatically categorize and organize your contacts based on frequency of interaction, groups, and custom
-                tags.</p>
+            <h3>One Source of Truth</h3>
+            <p>No need to worry about outdated phone lists. Everyone is on the same page, instantly together.</p>
         </div>
         <div class="feature-card">
-            <h3>Quick Search</h3>
-            <p>Find any contact instantly with our powerful search feature that looks through names, numbers, and even
-                notes.</p>
+            <h3>Set and Forget</h3>
+            <p>Once you've completed your initial setup there is no maintenance required. Our automated tasks manage it
+                all.</p>
         </div>
         <div class="feature-card">
-            <h3>Seamless Sync</h3>
-            <p>Keep your contacts up to date across all your devices with iCloud integration and automatic backups.</p>
+            <h3>Easy to Update</h3>
+            <p>No fancy update system to learn, just update an excel document & we'll take care of the rest.</p>
+        </div>
+        <div class="feature-card">
+            <h3>Mobile Privacy</h3>
+            <p>Smart mobile number detection. Hidden by default, & only visible 20 seconds at a time. No prying eyes.</p>
+        </div>
+        <div class="feature-card">
+            <h3>Type to Search</h3>
+            <p>Enable Type to Search once and just start typing. No need for that extra click to start searching.</p>
         </div>
     </section>
 
-    <section id="showcase">
-        <div class="feature-showcase">
-            <div class="showcase-container">
-                <div class="showcase-content">
-                    <h2>Lightning Fast Search</h2>
-                    <p>Find contacts instantly as you type. Our smart search looks through names, numbers, and even
-                        notes to help you find exactly who you're looking for in milliseconds.</p>
-                </div>
-                <div class="showcase-media">
-                    <div class="showcase-phone">
-                        <div class="showcase-screen">
-                            <video loop muted playsinline>
-                                <source src="/api/placeholder/270/560" type="video/mp4">
-                            </video>
-                            <!-- Replace with your demo video -->
+    <div class="feature-showcase">
+        <div class="showcase-container enhanced-spacing">
+            <div class="showcase-content">
+                <h2>Mobile App Support</h2>
+                <p>With the ability to save the website as a Progressive Web Application (PWA) you can ensure offline use and instant updates are always at your fingertips. All done through the web. </br></br><i>Set & forget for the user</i>.
+                </p>
+            </div>
+            <div class="showcase-media">
+                <div class="phone-mockup">
+                    <div class="phone-screen">
+                        <div class="iframe-container">
+                            <iframe class="device-iframe" style="display: none;"></iframe>
+                            <img src="images/iphone-icon.PNG" alt="Search Feature" class="mockup-image mobile-image">
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="feature-showcase">
-            <div class="showcase-container">
-                <div class="showcase-content">
-                    <h2>Smart Tags & Categories</h2>
-                    <p>Organize contacts your way with custom tags and smart categories. Group contacts by workplace,
-                        social circles, or any way that makes sense to you.</p>
-                </div>
-                <div class="showcase-media">
-                    <div class="showcase-phone">
-                        <div class="showcase-screen">
-                            <video loop muted playsinline>
-                                <source src="/api/placeholder/270/560" type="video/mp4">
-                            </video>
-                            <!-- Replace with your demo video -->
+    <div class="feature-showcase">
+        <div class="showcase-container enhanced-spacing" style="flex-direction: row-reverse">
+            <div class="showcase-content">
+                <h2>Searching...</h2>
+                <p>Only got a Department & a face? <i>Search it.</i></br></br> Got only an E number to go off? <i>Search
+                        it.</i></br></br> Don't know the owner of the extension from a missed call? <i>Search
+                        it.</i></br></br> Don't know who the new Phys Ed hire is? <i>Search it.</i></p>
+            </div>
+            <div class="showcase-media">
+                <div class="laptop-mockup">
+                    <div class="laptop-screen">
+                        <div class="iframe-container">
+                            <img src="images/laptop-search.png" alt="Feature Screenshot" class="mockup-image">
                         </div>
                     </div>
+                    <div class="laptop-base"></div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="feature-showcase">
-            <div class="showcase-container">
-                <div class="showcase-content">
-                    <h2>Contact History</h2>
-                    <p>Keep track of your interaction history with each contact. See past calls, messages, and custom
-                        notes all in one place.</p>
-                </div>
-                <div class="showcase-media">
-                    <div class="showcase-phone">
-                        <div class="showcase-screen">
-                            <video loop muted playsinline>
-                                <source src="/api/placeholder/270/560" type="video/mp4">
-                            </video>
-                            <!-- Replace with your demo video -->
+    <div class="feature-showcase">
+        <div class="showcase-container enhanced-spacing">
+            <div class="showcase-content">
+                <h2>Mobile Design</h2>
+                <p>Designed especially from the ground up for a mobile first world. A custom compact interface with the
+                    added bonus of a call now button.</br></br><i>Quickly make a call, in just a tap.</i></p>
+            </div>
+            <div class="showcase-media">
+                <div class="phone-mockup">
+                    <div class="phone-screen">
+                        <div class="iframe-container">
+                            <iframe class="device-iframe" style="display: none;"></iframe>
+                            <img src="images/iphone-menu.PNG" alt="History Feature" class="mockup-image mobile-image">
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 
     <section class="cta" id="download">
-        <h2>Get Started Today</h2>
-        <a href="#" class="download-btn">Download on App Store</a>
+        <h2>Try the Full Sized Demo Today</h2>
+        <a href="Phonebook/NEW.html" class="download-btn">Explore</a>
     </section>
 
-    <footer id="about">
+    <!--<footer id="about">
         <p>&copy; 2024 PhoneBook App. All rights reserved.</p>
-    </footer>
+    </footer>-->
 
     <script>
+        // Set the website URL once
+        const PHONEBOOK_URL = 'Phonebook/NEW.html'; // Replace with your actual website URL
+
+        // Set all iframe sources
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.device-iframe').forEach(iframe => {
+                iframe.src = PHONEBOOK_URL;
+            });
+        });
+
         // Smooth scrolling for anchor links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
@@ -427,48 +693,90 @@
             });
         }, { threshold: 0.1 });
 
-        document.querySelectorAll('.feature-card, .showcase-container').forEach(element => {
+        // Calculate and set iframe scales
+        function setIframeScales() {
+            // Desktop scale
+            const imac = document.querySelectorAll('.imac-screen .iframe-container');
+            imac.forEach(container => {
+                const iframe = container.querySelector('.device-iframe');
+                const scale = container.offsetWidth / 1440;
+                iframe.style.transform = `scale(${scale})`;
+                container.style.height = `${900 * scale}px`;
+            });
+
+            // Mobile scale
+            const phoneScreens = document.querySelectorAll('.phone-screen .iframe-container');
+            phoneScreens.forEach(container => {
+                const iframe = container.querySelector('.device-iframe');
+                const scale = container.offsetWidth / 390;
+                iframe.style.transform = `scale(${scale})`;
+                container.style.height = `${844 * scale}px`;
+            });
+        }
+
+        // Set initial scales and update on resize
+        window.addEventListener('load', setIframeScales);
+        window.addEventListener('resize', setIframeScales);
+
+        /* JavaScript to handle centering */
+        document.addEventListener('DOMContentLoaded', function () {
+            function adjustFeatureCards() {
+                const featuresSection = document.querySelector('.features');
+                const cards = document.querySelectorAll('.feature-card');
+                const containerWidth = featuresSection.offsetWidth;
+                const cardWidth = 300; // Width of each card
+                const gap = 32; // 2rem gap in pixels
+
+                // Calculate how many cards can fit in a row
+                const cardsPerRow = Math.floor((containerWidth + gap) / (cardWidth + gap));
+
+                // Calculate the total rows needed
+                const totalRows = Math.ceil(cards.length / cardsPerRow);
+
+                // Calculate cards in the last row
+                const cardsInLastRow = cards.length % cardsPerRow || cardsPerRow;
+
+                if (cardsInLastRow < cardsPerRow) {
+                    // Update grid template columns based on cards in last row
+                    featuresSection.style.gridTemplateColumns = `repeat(${cardsInLastRow}, minmax(300px, 1fr))`;
+                } else {
+                    // Reset to default if row is full
+                    featuresSection.style.gridTemplateColumns = `repeat(auto-fit, minmax(300px, 1fr))`;
+                }
+            }
+
+            // Run on load and resize
+            adjustFeatureCards();
+            window.addEventListener('resize', adjustFeatureCards);
+        });
+
+        /* JavaScript to handle last row centering */
+        document.addEventListener('DOMContentLoaded', function () {
+            const features = document.querySelector('.features');
+            const cards = features.querySelectorAll('.feature-card');
+
+            // Get the number of cards
+            const totalCards = cards.length;
+
+            // If we have less than 3 cards in the last row
+            if (totalCards % 3 !== 0) {
+                // Get the number of cards in the last row
+                const lastRowCards = totalCards % 3;
+                // Get all cards that should be in the last row
+                const lastRowStart = totalCards - lastRowCards;
+
+                for (let i = lastRowStart; i < totalCards; i++) {
+                    cards[i].style.gridColumn = `${Math.ceil((3 - lastRowCards) / 2) + 1 + (i - lastRowStart)} / span 1`;
+                }
+            }
+        });
+
+        // Animation observer
+        document.querySelectorAll('.feature-card, .showcase-container, .imac-mockup, .phone-mockup').forEach(element => {
             element.style.opacity = 0;
             element.style.transform = 'translateY(20px)';
             element.style.transition = 'opacity 0.5s, transform 0.5s';
             animationObserver.observe(element);
-        });
-
-        // Video autoplay on scroll
-        const videoObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                const video = entry.target;
-
-                // Play video when more than 50% visible
-                if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
-                    video.play().catch(error => {
-                        console.log("Video autoplay failed:", error);
-                    });
-                } else {
-                    video.pause();
-                }
-            });
-        }, {
-            threshold: [0, 0.5, 1],
-            rootMargin: '0px'
-        });
-
-        // Observe all videos
-        document.querySelectorAll('video').forEach(video => {
-            // Ensure videos are preloaded
-            video.preload = 'auto';
-
-            // Start observing the video
-            videoObserver.observe(video);
-
-            // Add loading state visual feedback
-            video.addEventListener('loadeddata', () => {
-                video.style.opacity = 1;
-            });
-
-            // Set initial opacity
-            video.style.opacity = 0;
-            video.style.transition = 'opacity 0.3s';
         });
     </script>
 </body>
