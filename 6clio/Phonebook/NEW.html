@@ -4,1608 +4,784 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#ffffff">
-    <!--<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0"> -->
-    <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
-    <title>Phonebook</title>
+    <title>PhoneBook - Smart Contact Management</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Birthstone&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary-color: #D35400;
+            --secondary-color: #E67E22;
+            --text-color: #333;
+            --light-gray: #f5f5f7;
+        }
+
         * {
+            margin: 0;
+            padding: 0;
             box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
         }
 
-        html,
-        body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
-            width: 100%;
-            position: relative;
-        }
-
-        .header-title {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 1rem;
+        .birthstone-regular {
+            font-family: "Birthstone", serif;
+            font-weight: 400;
+            font-style: normal;
+            font-size: 4.2rem;
         }
 
         body {
-            font-family: Arial, sans-serif;
             line-height: 1.6;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            /* Changed from min-height: 100vh */
-            max-width: 1200px;
-            margin: 0 auto;
-            position: relative;
+            color: var(--text-color);
         }
 
         .header {
-            position: sticky;
-            top: 0;
-            left: 0;
-            right: 0;
-            width: 100%;
-            background: white;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            z-index: 100;
+            background: var(--light-gray);
             padding: 1rem;
-        }
-
-        .header-logo {
-            height: 40px;
-            width: auto;
-            margin-right: 1rem;
-        }
-
-        .title-container {
-            display: flex;
-            align-items: center;
-            flex: 1;
-        }
-
-        .controls {
-            margin: 16px 0;
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            width: 100%;
-            box-sizing: border-box;
-            padding: 0 20px;
-            position: relative;
-            z-index: 101;
-        }
-
-        .search-container {
-            position: relative;
-            flex: 1;
-            min-width: 200px;
-            display: flex;
-            gap: 8px;
-        }
-
-        .search {
-            width: 100%;
-            padding: 12px 52px 12px 16px;
-            font-size: 16px;
-            border-radius: 8px;
-            border: 2px solid #ddd;
-            background-color: white;
-        }
-
-        .search:focus {
-            outline: none;
-            border-color: #007bff;
-            box-shadow: 0 0 0 1px #007bff;
-        }
-
-        .clear-search {
-            position: absolute;
-            right: 8px;
-            top: 50%;
-            transform: translateY(-50%);
-            border: none;
-            background: transparent;
-            padding: 12px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #666;
-            border-radius: 50%;
-            transition: all 0.2s ease;
-            min-width: 44px;
-            min-height: 44px;
-        }
-
-        .clear-search:hover {
-            background-color: rgba(0, 0, 0, 0.05);
-            color: #333;
-        }
-
-        .search:placeholder-shown+.clear-search {
-            display: none;
-        }
-
-        .mobile-sort-button {
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 12px;
-            background: #f5f9ff;
-            /* Very light blue background */
-            border: 1px solid #e3f2fd;
-            /* Light blue border */
-            border-radius: 8px;
-            cursor: pointer;
-            min-width: 48px;
-            height: 48px;
-        }
-
-        .mobile-sort-button svg {
-            width: 24px;
-            height: 24px;
-            stroke: #2196F3;
-            /* Material Design Blue */
-            stroke-width: 2;
-            fill: none;
-        }
-
-        .legend-toggle:hover .chevron-icon {
-            stroke: #1976D2;
-            /* Slightly darker blue on hover */
-        }
-
-        .mobile-sort-button:hover svg {
-            stroke: #1976D2;
-            /* Slightly darker blue on hover */
-        }
-
-        .mobile-sort-button:hover {
-            background: #e3f2fd;
-            /* Slightly darker background on hover */
-        }
-
-        .legend-toggle {
-            display: none;
-            width: 100%;
-            padding: 12px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .chevron-icon {
-            transition: transform 0.3s ease;
-        }
-
-        .legend-toggle[aria-expanded="true"] .chevron-icon {
-            transform: rotate(180deg);
-        }
-
-        .department-legend {
-            margin-bottom: 20px;
-            padding: 12px;
-            background: #f5f5f5;
-            border-radius: 4px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            position: relative;
-            z-index: 101;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 2px;
-        }
-
-        .legend-color {
-            width: 12px;
-            height: 12px;
-            border-radius: 2px;
-            flex-shrink: 0;
-        }
-
-        .legend-toggle .chevron-icon {
-            stroke: #2196F3;
-            /* Material Design Blue */
-            transition: transform 0.3s ease;
-        }
-
-        .type-search-button {
-            padding: 8px 12px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            background-color: #f8f9fa;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.2s ease;
-        }
-
-        .type-search-button.active {
-            background-color: #e7f5ff;
-            border-color: #339af0;
-            color: #1971c2;
-        }
-
-        .type-search-button:hover {
-            background-color: #e9ecef;
-        }
-
-        .sort-container {
-            position: relative;
-            display: flex;
-        }
-
-        .sort-select {
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            background-color: white;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-            padding: 20px;
-            width: 100%;
-            max-width: 100%;
-            box-sizing: border-box;
-            align-items: start;
-            flex: 1;
-            min-height: auto;
-            /* Changed from min-height: 100vh */
-            height: fit-content;
-            /* Added */
-        }
-
-        .department-header {
-            grid-column: 1 / -1;
-            background: #f5f5f5;
-            padding: 10px;
-            border-radius: 4px;
-            width: 100%;
-            box-sizing: border-box;
-            margin: 0;
-            padding: 12px 16px;
-        }
-
-        .department-section {
-            grid-column: 1 / -1;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-            width: 100%;
-            padding: 8px 0;
-            height: fit-content;
-            /* Added */
-        }
-
-        .card {
-            border: 1px solid #ddd;
-            padding: 15px;
-            border-radius: 8px;
-            background: #fff;
-            transition: all 0.3s ease;
-            width: 100%;
-            box-sizing: border-box;
-            height: fit-content;
-            margin: 0;
-        }
-
-        .card h3 {
-            margin-bottom: 15px;
-            color: #333;
-            font-size: 1.2rem;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
-        }
-
-        .card-body {
-            display: flex;
-            gap: 20px;
-            align-items: flex-start;
-            width: 100%;
-            box-sizing: border-box;
-            min-height: 170px;
-        }
-
-        .card-image-container {
-            position: relative;
-            width: 33.333%;
-            min-width: 33.333%;
-            height: 170px;
-            border-radius: 12px;
-            overflow: hidden;
-            background-color: #f0f0f0;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .card-content {
-            flex: 1;
-        }
-
-        .card p {
-            margin: 5px 0;
-            color: #666;
-        }
-
-        .card.leadership {
-            background-color: #fff8e1;
-            border-left: 4px solid #ffd700;
-        }
-
-        .card.department-head {
-            background-color: #f3e5f5;
-            border-left: 4px solid #9c27b0;
-        }
-
-        .card.erc-staff {
-            background-color: #e8f4f8;
-            border-left: 4px solid #2196F3;
-        }
-
-        .card.year-coordinator {
-            background-color: #e8f5e9;
-            border-left: 4px solid #4CAF50;
-        }
-
-        .card.esc-staff {
-            background-color: #f8f0e8;
-            border-left: 4px solid #FF9800;
-        }
-
-        .email-button {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background-color: #2196F3;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 4px;
-            text-decoration: none;
-            transition: background-color 0.2s ease;
-            margin-top: 10px;
-        }
-
-        .email-button:hover {
-            background-color: #1976D2;
-        }
-
-        .mobile-container {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            margin: 5px 0;
-            min-height: 24px;
-        }
-
-        .mobile-number-toggle {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            background: none;
-            border: none;
-            padding: 4px 8px;
-            cursor: pointer;
-            color: #666;
-            font-size: inherit;
-            border-radius: 4px;
-            transition: background-color 0.2s ease;
-            text-align: left;
-            height: 24px;
-            white-space: nowrap;
-        }
-
-        .mobile-number-toggle:hover {
-            background-color: #f0f0f0;
-        }
-
-        .mobile-number-hidden {
-            display: none;
-            color: #666;
-            white-space: nowrap;
-        }
-
-        .mobile-number-placeholder {
-            color: #666;
-            font-style: italic;
-            margin-right: 4px;
-            white-space: nowrap;
-            display: inline-block;
-        }
-
-        .mobile-number-toggle.revealed .mobile-number-hidden {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .mobile-number-toggle.revealed .mobile-number-placeholder,
-        .mobile-number-toggle.revealed .eye-icon {
-            display: none;
-        }
-
-        .card-image-container {
-            position: relative;
-            width: 33.333%;
-            min-width: 33.333%;
-            height: 170px;
-            border-radius: 12px;
-            overflow: hidden;
-            background-color: #f0f0f0;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .card-image-container::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 24px;
-            height: 24px;
-            border: 2px solid #ddd;
-            border-top-color: #999;
-            border-radius: 50%;
-            animation: spinner 1s linear infinite;
-            z-index: 1;
-            opacity: 1;
-            transition: opacity 0.2s ease;
-        }
-
-        .card-image {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: opacity 0.2s ease;
-            opacity: 0;
-            border-radius: 12px;
-            z-index: 2;
-        }
-
-        .card-image.loaded {
-            opacity: 1;
-        }
-
-        .card-image.loaded+.card-image-container::before {
-            opacity: 0;
-        }
-
-        @keyframes spinner {
-            to {
-                transform: translate(-50%, -50%) rotate(360deg);
-            }
-        }
-
-        /* Call button styles */
-        @keyframes fadeInOut {
-            0% {
-                opacity: 0;
-                transform: translate(-50%, 20px);
-            }
-
-            20% {
-                opacity: 1;
-                transform: translate(-50%, 0);
-            }
-
-            80% {
-                opacity: 1;
-                transform: translate(-50%, 0);
-            }
-
-            100% {
-                opacity: 0;
-                transform: translate(-50%, -20px);
-            }
-        }
-
-        .call-button {
-            display: var(--call-button-display, none);
-            align-items: center;
-            gap: 8px;
-            background-color: #4CAF50;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 4px;
-            text-decoration: none;
-            margin-top: 10px;
-            transition: background-color 0.2s ease;
-        }
-
-        .call-button svg {
-            width: 16px;
-            height: 16px;
-            fill: none;
-            stroke: currentColor;
-            stroke-width: 2;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
-
-        .call-button:hover {
-            background-color: #45a049;
-        }
-
-        .modal {
-            display: none;
             position: fixed;
-            top: 0;
-            left: 0;
             width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            opacity: 0;
-            transition: opacity 0.3s ease-in-out;
+            top: 0;
+            z-index: 100;
+            display: none;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
-        .modal.show {
+        .nav {
+            max-width: 1200px;
+            margin: 0 auto;
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            opacity: 1;
         }
 
-        .modal-content {
-            background-color: white;
-            padding: 2rem;
-            border-radius: 12px;
-            max-width: 90%;
-            width: 400px;
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-color);
+            margin-left: 2rem;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .hero {
+            padding: 5rem 2rem 7rem;
             text-align: center;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transform: translateY(20px);
-            transition: transform 0.3s ease-in-out;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
         }
 
-        .modal.show .modal-content {
-            transform: translateY(0);
-        }
-
-        .modal-icon {
+        .hero h1 {
             font-size: 3rem;
             margin-bottom: 1rem;
         }
 
-        .modal h2 {
-            margin-bottom: 1rem;
-            color: #333;
+        .hero p {
+            font-size: 1.25rem;
+            max-width: 700px;
+            margin: 0 auto 2rem;
         }
 
-        .modal p {
-            margin-bottom: 1.5rem;
-            color: #666;
-            line-height: 1.6;
+        /* Device Showcase Styles */
+        .device-showcase {
+            margin-top: -100px;
+            padding: 2rem;
+            display: flex;
+            justify-content: center;
+            gap: 4rem;
+            flex-wrap: wrap;
         }
 
-        #closeModal {
-            background-color: #2196F3;
-            color: white;
+        /* imac Device */
+        .imac-mockup {
+            position: relative;
+            width: 800px;
+            height: 500px;
+            background: #f0f0f0;
+            border-radius: 20px;
+            padding: 20px 20px 50px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .imac-screen {
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .imac-base {
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 20px;
+            background: #d0d0d0;
+            border-radius: 0 0 10px 10px;
+        }
+
+        .showcase-media .laptop-mockup {
+            position: relative;
+            width: 749px;
+            /* Base width for large screens */
+            /* Height calculated to match MacBook Pro aspect ratio (1.54:1) */
+            height: 508px;
+            /* 800px / 1.54 */
+            background: linear-gradient(to bottom, #c3c3c3, #b3b3b3);
+            border-radius: 12px;
+            padding: 12px 12px 25px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            transform-style: preserve-3d;
+            transform: perspective(1000px) rotateX(5deg);
+            margin: 20px auto;
+        }
+
+        .laptop-screen {
+            width: 100%;
+            height: 100%;
+            background: #000;
+            /* MacBook screens have black bezels */
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .laptop-screen .mockup-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: top center;
+        }
+
+        .showcase-media .laptop-screen {
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .laptop-base {
+            position: absolute;
+            bottom: -15px;
+            left: -2%;
+            width: 104%;
+            height: 15px;
+            background: linear-gradient(to bottom, #999, #888);
+            border-radius: 0 0 12px 12px;
+        }
+
+        .laptop-base::after {
+            content: '';
+            position: absolute;
+            bottom: 9px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30%;
+            height: 6px;
+            background: #777;
+            border-radius: 0 0 10px 10px;
+        }
+
+        @media (max-width: 768px) {
+            .showcase-media .laptop-mockup {
+                width: 90%;
+                height: 300px;
+                transform: perspective(1000px) rotateX(5deg) scale(0.9);
+            }
+        }
+
+        /* Phone Device */
+        .phone-mockup {
+            width: 300px;
+            height: 600px;
+            background: #f0f0f0;
+            border-radius: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .phone-screen {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            bottom: 20px;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        /* Iframe container styles */
+        .iframe-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        /* Desktop image styles */
+        .imac-screen .mockup-image,
+        .laptop-screen .mockup-image {
+            object-fit: contain;
+            background-color: white;
+        }
+
+        .mockup-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: top;
+        }
+
+        /* Desktop iframe styles */
+        .imac-screen .iframe-container {
+            transform-origin: 0 0;
+        }
+
+        .imac-screen .device-iframe {
+            width: 1440px;
+            /* Standard desktop width */
+            height: 820px;
+            /* Standard desktop height */
             border: none;
-            padding: 12px 24px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: background-color 0.2s ease;
+            transform-origin: 0 0;
         }
 
-        #closeModal:hover {
-            background-color: #1976D2;
+        /* Mobile iframe styles */
+        .phone-screen .iframe-container {
+            transform-origin: 0 0;
         }
 
-        .matched-department {
-            background-color: #e3f2fd;
-            border-left: 4px solid #2196F3;
-            transition: all 0.3s ease;
+        .phone-screen .device-iframe {
+            width: 390px;
+            /* iPhone 12/13/14 width */
+            height: 844px;
+            /* iPhone 12/13/14 height */
+            border: none;
+            transform-origin: 0 0;
         }
 
-        .matched-department h2 mark {
-            background-color: #bbdefb;
-            padding: 2px 4px;
-            border-radius: 2px;
+        /* Features Section */
+        /* CSS Changes */
+        .features {
+            max-width: 1200px;
+            margin: 4rem auto;
+            padding: 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            justify-content: center;
         }
 
-        .card mark {
-            background-color: #fff3cd;
-            padding: 2px 4px;
-            border-radius: 2px;
+        .feature-card {
+            padding: 2rem;
+            border-radius: 20px;
+            background: white;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s;
+            width: 300px;
+            /* Fixed width */
+            flex: 0 0 300px;
+            /* Don't grow, don't shrink, stay at 300px */
         }
 
-        @media screen and (max-width: 480px) {
-            .modal-content {
-                padding: 1.5rem;
-                margin: 1rem;
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        /* Feature Showcase Section */
+        .feature-showcase {
+            padding: 4rem 2rem;
+            background: white;
+        }
+
+        .feature-showcase:nth-child(even) {
+            background: var(--light-gray);
+        }
+
+        .showcase-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            /* This ensures vertical centering */
+            gap: 4rem;
+            min-height: 600px;
+            /* This gives enough room for the content */
+        }
+
+        .showcase-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            /* This helps with vertical centering */
+            max-width: 500px;
+        }
+
+        .showcase-content h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .showcase-content p {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+        }
+
+        /* CTA Section */
+        .cta {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: var(--light-gray);
+        }
+
+        .cta h2 {
+            margin-bottom: 2rem;
+        }
+
+        .download-btn {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: bold;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            background: var(--text-color);
+            color: white;
+        }
+
+        .showcase-media .imac-mockup {
+            width: 600px;
+            height: 375px;
+            margin: 0;
+        }
+
+        /* Enhanced spacing styles */
+        .showcase-container.enhanced-spacing {
+            gap: 6rem;
+            padding: 2rem 4rem;
+            align-items: center;
+        }
+
+        .showcase-container.enhanced-spacing .showcase-content {
+            padding: 2rem 0;
+            max-width: 500px;
+            /* Prevents text from stretching too wide */
+        }
+
+        .showcase-container.enhanced-spacing .showcase-content p {
+            margin-bottom: 3rem;
+            /* Increased bottom margin for more spacing */
+            line-height: 1.8;
+            /* Improved readability */
+        }
+
+        .showcase-container.enhanced-spacing .showcase-media {
+            margin-top: 2rem;
+            /* Additional top spacing */
+        }
+
+        @media (max-width: 1024px) {
+            .imac-mockup {
+                width: 600px;
+                height: 400px;
             }
 
-            body {
-                min-height: 100vh;
-                /* Keep full height on mobile */
+            .features {
+                grid-template-columns: repeat(2, 300px);
             }
 
-            .call-button {
-                display: inline-flex !important;
+            .showcase-media .laptop-mockup {
+                width: 800px;
+                /* Larger size for desktop */
+                height: 500px;
+                /* Maintaining 16:10 ratio */
             }
+        }
 
-            .controls {
-                padding: 0 8px;
-                margin: 8px 0;
-                gap: 8px;
+        @media screen and (max-width: 1023px) {
+            .showcase-media .laptop-mockup {
+                width: 600px;
+                height: 375px;
             }
+        }
 
-            .header-logo {
-                height: 32px;
+        @media screen and (max-width: 1200px) {
+            .showcase-media .laptop-mockup {
+                width: 700px;
+                height: 455px;
+                /* 700px / 1.54 */
             }
+        }
 
-            .card-body {
-                gap: 12px;
+        @media screen and (max-width: 992px) {
+            .showcase-media .laptop-mockup {
+                width: 600px;
+                height: 390px;
+                /* 600px / 1.54 */
             }
+        }
 
-            .search-container {
-                width: 100%;
-            }
-
-            .search {
-                padding-right: 48px;
-            }
-
-            .type-search-button {
-                display: none !important;
-            }
-
-            .grid {
-                min-height: calc(100vh - 200px);
-                /* Approximate header height subtracted */
-            }
-
-            .department-section {
-                gap: 12px;
-                padding: 4px 0;
-            }
-
-            .mobile-sort-button {
-                display: flex;
-                z-index: 1;
-            }
-
-            .sort-select {
-                opacity: 0;
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 48px;
-                height: 48px;
-                z-index: 2;
-                cursor: pointer;
-            }
-
-            .legend-toggle {
-                display: flex;
-                width: 20%;
-            }
-
-            .department-legend {
+        @media (max-width: 768px) {
+            .nav-links {
                 display: none;
             }
 
-            .department-legend.expanded {
-                display: flex;
+            .hero h1 {
+                font-size: 2rem;
             }
 
-            .header-inner {
-                padding: 0;
+            .hero p {
+                font-size: 1rem;
             }
 
-            .header {
-                padding: 8px;
+            .imac-mockup {
+                width: 90%;
+                height: 300px;
             }
 
-            .header-title {
-                padding-left: 2%;
-                margin-top: 2%;
-                margin-bottom: 2%;
+            .phone-mockup {
+                width: 250px;
+                height: 500px;
             }
 
+            .features {
+                padding: 1rem;
+            }
+
+            .feature-card {
+                width: calc(100% - 2rem);
+                flex: 0 0 calc(100% - 2rem);
+            }
+
+            .showcase-container {
+                flex-direction: column !important;
+                gap: 2rem;
+                min-height: auto;
+                /* Remove fixed height on mobile */
+            }
+
+            .showcase-content {
+                text-align: center;
+                padding: 2rem 0;
+            }
+
+            .showcase-content h2 {
+                font-size: 2rem;
+            }
+
+            .showcase-media .imac-mockup {
+                width: 90%;
+                height: 300px;
+            }
+
+            .showcase-media .laptop-mockup {
+                width: 90vw;
+                /* 90% of viewport width */
+                height: calc(90vw / 1.54);
+                /* Maintain aspect ratio */
+                transform: perspective(1000px) rotateX(5deg) scale(0.9);
+            }
+
+            .showcase-container.enhanced-spacing {
+                padding: 1rem 2rem;
+                gap: 4rem;
+            }
+
+            .showcase-container.enhanced-spacing .showcase-content p {
+                margin-bottom: 2rem;
+            }
         }
 
-        @media screen and (max-width: 320px) {
-            .grid {
-                padding: 8px;
-                gap: 8px;
-            }
-
-            .controls {
-                padding: 0 4px;
-                margin: 4px 0;
-            }
-
-            .legend-item {
-                min-width: 100%;
+        @media (max-width: 680px) {
+            .features {
+                grid-template-columns: 300px;
             }
         }
     </style>
 </head>
 
 <body>
+    <header class="header">
+        <nav class="nav">
+            <div class="logo">Phonebook</div>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#showcase">Showcase</a>
+                <a href="#download">Try Now</a>
+                <!--<a href="#about">About</a>-->
+            </div>
+        </nav>
+    </header>
 
-    <div id="welcomeModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-icon">🚧</div>
-            <h2>Welcome!</h2>
-            <p>We're only testing the phonebook, it's a side project so updates will come when they can. </br></br>
-                We're ironing out the issues & trying our best. Please pardon our dust.
+    <section class="hero">
+        <h1>Say Hello to <span class="birthstone-regular">Clio</span></h1>
+        <p>Contact information for your school staff in an instant.</br> On any device, even in your pocket.</p>
+        <!--<p>Contact information for your school staff; on any device, even in your pocket.</br> Intuitive, automatic, &
+                simple.</p> -->
+    </section>
+
+    <section class="device-showcase">
+        <div class="imac-mockup">
+            <div class="imac-screen">
+                <div class="iframe-container">
+                    <iframe class="device-iframe"></iframe>
+                </div>
+            </div>
+            <div class="imac-base"></div>
+        </div>
+        <div class="phone-mockup">
+            <div class="phone-screen">
+                <div class="iframe-container">
+                    <iframe class="device-iframe"></iframe>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta" id="download">
+        <h2>Try the Full Demo Now</h2>
+        <a href="Phonebook/NEW.html" class="download-btn">Explore</a>
+    </section>
+
+    <section class="features" id="features">
+        <div class="feature-card">
+            <h3>One Source of Truth</h3>
+            <p>No need to worry about outdated phone lists. Everyone is on the same page, instantly together.</p>
+        </div>
+        <div class="feature-card">
+            <h3>Set and Forget</h3>
+            <p>Once you've completed your initial setup there is no maintenance required. Our automated tasks manage it
+                all.</p>
+        </div>
+        <div class="feature-card">
+            <h3>Easy to Update</h3>
+            <p>No fancy update system to learn, just update an excel document & we'll take care of the rest.</p>
+        </div>
+        <div class="feature-card">
+            <h3>Mobile Privacy</h3>
+            <p>Smart mobile number detection. Hidden by default, & only visible 20 seconds at a time. No prying eyes.
             </p>
-            <button id="closeModal">Cool, let me use it!</button>
+        </div>
+        <div class="feature-card">
+            <h3>Type to Search</h3>
+            <p>Enable Type to Search once and just start typing. No need for that extra click to start searching.</p>
+        </div>
+    </section>
+
+    <div class="feature-showcase">
+        <div class="showcase-container enhanced-spacing">
+            <div class="showcase-content">
+                <h2>Mobile App Support</h2>
+                <p>With the ability to save the website as a Progressive Web Application (PWA) you can ensure offline
+                    use and instant updates are always at your fingertips. All done through the web. </br></br><i>Set &
+                        forget for the user</i>.
+                </p>
+            </div>
+            <div class="showcase-media">
+                <div class="phone-mockup">
+                    <div class="phone-screen">
+                        <div class="iframe-container">
+                            <iframe class="device-iframe" style="display: none;"></iframe>
+                            <img src="images/iphone-icon.PNG" alt="Search Feature" class="mockup-image mobile-image">
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <header class="header">
-        <div class="header-inner">
-            <div class="header-title">
-                <div class="title-container">
-                    <img src="logo.png" alt="Logo" class="header-logo" onerror="this.style.display='none'">
-                    <h1>Phonebook</h1>
-                </div>
-                <button class="legend-toggle" aria-expanded="false" aria-controls="department-legend">
-                    <svg class="chevron-icon" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor"
-                        stroke-width="4" fill="none">
-                        <polyline points="6 9 12 15 18 9"></polyline>
-                    </svg>
-                </button>
+    <div class="feature-showcase">
+        <div class="showcase-container enhanced-spacing" style="flex-direction: row-reverse">
+            <div class="showcase-content">
+                <h2>Searching...</h2>
+                <p>Only got a Department & a face? <i>Search it.</i></br></br> Got only an E number to go off? <i>Search
+                        it.</i></br></br> Don't know the owner of the extension from a missed call? <i>Search
+                        it.</i></br></br> Don't know who the new Phys Ed hire is? <i>Search it.</i></p>
             </div>
-
-            <div id="department-legend" class="department-legend">
-                <div class="legend-item">
-                    <div class="legend-color" style="background-color: #f8f0e8; border-left: 4px solid #FF9800;"></div>
-                    <span>ESC Staff</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-color" style="background-color: #e8f4f8; border-left: 4px solid #2196F3;"></div>
-                    <span>ERC Staff</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-color" style="background-color: #fff8e1; border-left: 4px solid #ffd700;"></div>
-                    <span>Leadership</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-color" style="background-color: #f3e5f5; border-left: 4px solid #9c27b0;"></div>
-                    <span>HOD/TIC</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-color" style="background-color: #e8f5e9; border-left: 4px solid #4CAF50;"></div>
-                    <span>Year Co</span>
+            <div class="showcase-media">
+                <div class="laptop-mockup">
+                    <div class="laptop-screen">
+                        <div class="iframe-container">
+                            <img src="images/laptop-search.png" alt="Feature Screenshot" class="mockup-image">
+                        </div>
+                    </div>
+                    <div class="laptop-base"></div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="controls">
-            <div class="search-container">
-                <input type="text" class="search" placeholder="Search by name, number, or department..." id="search">
-                <button id="clearSearch" class="clear-search" title="Clear search">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                </button>
+    <div class="feature-showcase">
+        <div class="showcase-container enhanced-spacing">
+            <div class="showcase-content">
+                <h2>Mobile Design</h2>
+                <p>Designed especially from the ground up for a mobile first world. A custom compact interface with the
+                    added bonus of a call now button.</br></br><i>Quickly make a call, in just a tap.</i></p>
             </div>
-            <button id="typeSearchToggle" class="type-search-button" title="Toggle type to search">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect>
-                    <path d="M7 8h.01M11 8h.01M15 8h.01M19 8h.01M9 12h.01M13 12h.01M17 12h.01M8 16h8"></path>
-                </svg>
-                Type to Search
-            </button>
-            <div class="sort-container">
-                <select id="sort" class="sort-select">
-                    <optgroup label="Sort by">
-                        <option value="firstName">First Name</option>
-                        <option value="lastName">Last Name</option>
-                    </optgroup>
-                    <option value="department">Group by Department</option>
-                </select>
-                <button class="mobile-sort-button" aria-label="Sort options">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="20" viewBox="0 0 22 20" id="filter">
-                        <g fill="none" fill-rule="evenodd" stroke="none" stroke-linecap="round" stroke-linejoin="round"
-                            stroke-width="1">
-                            <g stroke="#2196F3" stroke-width="2" transform="translate(-1614 -1629)">
-                                <g transform="translate(1615 1630)">
-                                    <path d="M20 0H0l8 9.46V16l4 2V9.46z"></path>
-                                </g>
-                            </g>
-                        </g>
-                    </svg>
-                </button>
+            <div class="showcase-media">
+                <div class="phone-mockup">
+                    <div class="phone-screen">
+                        <div class="iframe-container">
+                            <iframe class="device-iframe" style="display: none;"></iframe>
+                            <img src="images/iphone-menu.PNG" alt="History Feature" class="mockup-image mobile-image">
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </header>
+    </div>
 
-    <div class="grid" id="grid"></div>
-    <script src="staff-data.js"></script>
+    <!--<footer id="about">
+        <p>&copy; 2024 PhoneBook App. All rights reserved.</p>
+    </footer>-->
 
     <script>
-        // Initialize variables
-        let currentStaffData = [];
-        const grid = document.getElementById('grid');
-        const search = document.getElementById('search');
-        const sort = document.getElementById('sort');
-        const clearSearchBtn = document.getElementById('clearSearch');
-        const typeSearchToggle = document.getElementById('typeSearchToggle');
-        let typeToSearchEnabled = false;
-        let searchTimeout;
-        const legendToggle = document.querySelector('.legend-toggle');
-        const legend = document.querySelector('.department-legend');
-        const loadedImagesCache = new Map();
-        const imageCache = new Map();
+        // Set the website URL once
+        const PHONEBOOK_URL = 'Phonebook/NEW.html'; // Replace with your actual website URL
 
-        const konamiCode = [
-            'ArrowUp', 'ArrowUp',
-            'ArrowDown', 'ArrowDown',
-            'ArrowLeft', 'ArrowRight',
-            'ArrowLeft', 'ArrowRight'
-        ];
-        let konamiIndex = 0;
-        let callButtonEnabled = false;
-
-        document.addEventListener('DOMContentLoaded', function () {
-            const modal = document.getElementById('welcomeModal');
-            const closeButton = document.getElementById('closeModal');
-            const hasSeenModal = localStorage.getItem('hasSeenPhonebookModal');
-
-            function showModal() {
-                modal.classList.add('show');
-                document.body.style.overflow = 'hidden';
-            }
-
-            function hideModal() {
-                modal.classList.remove('show');
-                document.body.style.overflow = '';
-                localStorage.setItem('hasSeenPhonebookModal', 'true');
-            }
-
-            if (!hasSeenModal) {
-                // Small delay to ensure smooth animation
-                setTimeout(showModal, 500);
-            }
-
-            closeButton.addEventListener('click', hideModal);
-
-            // Close modal if clicking outside
-            modal.addEventListener('click', function (e) {
-                if (e.target === modal) {
-                    hideModal();
-                }
-            });
-
-            // Close modal on escape key
-            document.addEventListener('keydown', function (e) {
-                if (e.key === 'Escape' && modal.classList.contains('show')) {
-                    hideModal();
-                }
-            });
-        });
-
-        // Utility Functions for Call Button
-        function loadCallButtonPreference() {
-            try {
-                return localStorage.getItem('staffDirectoryCallButton') === 'true';
-            } catch (e) {
-                console.warn('Unable to load call button preference:', e);
-                return false;
-            }
-        }
-
-        function saveCallButtonPreference(enabled) {
-            try {
-                localStorage.setItem('staffDirectoryCallButton', enabled);
-            } catch (e) {
-                console.warn('Unable to save call button preference:', e);
-            }
-        }
-
-        function updatePageTitle(isEnabled) {
-            const title = document.querySelector('title');
-            const heading = document.querySelector('h1');
-            const newText = isEnabled ? 'Clio' : 'Phonebook';
-
-            if (title) title.textContent = newText;
-            if (heading) heading.textContent = newText;
-        }
-
-        function updateCallButtonVisibility(enabled) {
-            document.documentElement.style.setProperty('--call-button-display', enabled ? 'inline-flex' : 'none');
-            callButtonEnabled = enabled;
-            updatePageTitle(enabled);
-        }
-
-        function showToast(message) {
-            const toast = document.createElement('div');
-            toast.textContent = message;
-            toast.style.cssText = `
-        position: fixed;
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: #333;
-        color: white;
-        padding: 12px 24px;
-        border-radius: 8px;
-        z-index: 1000;
-        animation: fadeInOut 2s ease-in-out forwards;
-    `;
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 2000);
-        }
-
-        // Type search preferences
-        function loadTypeSearchPreference() {
-            try {
-                return localStorage.getItem('staffDirectoryTypeSearch') === 'true';
-            } catch (e) {
-                console.warn('Unable to load type search preference:', e);
-                return false;
-            }
-        }
-
-        function saveTypeSearchPreference(enabled) {
-            try {
-                localStorage.setItem('staffDirectoryTypeSearch', enabled);
-            } catch (e) {
-                console.warn('Unable to save type search preference:', e);
-            }
-        }
-
-        function updateTypeSearchButton() {
-            if (typeToSearchEnabled) {
-                typeSearchToggle.classList.add('active');
-            } else {
-                typeSearchToggle.classList.remove('active');
-            }
-        }
-
-        // Sort preferences
-        function saveSortPreference(value) {
-            try {
-                localStorage.setItem('staffDirectorySortPreference', value);
-            } catch (e) {
-                console.warn('Unable to save sort preference:', e);
-            }
-        }
-
-        function loadSortPreference() {
-            try {
-                return localStorage.getItem('staffDirectorySortPreference') || 'firstName';
-            } catch (e) {
-                console.warn('Unable to load sort preference:', e);
-                return 'firstName';
-            }
-        }
-
-        // Data cleaning and processing
-        function cleanStaffData(staffArray) {
-            const cleanedEntries = staffArray.filter(staff => {
-                if (!staff.name || staff.name.trim() === '') {
-                    return false;
-                }
-
-                staff.name = staff.name.trim();
-                staff.department = staff.department || 'Unassigned';
-                staff.phoneNumber = staff.phoneNumber || 'No Extension';
-                staff.email = staff.email || 'No Email';
-
-                return true;
-            });
-
-            const staffMap = new Map();
-            cleanedEntries.forEach(staff => {
-                const existingStaff = staffMap.get(staff.name);
-                const currentIsHOD = staff.department.toLowerCase().includes('hod');
-                if (!existingStaff || currentIsHOD) {
-                    staffMap.set(staff.name, staff);
-                }
-            });
-
-            return Array.from(staffMap.values());
-        }
-
-        function getDepartmentClass(department) {
-            const normalizedDept = department.toLowerCase().trim();
-
-            if (normalizedDept.startsWith('erc')) return 'erc-staff';
-            if (normalizedDept.startsWith('esc')) return 'esc-staff';
-            if (normalizedDept.includes('yr ') || normalizedDept.includes('year ') ||
-                normalizedDept.includes('yearco')) {
-                return 'year-coordinator';
-            }
-            if (normalizedDept.includes('principal') || normalizedDept.includes('deputy') ||
-                (normalizedDept === 'mcs')) {
-                return 'leadership';
-            }
-            if (normalizedDept.includes('hod') || normalizedDept.includes('tic') ||
-                normalizedDept.includes('(tic)') || normalizedDept.includes('head of') ||
-                normalizedDept.includes('hola') || normalizedDept.includes('in charge') ||
-                normalizedDept.includes('program co')) {
-                return 'department-head';
-            }
-
-            return '';
-        }
-
-        // Card creation
-        async function createCardElement(staff) {
-            const card = document.createElement('div');
-            const deptClass = getDepartmentClass(staff.department);
-            card.className = `card ${deptClass}`;
-
-            // Handle phone numbers
-            let extensionNumber = '';
-            let mobileNumber = '';
-            let mobileType = '';
-
-            if (staff.phoneNumber) {
-                if (staff.phoneNumber.includes('/')) {
-                    const [extension, mobile] = staff.phoneNumber.split('/').map(num => num.trim());
-                    extensionNumber = extension;
-                    if (mobile && mobile.startsWith('04')) {
-                        const typeMatch = mobile.match(/(.*?)(\s*\([SP]\))?$/);
-                        if (typeMatch) {
-                            mobileNumber = typeMatch[1].trim();
-                            mobileType = typeMatch[2] ? typeMatch[2].trim() : '';
-                        }
-                    }
-                } else {
-                    extensionNumber = staff.phoneNumber;
-                }
-            }
-
-            // Create call button HTML
-            const callButtonHtml = extensionNumber.startsWith('19')
-                ? `<a href="tel:907${extensionNumber}" class="call-button">
-            Call
-            <svg viewBox="0 0 24 24" width="16" height="16">
-                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-            </svg>
-        </a>`
-                : '';
-
-            // Rest of your existing card HTML...
-            card.innerHTML = `
-        <h3>${staff.name}</h3>
-        <div class="card-body">
-            <div class="card-image-container"></div>
-            <div class="card-content">
-                <p><strong>E Num</strong>: ${staff.employeeNumber || 'No ID'}</p>
-                <p><strong>Dept</strong>: ${staff.department || 'Unassigned'}</p>
-                <p><strong>Extension</strong>: ${extensionNumber || 'No Extension'}</p>
-                ${mobileNumber ? `
-                    <p class="mobile-container">
-                        <strong>Mobile</strong>:
-                        <button class="mobile-number-toggle" aria-label="Click to reveal mobile number">
-                            <span class="mobile-number-hidden">${mobileNumber}${mobileType ? ` <span class="mobile-type">${mobileType}</span>` : ''}</span>
-                            <span class="mobile-number-placeholder">Click to reveal</span>
-                            <svg class="eye-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"></path>
-                                <circle cx="12" cy="12" r="3"></circle>
-                            </svg>
-                        </button>
-                    </p>
-                ` : ''}
-                <div class="button-container">
-                    ${callButtonHtml}
-                    ${staff.email && staff.email.endsWith('@company.com') ? `
-                        <a href="mailto:${staff.email}" class="email-button" aria-label="Send email to ${staff.email}">
-                            Email
-                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                                <polyline points="22,6 12,13 2,6"></polyline>
-                            </svg>
-                        </a>
-                    ` : ''}
-                </div>
-            </div>
-        </div>
-    `;
-
-            // Add mobile number reveal handler
-            if (mobileNumber) {
-                const mobileToggle = card.querySelector('.mobile-number-toggle');
-                let hideTimeout;
-
-                mobileToggle.addEventListener('click', function () {
-                    this.classList.toggle('revealed');
-                    if (hideTimeout) {
-                        clearTimeout(hideTimeout);
-                    }
-                    if (this.classList.contains('revealed')) {
-                        hideTimeout = setTimeout(() => {
-                            this.classList.remove('revealed');
-                        }, 20000);
-                    }
-                });
-            }
-
-            return { card, imageId: staff.employeeNumber || 'default' };
-        }
-
-        // Department handling
-        function createDepartmentHeader(dept) {
-            const header = document.createElement('div');
-            header.className = 'department-header';
-            header.innerHTML = `<h2>${dept}</h2>`;
-            return header;
-        }
-
-        function getNormalizedDepartment(dept) {
-            if (!dept) return 'Unassigned';
-
-            const departmentMappings = {
-                'ss Admin': 'Student Services',
-                'eftc': 'EFTC',
-                'farm ': 'EFTC',
-                'home ec': 'Home Economics',
-                'english': 'English',
-                'maths': 'Mathematics',
-                'mathematics': 'Mathematics',
-                'science': 'Science',
-                'interim': 'Principal',
-                'hpe': 'Health & Physical Education',
-                'physical education': 'Health & Physical Education',
-                'hass': 'Humanities & Social Sciences',
-                'humanities': 'Humanities & Social Sciences',
-                'd&t': 'Design & Technology',
-                'design and technology': 'Design & Technology',
-                'esc': 'ESC',
-                'education support': 'ESC',
-                'erc': 'ERC',
-                'deputy': 'Deputies',
-                'library': 'Library',
-                'stars mentor': 'Stars',
-                'information technology': 'Information Technology',
-                'computing': 'Information Technology',
-                'aieo': 'Aboriginal Education',
-                'aboriginal education': 'Aboriginal Education',
-                'admin': 'Administration',
-                'finance': 'Finance',
-                'triage': 'Student Services',
-                'career': 'Career Services',
-                'careers': 'Career Services',
-                'mentor': 'Student Services',
-                'student services': 'Student Services',
-                'arts': 'Arts',
-                'visual arts': 'Arts',
-                'performing arts': 'Arts',
-                'music': 'Arts',
-                'drama': 'Arts',
-                'languages': 'Languages',
-                'lote': 'Languages'
-            };
-
-            const baseDept = dept.toLowerCase().trim();
-            for (const [key, value] of Object.entries(departmentMappings)) {
-                if (baseDept.includes(key)) {
-                    return value;
-                }
-            }
-
-            return dept.split(' ')
-                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                .join(' ');
-        }
-
-        // Grid rendering
-        async function renderGrid(data, sortOption = 'firstName') {
-            grid.innerHTML = '';
-            const cardPromises = [];
-
-            if (sortOption === 'department') {
-                const departments = {};
-                data.forEach(staff => {
-                    const normalizedDept = getNormalizedDepartment(staff.department);
-                    if (!departments[normalizedDept]) {
-                        departments[normalizedDept] = [];
-                    }
-                    departments[normalizedDept].push(staff);
-                });
-
-                // Process departments sequentially
-                for (const dept of Object.keys(departments).sort()) {
-                    const deptSection = document.createElement('div');
-                    deptSection.className = 'department-section';
-
-                    // Create department header
-                    const header = createDepartmentHeader(dept);
-                    deptSection.appendChild(header);
-
-                    // Process staff members in each department
-                    const sortedStaff = departments[dept].sort((a, b) => a.name.localeCompare(b.name));
-                    for (const staff of sortedStaff) {
-                        const { card, imageId } = await createCardElement(staff);
-                        deptSection.appendChild(card);
-                        cardPromises.push({ card, imageId });
-                    }
-
-                    // Only append sections that have visible content
-                    if (sortedStaff.length > 0) {
-                        grid.appendChild(deptSection);
-                    }
-                }
-            } else {
-                const sortedData = data.sort((a, b) => {
-                    if (sortOption === 'firstName') {
-                        return a.name.split(' ')[0].localeCompare(b.name.split(' ')[0]);
-                    } else {
-                        const aName = a.name.split(' ');
-                        const bName = b.name.split(' ');
-                        return aName[aName.length - 1].localeCompare(bName[bName.length - 1]);
-                    }
-                });
-
-                for (const staff of sortedData) {
-                    const { card, imageId } = await createCardElement(staff);
-                    grid.appendChild(card);
-                    cardPromises.push({ card, imageId });
-                }
-            }
-
-            // Load images after all cards are created
-            await loadInitialVisibleImages(cardPromises);
-        }
-
-        // Search functionality
-        function isPartialMatch(searchWord, targetWord) {
-            return targetWord.toLowerCase().startsWith(searchWord.toLowerCase());
-        }
-
-        function filterStaff(searchTerm) {
-            if (!searchTerm.trim()) {
-                return currentStaffData;
-            }
-
-            const searchWords = searchTerm.toLowerCase().trim().split(/\s+/);
-
-            // Check if any search word is a partial match for "science"
-            const hasScience = searchWords.some(word =>
-                isPartialMatch(word, 'science') && !searchWords.some(w => w.includes('social'))
-            );
-
-            return currentStaffData.filter(staff => {
-                // Get the normalized department header for this staff member
-                const departmentHeader = getNormalizedDepartment(staff.department);
-                const deptLower = departmentHeader.toLowerCase();
-
-                // Handle Science vs Social Sciences prioritization
-                if (hasScience) {
-                    // If searching for science-related terms, exclude Social Sciences
-                    if (deptLower.includes('social sciences')) {
-                        return false;
-                    }
-                    // Prioritize exact Science department matches
-                    if (deptLower === 'science') {
-                        return true;
-                    }
-                }
-
-                // Create searchable text including the department header
-                const searchableText = [
-                    staff.name,
-                    staff.employeeNumber,
-                    staff.department,
-                    departmentHeader,
-                    staff.phoneNumber,
-                    staff.email
-                ]
-                    .filter(Boolean)
-                    .join(' ')
-                    .toLowerCase();
-
-                return searchWords.every(word => searchableText.includes(word));
-            });
-        }
-
-        function highlightText(text, searchTerm) {
-            if (!searchTerm) return text;
-
-            const searchWords = searchTerm.split(/\s+/).map(word => word.trim());
-            let highlightedText = text;
-
-            searchWords.forEach(word => {
-                if (word) {
-                    const searchRegex = new RegExp(`(${word})`, 'gi');
-                    highlightedText = highlightedText.replace(searchRegex, '<mark>$1</mark>');
-                }
-            });
-
-            return highlightedText;
-        }
-
-
-        async function handleSearchUpdate(searchTerm) {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(async () => {
-                const filtered = filterStaff(searchTerm);
-                await renderGrid(filtered, sort.value);
-            }, 300);
-        }
-
-        // Event Listeners
+        // Set all iframe sources
         document.addEventListener('DOMContentLoaded', () => {
-            typeToSearchEnabled = loadTypeSearchPreference();
-            updateTypeSearchButton();
-
-            const enabled = loadCallButtonPreference();
-            updateCallButtonVisibility(enabled);
-
-            const savedSortPreference = loadSortPreference();
-            sort.value = savedSortPreference;
-
-            search.addEventListener('input', (e) => {
-                handleSearchUpdate(e.target.value.trim());
+            document.querySelectorAll('.device-iframe').forEach(iframe => {
+                iframe.src = PHONEBOOK_URL;
             });
+        });
 
-            clearSearchBtn.addEventListener('click', () => {
-                search.value = '';
-                handleSearchUpdate('');
-            });
-
-            sort.addEventListener('change', (e) => {
-                const sortValue = e.target.value;
-                saveSortPreference(sortValue);
-                const filtered = filterStaff(search.value);
-                renderGrid(filtered, sortValue);
-            });
-
-            typeSearchToggle.addEventListener('click', () => {
-                typeToSearchEnabled = !typeToSearchEnabled;
-                saveTypeSearchPreference(typeToSearchEnabled);
-                updateTypeSearchButton();
-            });
-
-            document.addEventListener('keydown', (e) => {
-                // Handle Ctrl+F (or Cmd+F on Mac)
-                if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
-                    e.preventDefault();
-                    search.focus();
-                    search.select();
-                    return;
-                }
-
-                // Handle Konami code check
-                if (e.key === konamiCode[konamiIndex]) {
-                    konamiIndex++;
-                    if (konamiIndex === konamiCode.length) {
-                        const newState = !callButtonEnabled;
-                        updateCallButtonVisibility(newState);
-                        saveCallButtonPreference(newState);
-                        showToast(newState ? '📞 Call buttons enabled!' : '📞 Call buttons disabled!');
-                        konamiIndex = 0;
-                    }
-                } else {
-                    konamiIndex = 0;
-                }
-
-                // Only proceed with type-to-search if it's enabled
-                if (!typeToSearchEnabled) return;
-
-                // Don't capture keystrokes if already in an input or editable element
-                if (e.target.matches('input, textarea, select, [contenteditable="true"]')) return;
-
-                // Don't capture if using modifier keys
-                if (e.ctrlKey || e.altKey || e.metaKey) return;
-
-                // List of keys to ignore
-                const ignoredKeys = [
-                    'Tab', 'Escape', 'Enter', 'Home', 'End', 'PageUp', 'PageDown',
-                    'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Shift',
-                    'Control', 'Alt', 'Meta', 'CapsLock', 'NumLock', 'ScrollLock',
-                    'Insert', 'Delete', 'ContextMenu', 'F1', 'F2', 'F3', 'F4',
-                    'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12'
-                ];
-
-                // Ignore special keys
-                if (ignoredKeys.includes(e.key)) return;
-
-                // If it's a single character key press
-                if (e.key.length === 1) {
-                    e.preventDefault(); // Prevent the key from doing its default action
-                    search.focus();
-
-                    // If this is the first character being typed, clear the search
-                    if (document.activeElement !== search) {
-                        search.value = e.key;
-                        handleSearchUpdate(search.value);
-                    }
-
-                    // Move cursor to end of input
-                    const len = search.value.length;
-                    search.setSelectionRange(len, len);
-                }
-            });
-
-            if (legendToggle && legend) {
-                legendToggle.setAttribute('aria-expanded', 'false');
-
-                legendToggle.addEventListener('click', () => {
-                    const isExpanded = legendToggle.getAttribute('aria-expanded') === 'true';
-                    legendToggle.setAttribute('aria-expanded', !isExpanded);
-                    legend.classList.toggle('expanded');
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
                 });
-            }
+            });
         });
 
-        function isElementInViewport(element) {
-            const rect = element.getBoundingClientRect();
-            return (
-                rect.top >= 0 &&
-                rect.left >= 0 &&
-                rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-                rect.right <= (window.innerWidth || document.documentElement.clientWidth)
-            );
-        }
-
-        async function preloadImage(imageId) {
-            if (loadedImagesCache.has(imageId)) {
-                return loadedImagesCache.get(imageId);
-            }
-
-            function createCachedImage(imageId, src) {
-                if (loadedImagesCache.has(imageId)) {
-                    return loadedImagesCache.get(imageId);
+        // Add scroll animation for feature cards and showcase sections
+        const animationObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = 1;
+                    entry.target.style.transform = 'translateY(0)';
                 }
+            });
+        }, { threshold: 0.1 });
 
-                const img = document.createElement('img');
-                img.src = src;
-                img.className = 'card-image loaded';
-                img.alt = imageId;
-                img.loading = 'lazy';
-                loadedImagesCache.set(imageId, img);
-                return img;
-            }
+        // Calculate and set iframe scales
+        function setIframeScales() {
+            // Desktop scale
+            const imac = document.querySelectorAll('.imac-screen .iframe-container');
+            imac.forEach(container => {
+                const iframe = container.querySelector('.device-iframe');
+                const scale = container.offsetWidth / 1440;
+                iframe.style.transform = `scale(${scale})`;
+                container.style.height = `${900 * scale}px`;
+            });
 
-            const extensions = ['.png', '.jpg', '.jpeg'];
-            const img = new Image();
-
-            return new Promise((resolve) => {
-                let currentExtIndex = 0;
-
-                img.onload = () => {
-                    const src = img.src;
-                    imageCache.set(imageId, src);
-                    const cachedImg = createCachedImage(imageId, src);
-                    resolve(cachedImg);
-                };
-
-                img.onerror = () => {
-                    currentExtIndex++;
-                    if (currentExtIndex < extensions.length) {
-                        img.src = `images/${imageId}${extensions[currentExtIndex]}`;
-                    } else {
-                        const defaultSrc = 'images/default.png';
-                        imageCache.set(imageId, defaultSrc);
-                        const cachedImg = createCachedImage(imageId, defaultSrc);
-                        resolve(cachedImg);
-                    }
-                };
-
-                img.src = `images/${imageId}${extensions[0]}`;
+            // Mobile scale
+            const phoneScreens = document.querySelectorAll('.phone-screen .iframe-container');
+            phoneScreens.forEach(container => {
+                const iframe = container.querySelector('.device-iframe');
+                const scale = container.offsetWidth / 390;
+                iframe.style.transform = `scale(${scale})`;
+                container.style.height = `${844 * scale}px`;
             });
         }
 
-        async function loadInitialVisibleImages(cards) {
-            const startTime = performance.now();
-            console.log('🔄 Starting image loading process...', performance.now() - startTime, 'ms');
+        // Set initial scales and update on resize
+        window.addEventListener('load', setIframeScales);
+        window.addEventListener('resize', setIframeScales);
 
-            const visibleCards = [];
-            const backgroundCards = [];
-            let processed = 0;
+        /* JavaScript to handle centering */
+        document.addEventListener('DOMContentLoaded', function () {
+            function adjustFeatureCards() {
+                const featuresSection = document.querySelector('.features');
+                const cards = document.querySelectorAll('.feature-card');
+                const containerWidth = featuresSection.offsetWidth;
+                const cardWidth = 300; // Width of each card
+                const gap = 32; // 2rem gap in pixels
 
-            cards.forEach(({ card, imageId }) => {
-                const imageContainer = card.querySelector('.card-image-container');
-                if (isElementInViewport(imageContainer)) {
-                    visibleCards.push({ card, imageId });
+                // Calculate how many cards can fit in a row
+                const cardsPerRow = Math.floor((containerWidth + gap) / (cardWidth + gap));
+
+                // Calculate the total rows needed
+                const totalRows = Math.ceil(cards.length / cardsPerRow);
+
+                // Calculate cards in the last row
+                const cardsInLastRow = cards.length % cardsPerRow || cardsPerRow;
+
+                if (cardsInLastRow < cardsPerRow) {
+                    // Update grid template columns based on cards in last row
+                    featuresSection.style.gridTemplateColumns = `repeat(${cardsInLastRow}, minmax(300px, 1fr))`;
                 } else {
-                    backgroundCards.push({ card, imageId });
-                }
-                processed++;
-            });
-
-            console.log(`📊 Categorized ${processed} total cards: ${visibleCards.length} visible, ${backgroundCards.length} background`,
-                performance.now() - startTime, 'ms');
-
-            // Load visible images first
-            for (const { card, imageId } of visibleCards) {
-                try {
-                    const img = await preloadImage(imageId);
-                    const container = card.querySelector('.card-image-container');
-                    if (container) {
-                        container.appendChild(img.cloneNode(true));
-                    }
-                } catch (error) {
-                    console.error(`Failed to load visible image ${imageId}:`, error);
+                    // Reset to default if row is full
+                    featuresSection.style.gridTemplateColumns = `repeat(auto-fit, minmax(300px, 1fr))`;
                 }
             }
 
-            // Now load background images
-            const backgroundPromises = backgroundCards.map(({ card, imageId }) =>
-                preloadImage(imageId)
-                    .then(img => {
-                        const container = card.querySelector('.card-image-container');
-                        if (container) {
-                            container.appendChild(img.cloneNode(true));
-                        }
-                    })
-                    .catch(error => console.error(`Failed to load background image ${imageId}:`, error))
-            );
+            // Run on load and resize
+            adjustFeatureCards();
+            window.addEventListener('resize', adjustFeatureCards);
+        });
 
-            await Promise.all(backgroundPromises);
-        }
+        /* JavaScript to handle last row centering */
+        document.addEventListener('DOMContentLoaded', function () {
+            const features = document.querySelector('.features');
+            const cards = features.querySelectorAll('.feature-card');
 
-        let isMobile = window.matchMedia('(max-width: 480px)').matches;
-        window.addEventListener('resize', () => {
-            const wasDesktop = !isMobile;
-            isMobile = window.matchMedia('(max-width: 480px)').matches;
+            // Get the number of cards
+            const totalCards = cards.length;
 
-            if (wasDesktop && isMobile) {
-                legend.classList.remove('expanded');
-                legendToggle.setAttribute('aria-expanded', 'false');
+            // If we have less than 3 cards in the last row
+            if (totalCards % 3 !== 0) {
+                // Get the number of cards in the last row
+                const lastRowCards = totalCards % 3;
+                // Get all cards that should be in the last row
+                const lastRowStart = totalCards - lastRowCards;
+
+                for (let i = lastRowStart; i < totalCards; i++) {
+                    cards[i].style.gridColumn = `${Math.ceil((3 - lastRowCards) / 2) + 1 + (i - lastRowStart)} / span 1`;
+                }
             }
         });
 
-        function initializeApp() {
-            if (typeof staffData !== 'undefined' && staffData.staff) {
-                console.log('📋 Staff data found:', staffData.staff.length, 'records');
-                currentStaffData = cleanStaffData(staffData.staff);
-                console.log('🧹 Cleaned staff data:', currentStaffData.length, 'records');
-                renderGrid(currentStaffData, loadSortPreference());
-            } else {
-                console.error('❌ Staff data not found or invalid format');
-                grid.innerHTML = `
-                    <div style="grid-column: 1 / -1; text-align: center; padding: 2rem;">
-                        <h2>Error Loading Staff Data</h2>
-                        <p>Please ensure staff-data.js is present in the root directory and contains valid data.</p>
-                    </div>
-                `;
-            }
-        }
-
-        window.addEventListener('load', initializeApp);
-
-        // Initialize
-        window.onload = async function () {
-            if (typeof staffData !== 'undefined' && staffData.staff) {
-                currentStaffData = cleanStaffData(staffData.staff);
-                await renderGrid(currentStaffData, loadSortPreference());
-            } else {
-                console.error('Staff data not found');
-                // Create a sample staff member to show the layout
-                currentStaffData = [{
-                    name: "John Smith",
-                    employeeNumber: "E001",
-                    department: "Information Technology",
-                    phoneNumber: "1234 / 0412345678 (P)",
-                    email: "john.smith@company.com"
-                }];
-                await renderGrid(currentStaffData, loadSortPreference());
-            }
-        };
-
+        // Animation observer
+        document.querySelectorAll('.feature-card, .showcase-container, .imac-mockup, .phone-mockup').forEach(element => {
+            element.style.opacity = 0;
+            element.style.transform = 'translateY(20px)';
+            element.style.transition = 'opacity 0.5s, transform 0.5s';
+            animationObserver.observe(element);
+        });
     </script>
 </body>
 
