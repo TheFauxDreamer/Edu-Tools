@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Validator v3.0.0a</title>
+    <title>Student Validator v3.0.1</title>
     <script src="demo_data.js"></script>
     <script src="demo_mode.js"></script>
     <script src="debug_progress.js"></script>
@@ -3696,7 +3696,7 @@ Finally happy with the new validator. Shown to staff for the first time.
 
             // First, split content into blocks separated by double newlines
             const blocks = markdown.split(/\n\s*\n/);
-            
+
             let html = '';
             let inList = false;
 
@@ -3718,7 +3718,7 @@ Finally happy with the new validator. Shown to staff for the first time.
                             return line;
                         })
                         .join('\n');
-                    
+
                     if (!inList) {
                         html += '<ul>';
                         inList = true;
@@ -3747,7 +3747,7 @@ Finally happy with the new validator. Shown to staff for the first time.
                             .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                             // Italic
                             .replace(/\*(.*?)\*/g, '<em>$1</em>');
-                        
+
                         html += `<p>${processedBlock}</p>`;
                     }
                 }
@@ -4545,10 +4545,15 @@ Finally happy with the new validator. Shown to staff for the first time.
                 student[`${prefix}Add${num}L4`] || ''
             ].join(' ').toLowerCase();
 
-            return name.includes('residential college') ||
-                name.includes('erc') ||
-                address.includes('residential college') ||
-                address.includes('erc');
+            // Check for "residential college" as before
+            if (name.includes('residential college') || address.includes('residential college')) {
+                return true;
+            }
+
+            // More precise check for "erc" by ensuring it's a standalone word or abbreviation
+            // This uses word boundaries to prevent matching within other words like "Erceg"
+            const ercRegex = /\berc\b/;
+            return ercRegex.test(name) || ercRegex.test(address);
         }
 
         function isDuplicateContact(student, conNumber) {
