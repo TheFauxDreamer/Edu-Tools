@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Day Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .current-time {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .timeline-container {
+            position: relative;
+            background: white;
+            border-radius: 10px;
+            padding: 30px 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .timeline {
+            position: relative;
+            height: 80px;
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: visible;
+        }
+
+        .period {
+            position: absolute;
+            height: 100%;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 13px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+            border: 2px solid rgba(255,255,255,0.3);
+            box-sizing: border-box;
+        }
+
+        .period.class {
+            background: #3498db;
+        }
+
+        .period.lunch {
+            background: #e74c3c;
+        }
+
+        .time-indicator {
+            position: absolute;
+            top: -15px;
+            bottom: -15px;
+            width: 4px;
+            background: #f39c12;
+            z-index: 10;
+            border-radius: 2px;
+            box-shadow: 0 0 8px rgba(243, 156, 18, 0.8);
+        }
+
+        .time-indicator::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: -6px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-bottom: 12px solid #f39c12;
+        }
+
+        .time-indicator-label {
+            position: absolute;
+            top: -35px;
+            left: -20px;
+            background: #f39c12;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .time-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            font-size: 14px;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .period-details {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .period-card {
+            background: white;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .period-card.lunch {
+            border-left-color: #e74c3c;
+        }
+
+        .period-card.current {
+            background: #d5f4e6;
+            border-left-color: #27ae60;
+            box-shadow: 0 2px 8px rgba(39, 174, 96, 0.3);
+        }
+
+        .period-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .period-time {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .period-duration {
+            color: #95a5a6;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .status {
+            text-align: center;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            padding: 10px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .status.before {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status.during {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status.after {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>School Day Tracker</h1>
+        <div class="current-time" id="currentTime"></div>
+    </div>
+    <div class="status" id="status"></div>
+
+    <div class="timeline-container">
+        <div class="timeline" id="timeline"></div>
+        <div class="time-labels">
+            <span>8:45 AM</span>
+            <span>12:00 PM</span>
+            <span>3:00 PM</span>
+        </div>
+    </div>
+
+    <div class="period-details" id="periodDetails"></div>
+
+    <script>
+        const periods = [
+            { name: 'Period 1', start: '8:45', end: '9:49', type: 'class' },
+            { name: 'Period 2', start: '9:49', end: '10:53', type: 'class' },
+            { name: 'Lunch 1', start: '10:53', end: '11:18', type: 'lunch' },
+            { name: 'Period 3', start: '11:18', end: '12:22', type: 'class' },
+            { name: 'Period 4', start: '12:22', end: '13:26', type: 'class' },
+            { name: 'Lunch 2', start: '13:26', end: '13:56', type: 'lunch' },
+            { name: 'Period 5', start: '13:56', end: '15:00', type: 'class' }
+        ];
+
+        function timeToMinutes(timeStr) {
+            const [hours, minutes] = timeStr.split(':').map(Number);
+            return hours * 60 + minutes;
+        }
+
+        function minutesToTime(minutes) {
+            const hours = Math.floor(minutes / 60);
+            const mins = minutes % 60;
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            const displayHours = hours > 12 ? hours - 12 : (hours === 0 ? 12 : hours);
+            return `${displayHours}:${mins.toString().padStart(2, '0')} ${ampm}`;
+        }
+
+        function minutesToDuration(minutes) {
+            const hours = Math.floor(minutes / 60);
+            const mins = minutes % 60;
+            if (hours > 0) {
+                return `${hours}h ${mins}m`;
+            } else {
+                return `${mins}m`;
+            }
+        }
+
+        function getCurrentTimeMinutes() {
+            const now = new Date();
+            return now.getHours() * 60 + now.getMinutes();
+        }
+
+        function updateDisplay() {
+            const now = new Date();
+            const currentMinutes = getCurrentTimeMinutes();
+            
+            // Update current time display
+            document.getElementById('currentTime').textContent = now.toLocaleTimeString('en-US', {
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true
+            });
+            
+            // Clear timeline
+            const timeline = document.getElementById('timeline');
+            timeline.innerHTML = '';
+            
+            // School day bounds
+            const dayStart = timeToMinutes('8:45');
+            const dayEnd = timeToMinutes('15:00');
+            const dayDuration = dayEnd - dayStart;
+            
+            // Create period elements
+            periods.forEach((period, index) => {
+                const startMinutes = timeToMinutes(period.start);
+                const endMinutes = timeToMinutes(period.end);
+                const duration = endMinutes - startMinutes;
+                
+                const left = ((startMinutes - dayStart) / dayDuration) * 100;
+                const width = (duration / dayDuration) * 100;
+                
+                const periodEl = document.createElement('div');
+                periodEl.className = `period ${period.type}`;
+                periodEl.style.left = `${left}%`;
+                periodEl.style.width = `${width}%`;
+                periodEl.textContent = period.name;
+                
+                timeline.appendChild(periodEl);
+            });
+            
+            // Add time indicator if within school day
+            if (currentMinutes >= dayStart && currentMinutes <= dayEnd) {
+                const position = ((currentMinutes - dayStart) / dayDuration) * 100;
+                const indicator = document.createElement('div');
+                indicator.className = 'time-indicator';
+                indicator.style.left = `${position}%`;
+                
+                const label = document.createElement('div');
+                label.className = 'time-indicator-label';
+                label.textContent = 'NOW';
+                indicator.appendChild(label);
+                
+                timeline.appendChild(indicator);
+            }
+            
+            // Update period details
+            updatePeriodDetails(currentMinutes);
+            
+            // Update status
+            updateStatus(currentMinutes);
+        }
+
+        function updatePeriodDetails(currentMinutes) {
+            const container = document.getElementById('periodDetails');
+            container.innerHTML = '';
+            
+            periods.forEach(period => {
+                const startMinutes = timeToMinutes(period.start);
+                const endMinutes = timeToMinutes(period.end);
+                const duration = endMinutes - startMinutes;
+                const isCurrent = currentMinutes >= startMinutes && currentMinutes < endMinutes;
+                
+                const card = document.createElement('div');
+                card.className = `period-card ${period.type} ${isCurrent ? 'current' : ''}`;
+                
+                card.innerHTML = `
+                    <div class="period-name">${period.name}</div>
+                    <div class="period-time">${minutesToTime(startMinutes)} - ${minutesToTime(endMinutes)}</div>
+                    <div class="period-duration">Duration: ${minutesToDuration(duration)}</div>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+
+        function updateStatus(currentMinutes) {
+            const statusEl = document.getElementById('status');
+            const dayStart = timeToMinutes('8:45');
+            const dayEnd = timeToMinutes('15:00');
+            
+            let statusText = '';
+            let statusClass = '';
+            
+            if (currentMinutes < dayStart) {
+                const minutesUntilStart = dayStart - currentMinutes;
+                const hours = Math.floor(minutesUntilStart / 60);
+                const mins = minutesUntilStart % 60;
+                statusText = `Currently before school - starts in ${hours > 0 ? hours + 'h ' : ''}${mins}m`;
+                statusClass = 'before';
+            } else if (currentMinutes > dayEnd) {
+                statusText = 'Currently after school - the day has ended';
+                statusClass = 'after';
+            } else {
+                // Find current period
+                const currentPeriod = periods.find(period => {
+                    const start = timeToMinutes(period.start);
+                    const end = timeToMinutes(period.end);
+                    return currentMinutes >= start && currentMinutes < end;
+                });
+                
+                if (currentPeriod) {
+                    const endMinutes = timeToMinutes(currentPeriod.end);
+                    const minutesLeft = endMinutes - currentMinutes;
+                    statusText = `Currently ${currentPeriod.name} - ${minutesLeft} minutes remaining`;
+                    statusClass = 'during';
+                } else {
+                    // Between periods
+                    const nextPeriod = periods.find(period => timeToMinutes(period.start) > currentMinutes);
+                    if (nextPeriod) {
+                        const minutesUntilNext = timeToMinutes(nextPeriod.start) - currentMinutes;
+                        statusText = `Currently on break - ${nextPeriod.name} starts in ${minutesUntilNext} minutes`;
+                        statusClass = 'during';
+                    }
+                }
+            }
+            
+            statusEl.textContent = statusText;
+            statusEl.className = `status ${statusClass}`;
+        }
+
+        // Update immediately and then every minute
+        updateDisplay();
+        setInterval(updateDisplay, 60000);
+    </script>
+</body>
+</html>

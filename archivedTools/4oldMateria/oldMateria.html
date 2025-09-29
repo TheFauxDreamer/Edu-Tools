@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Lunch Break Scheduler</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.5;
+        }
+        
+        h1, h2 {
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .day-tabs {
+            display: flex;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .day-tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            border-radius: 4px 4px 0 0;
+            margin-right: 5px;
+            background-color: #f8f8f8;
+        }
+        
+        .day-tab.active {
+            background-color: #e6f7ff;
+            font-weight: bold;
+        }
+        
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        
+        th {
+            background-color: #f2f2f2;
+            position: sticky;
+            top: 0;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+        }
+        
+        .section-header {
+            background-color: #4472C4;
+            color: white;
+            padding: 10px;
+            margin: -15px -15px 15px -15px;
+            border-radius: 4px 4px 0 0;
+        }
+        
+        .lunch-break {
+            background-color: #ffeb99;
+        }
+        
+        .mail-day-lunch {
+            background-color: #ffd699;
+        }
+        
+        .fixed-lunch {
+            background-color: #e1bee7;
+        }
+        
+        .staff-on-duty {
+            background-color: #e6ffe6;
+        }
+        
+        .covering-special {
+            background-color: #bbdefb;
+            font-weight: bold;
+        }
+        
+        .backup-staff {
+            font-style: italic;
+            color: #666;
+        }
+        
+        .legend {
+            display: flex;
+            margin-bottom: 15px;
+        }
+        
+        .legend-item {
+            margin-right: 20px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .color-box {
+            width: 15px;
+            height: 15px;
+            margin-right: 5px;
+            border: 1px solid #ccc;
+        }
+        
+        select {
+            padding: 5px;
+        }
+        
+        .alert {
+            padding: 10px;
+            background-color: #fff8e1;
+            border-left: 4px solid #ffc107;
+            margin-bottom: 15px;
+        }
+        
+        button {
+            padding: 8px 15px;
+            background-color: #4472C4;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-right: 10px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Staff Lunch Break Scheduler</h1>
+        
+        <div class="legend">
+            <div class="legend-item">
+                <div class="color-box" style="background-color: #e6ffe6;"></div>
+                <span>On Duty</span>
+            </div>
+            <div class="legend-item">
+                <div class="color-box" style="background-color: #ffeb99;"></div>
+                <span>Regular Lunch (30 min)</span>
+            </div>
+            <div class="legend-item">
+                <div class="color-box" style="background-color: #ffd699;"></div>
+                <span>Mail Day Lunch (45 min)</span>
+            </div>
+            <div class="legend-item">
+                <div class="color-box" style="background-color: #e1bee7;"></div>
+                <span>Fixed Lunch (30 min)</span>
+            </div>
+            <div class="legend-item">
+                <div class="color-box" style="background-color: #bbdefb;"></div>
+                <span>Covering Special Staff</span>
+            </div>
+        </div>
+        
+        <!-- Staff Section -->
+        <div class="section">
+            <div class="section-header">Staff List</div>
+            <table id="staff-table">
+                <tr>
+                    <th>Staff Name</th>
+                    <th>Type</th>
+                    <th>Mail Handler</th>
+                    <th>Monday</th>
+                    <th>Tuesday</th>
+                    <th>Wednesday</th>
+                    <th>Thursday</th>
+                    <th>Friday</th>
+                </tr>
+                <tr>
+                    <td>Tifa</td>
+                    <td>Regular</td>
+                    <td>
+                        <select class="mail-handler-select" data-staff="Tifa">
+                            <option value="preferred" selected>Preferred</option>
+                            <option value="backup">Backup</option>
+                            <option value="no">No</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="availability-select" data-staff="Tifa" data-day="Monday">
+                            <option value="available" selected>Available</option>
+                            <option value="sick">Sick</option>
+                            <option value="on-leave">On-Leave</option>
+                            <option value="scheduled-off">Scheduled Off</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="availability-select" data-staff="Tifa" data-day="Tuesday">
+                            <option value="available">Available</option>
+                            <option value="sick">Sick</option>
+                            <option value="on-leave">On-Leave</option>
+                            <option value="scheduled-off" selected>Scheduled Off</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="availability-select" data-staff="Tifa" data-day="Wednesday">
+                            <option value="available" selected>Available</option>
+                            <option value="sick">Sick</option>
+                            <option value="on-leave">On-Leave</option>
+                            <option value="scheduled-off">Scheduled Off</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="availability-select" data-staff="Tifa" data-day="Thursday">
+                            <option value="available" selected>Available</option>
+                            <option value="sick">Sick</option>
+                            <option value="on-leave">On-Leave</option>
+                            <option value="scheduled-off">Scheduled Off</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="availability-select" data-staff="Tifa" data-day="Friday">
+                            <option value="available" selected>Available</option>
+                            <option value="sick">Sick</option>
+                            <option value="on-leave">On-Leave</option>
+                            <option value="scheduled-off">Scheduled Off</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Cloud</td>
+                    <td>Regular</td>
+                    <td>
+                        <select class="mail-handler-select" data-staff="Cloud">
+                            <option value="preferred">Preferred</option>
+                            <option value="backup" selected>Backup</option>
+                            <option value="no">No</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="availability-select" data-staff="Cloud" data-day="Monday">
+                            <option value="available" selected>Available</option>
+                            <option value="sick">Sick</option>
+                            <option value="on-leave">On-Leave</option>
+                            <option value="scheduled-off">Scheduled Off</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="availability-select" data-staff="Cloud" data-day="Tuesday">
+                            <option value="available" selected>Available</option>
+                            <option value="sick">Sick</option>
+                            <option value="on-leave">On-Leave</option>
+                            <option value="scheduled-off">Scheduled Off</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="availability-select" data-staff="Cloud" data-day="Wednesday">
+                            <option value="available" selected>Available</option>
+                            <option value="sick">Sick</option>
+                            <option value="on-leave">On-Leave</option>
+                            <option value="scheduled-off">Scheduled Off</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="availability-select" data-staff="Cloud" data-day="Thursday">
+                            <option value="available" selected>Available</option>
+                            <option value="sick">Sick</option>
+                            <option value="on-leave">On-Leave</option>
+                            <option value="scheduled-off">Scheduled Off</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="availability-select" data-staff="Cloud" data-day="Friday">
+                            <option value="available" selected>Available</option>
+                            <option value="sick">Sick</option>
+                            <option value="on-leave">On-Leave</option>
+                            <option value="scheduled-off">Scheduled Off</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Aerith</td>
+                    <td>Regular</td>
+                    <td>
+                        <select class="mail-handler-select" data-staff="Aerith">
+                            <option value="preferred">Preferred</option>
+                            <option value="backup">Backup</option>
+                            <option value="no" selected>No</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="availability-select" data-staff="Aerith" data-day="Monday">
+                            <option value="available" selected>Available</option>
+                            <option value="sick">Sick</option>
+                            <option value="on-leave">On-Leave</option>
+                            <option value="scheduled-off">Scheduled Off</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="availability-select" data-staff="Aerith" data-day="Tuesday">
+                            <option value="available" selected>Available</option>
+                            <option value="sick">Sick</option>
+                            <option value="on-leave">On-Leave</option>
+                            <option value="scheduled-off">Scheduled Off</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="availability-select" data-staff="Aerith" data-day="Wednesday">
+                            <option value="available" selected>Available</option>
+                            <option value="sick">Sick</option>
+                            <option value="on-leave">On-Leave</option>
+                            <option value="scheduled-off">Scheduled Off</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="availability-select" data-staff="Aerith" data-day="Thursday">
+                            <option value="available" selected>Available</option>
+                            <option value="sick">Sick</option>
+                            <option value="on-leave">On-Leave</option>
+                            <option value="scheduled-off">Scheduled Off</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="availability-select" data-staff="Aerith" data-day="Friday">
+                            <option value="available" selected>Available</option>
+                            <option value="sick">Sick</option>
+                            <option value="on-leave">On-Leave</option>
+                            <option value="scheduled-off">Scheduled Off</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Penelo</td>
+                    <td>Backup</td>
+                    <td>
+                        <select class="mail-handler-select" data-staff="Penelo">
+                            <option value="preferred">Preferred</option>
+                            <option value="backup">Backup</option>
+                            <option value="no" selected>No</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="availability-select" data-staff="Penelo" data-day="Monday">
+                            <option value="available" selected>Available</option>
+                            <option value="sick">Sick</option>
+                            <option value="on-leave">On-Leave</option>
+                            <option value="scheduled-off">Scheduled Off</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="availability-select" data-staff="Penelo" data-day="Tuesday">
+                            <option value="available" selected>Available</option>
+                            <option value="sick">Sick</option>
+                            <option value="on-leave">On-Leave</option>
+                            <option value="scheduled-off">Scheduled Off</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="availability-select" data-staff="Penelo" data-day="Wednesday">
+                            <option value="available" selected>Available</option>
+                            <option value="sick">Sick</option>
+                            <option value="on-leave">On-Leave</option>
+                            <option value="scheduled-off">Scheduled Off</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="availability-select" data-staff="Penelo" data-day="Thursday">
+                            <option value="available" selected>Available</option>
+                            <option value="sick">Sick</option>
+                            <option value="on-leave">On-Leave</option>
+                            <option value="scheduled-off">Scheduled Off</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="availability-select" data-staff="Penelo" data-day="Friday">
+                            <option value="available" selected>Available</option>
+                            <option value="sick">Sick</option>
+                            <option value="on-leave">On-Leave</option>
+                            <option value="scheduled-off">Scheduled Off</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Jessie</td>
+                    <td>Backup</td>
+                    <td>
+                        <select class="mail-handler-select" data-staff="Jessie">
+                            <option value="preferred">Preferred</option>
+                            <option value="backup">Backup</option>
+                            <option value="no" selected>No</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="availability-select" data-staff="Jessie" data-day="Monday">
+                            <option value="available" selected>Available</option>
+                            <option value="sick">Sick</option>
+                            <option value="on-leave">On-Leave</option>
+                            <option value="scheduled-off">Scheduled Off</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="availability-select" data-staff="Jessie" data-day="Tuesday">
+                            <option value="available" selected>Available</option>
+                            <option value="sick">Sick</option>
+                            <option value="on-leave">On-Leave</option>
+                            <option value="scheduled-off">Scheduled Off</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="availability-select" data-staff="Jessie" data-day="Wednesday">
+                            <option value="available" selected>Available</option>
+                            <option value="sick">Sick</option>
+                            <option value="on-leave">On-Leave</option>
+                            <option value="scheduled-off">Scheduled Off</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="availability-select" data-staff="Jessie" data-day="Thursday">
+                            <option value="available" selected>Available</option>
+                            <option value="sick">Sick</option>
+                            <option value="on-leave">On-Leave</option>
+                            <option value="scheduled-off">Scheduled Off</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="availability-select" data-staff="Jessie" data-day="Friday">
+                            <option value="available" selected>Available</option>
+                            <option value="sick">Sick</option>
+                            <option value="on-leave">On-Leave</option>
+                            <option value="scheduled-off">Scheduled Off</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Barret</td>
+                    <td>Special</td>
+                    <td>
+                        <select class="mail-handler-select" data-staff="Barret">
+                            <option value="preferred">Preferred</option>
+                            <option value="backup">Backup</option>
+                            <option value="no" selected>No</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="availability-select" data-staff="Barret" data-day="Monday">
+                            <option value="available" selected>Available</option>
+                            <option value="sick">Sick</option>
+                            <option value="on-leave">On-Leave</option>
+                            <option value="scheduled-off">Scheduled Off</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="availability-select" data-staff="Barret" data-day="Tuesday">
+                            <option value="available" selected>Available</option>
+                            <option value="sick">Sick</option>
+                            <option value="on-leave">On-Leave</option>
+                            <option value="scheduled-off">Scheduled Off</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="availability-select" data-staff="Barret" data-day="Wednesday">
+                            <option value="available" selected>Available</option>
+                            <option value="sick">Sick</option>
+                            <option value="on-leave">On-Leave</option>
+                            <option value="scheduled-off">Scheduled Off</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="availability-select" data-staff="Barret" data-day="Thursday">
+                            <option value="available" selected>Available</option>
+                            <option value="sick">Sick</option>
+                            <option value="on-leave">On-Leave</option>
+                            <option value="scheduled-off">Scheduled Off</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="availability-select" data-staff="Barret" data-day="Friday">
+                            <option value="available" selected>Available</option>
+                            <option value="sick">Sick</option>
+                            <option value="on-leave">On-Leave</option>
+                            <option value="scheduled-off">Scheduled Off</option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+            
+            <button id="recalculate-btn">Recalculate Schedules</button>
+            <span id="last-updated" style="margin-left: 15px; font-style: italic;"></span>
+        </div>
+        
+        <!-- Schedule Section -->
+        <div class="section">
+            <div class="section-header" id="schedule-header">Lunch Schedule</div>
+            
+            <!-- Day selector tabs -->
+            <div class="day-tabs">
+                <div class="day-tab active" data-day="Monday">Monday</div>
+                <div class="day-tab" data-day="Tuesday">Tuesday</div>
+                <div class="day-tab" data-day="Wednesday">Wednesday</div>
+                <div class="day-tab" data-day="Thursday">Thursday</div>
+                <div class="day-tab" data-day="Friday">Friday</div>
+            </div>
+            
+            <div id="critical-staffing-alert" class="alert" style="display: none;">
+                <strong>⚠️ CRITICAL STAFFING:</strong> Limited staff available today. Lunch breaks have been optimized to ensure continuous coverage.
+            </div>
+            
+            <div id="mail-handler-alert" class="alert" style="display: none;">
+                <strong>⚠️ Mail Handler Notification:</strong> <span id="mail-handler-message"></span>
+            </div>
+            
+            <div id="special-staff-alert" class="alert" style="background-color: #e3f2fd; border-left: 4px solid #2196f3;">
+                <strong>🔄 Coverage Assignment:</strong> <span id="special-staff-message"></span>
+            </div>
+            
+            <!-- Schedule table -->
+            <table id="schedule-table">
+                <tr>
+                    <th>Staff Name</th>
+                    <th>Status</th>
+                    <th>11:30-11:45</th>
+                    <th>11:45-12:00</th>
+                    <th>12:00-12:15</th>
+                    <th>12:15-12:30</th>
+                    <th>12:30-12:45</th>
+                    <th>12:45-1:00</th>
+                    <th>1:00-1:15</th>
+                    <th>1:15-1:30</th>
+                </tr>
+                <!-- Rows will be generated by JavaScript -->
+            </table>
+            
+            <!-- Staff on duty count -->
+            <div style="margin-top: 20px;">
+                <h3>Staff on Duty Count</h3>
+                <table id="staff-count-table">
+                    <tr>
+                        <th>Time Slot</th>
+                        <th>11:30-11:45</th>
+                        <th>11:45-12:00</th>
+                        <th>12:00-12:15</th>
+                        <th>12:15-12:30</th>
+                        <th>12:30-12:45</th>
+                        <th>12:45-1:00</th>
+                        <th>1:00-1:15</th>
+                        <th>1:15-1:30</th>
+                    </tr>
+                    <!-- Rows will be generated by JavaScript -->
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Config settings
+        const config = {
+            lunchStartTime: "11:30 AM",
+            lunchEndTime: "1:30 PM",
+            regularLunchDuration: 30, // minutes
+            mailDayLunchDuration: 45, // minutes
+            mailDays: ["Monday", "Wednesday"],
+            minStaffOnDuty: 2
+        };
+
+        // Time slots
+        const timeSlots = [
+            "11:30-11:45", "11:45-12:00", "12:00-12:15", "12:15-12:30",
+            "12:30-12:45", "12:45-1:00", "1:00-1:15", "1:15-1:30"
+        ];
+
+        // Staff list
+        let staffList = [
+            {
+                name: "Tifa", 
+                type: "Regular", 
+                mailHandler: true,
+                preferredMailHandler: true,
+                availability: {
+                    Monday: "available",
+                    Tuesday: "scheduled-off",
+                    Wednesday: "available",
+                    Thursday: "available",
+                    Friday: "available"
+                },
+                schedule: {}
+            },
+            {
+                name: "Cloud", 
+                type: "Regular", 
+                mailHandler: false,
+                preferredMailHandler: false,
+                availability: {
+                    Monday: "available",
+                    Tuesday: "available",
+                    Wednesday: "available",
+                    Thursday: "available",
+                    Friday: "available"
+                },
+                schedule: {}
+            },
+            {
+                name: "Aerith", 
+                type: "Regular", 
+                mailHandler: true,
+                preferredMailHandler: false,
+                availability: {
+                    Monday: "available",
+                    Tuesday: "available",
+                    Wednesday: "available",
+                    Thursday: "available",
+                    Friday: "available"
+                },
+                schedule: {}
+            },
+            {
+                name: "Penelo", 
+                type: "Backup", 
+                mailHandler: false,
+                preferredMailHandler: false,
+                availability: {
+                    Monday: "available",
+                    Tuesday: "available",
+                    Wednesday: "available",
+                    Thursday: "available",
+                    Friday: "available"
+                },
+                schedule: {}
+            },
+            {
+                name: "Jessie", 
+                type: "Backup", 
+                mailHandler: false,
+                preferredMailHandler: false,
+                availability: {
+                    Monday: "available",
+                    Tuesday: "available",
+                    Wednesday: "available",
+                    Thursday: "available",
+                    Friday: "available"
+                },
+                schedule: {}
+            },
+            {
+                name: "Barret", 
+                type: "Special", 
+                mailHandler: false,
+                preferredMailHandler: false,
+                fixedLunch: true,
+                fixedLunchSlots: ["12:30-12:45", "12:45-1:00"],
+                availability: {
+                    Monday: "available",
+                    Tuesday: "available",
+                    Wednesday: "available",
+                    Thursday: "available",
+                    Friday: "available"
+                },
+                schedule: {}
+            }
+        ];
+
+        // Schedule data for each day
+        let schedules = {
+            Monday: {},
+            Tuesday: {},
+            Wednesday: {},
+            Thursday: {},
+            Friday: {}
+        };
+
+        // Current active day
+        let activeDay = "Monday";
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load staff data from UI
+            loadStaffFromUI();
+            
+            // Generate schedules
+            generateAllSchedules();
+            
+            // Display the first day's schedule
+            displaySchedule(activeDay);
+            
+            // Update last updated timestamp
+            updateLastUpdated();
+            
+            // Set up event listeners
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            // Day tab click events
+            const dayTabs = document.querySelectorAll('.day-tab');
+            dayTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Set active tab
+                    dayTabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Update active day
+                    activeDay = this.getAttribute('data-day');
+                    
+                    // Display schedule for selected day
+                    displaySchedule(activeDay);
+                });
+            });
+            
+            // Availability select change events
+            const availabilitySelects = document.querySelectorAll('.availability-select');
+            availabilitySelects.forEach(select => {
+                select.addEventListener('change', function() {
+                    // Get staff and day
+                    const staffName = this.getAttribute('data-staff');
+                    const day = this.getAttribute('data-day');
+                    
+                    // Update staff availability
+                    const staffMember = staffList.find(s => s.name === staffName);
+                    if (staffMember) {
+                        staffMember.availability[day] = this.value;
+                        
+                        // Regenerate schedule for that day
+                        generateDaySchedule(day);
+                        
+                        // If current day is displayed, update the display
+                        if (day === activeDay) {
+                            displaySchedule(day);
+                        }
+                        
+                        // Update last updated timestamp
+                        updateLastUpdated();
+                    }
+                });
+            });
+            
+            // Mail handler select change events
+            const mailHandlerSelects = document.querySelectorAll('.mail-handler-select');
+            mailHandlerSelects.forEach(select => {
+                select.addEventListener('change', function() {
+                    const staffName = this.getAttribute('data-staff');
+                    const mailHandlerStatus = this.value;
+                    
+                    // Update mail handler status
+                    const staffMember = staffList.find(s => s.name === staffName);
+                    if (staffMember) {
+                        staffMember.mailHandler = (mailHandlerStatus === 'preferred' || mailHandlerStatus === 'backup');
+                        staffMember.preferredMailHandler = (mailHandlerStatus === 'preferred');
+                        
+                        // If this is set as preferred, unset any other preferred handlers
+                        if (mailHandlerStatus === 'preferred') {
+                            staffList.forEach(s => {
+                                if (s.name !== staffName && s.preferredMailHandler) {
+                                    s.preferredMailHandler = false;
+                                    
+                                    // Update UI to match
+                                    const otherSelect = document.querySelector(`.mail-handler-select[data-staff="${s.name}"]`);
+                                    if (otherSelect) {
+                                        if (s.mailHandler) {
+                                            otherSelect.value = 'backup';
+                                        } else {
+                                            otherSelect.value = 'no';
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                        
+                        // Regenerate all schedules
+                        generateAllSchedules();
+                        
+                        // Update the display
+                        displaySchedule(activeDay);
+                        
+                        // Update last updated timestamp
+                        updateLastUpdated();
+                    }
+                });
+            });
+            
+            // Recalculate button
+            const recalculateButton = document.getElementById('recalculate-btn');
+            if (recalculateButton) {
+                recalculateButton.addEventListener('click', function() {
+                    generateAllSchedules();
+                    displaySchedule(activeDay);
+                    updateLastUpdated();
+                });
+            }
+        }
+
+        function loadStaffFromUI() {
+            // Update staff list from the UI
+            const table = document.getElementById('staff-table');
+            if (!table) return;
+            
+            // Skip header row
+            for (let i = 1; i < table.rows.length; i++) {
+                const row = table.rows[i];
+                const staffName = row.cells[0].textContent;
+                const staffType = row.cells[1].textContent;
+                
+                // Get mail handler status
+                const mailHandlerSelect = row.cells[2].querySelector('select');
+                const mailHandlerStatus = mailHandlerSelect ? mailHandlerSelect.value : 'no';
+                
+                // Find or create staff member
+                let staffMember = staffList.find(s => s.name === staffName);
+                if (!staffMember) {
+                    staffMember = {
+                        name: staffName,
+                        type: staffType,
+                        mailHandler: (mailHandlerStatus === 'preferred' || mailHandlerStatus === 'backup'),
+                        preferredMailHandler: (mailHandlerStatus === 'preferred'),
+                        availability: {
+                            Monday: "available",
+                            Tuesday: "available",
+                            Wednesday: "available",
+                            Thursday: "available",
+                            Friday: "available"
+                        },
+                        schedule: {}
+                    };
+                    staffList.push(staffMember);
+                } else {
+                    // Update existing staff member
+                    staffMember.type = staffType;
+                    staffMember.mailHandler = (mailHandlerStatus === 'preferred' || mailHandlerStatus === 'backup');
+                    staffMember.preferredMailHandler = (mailHandlerStatus === 'preferred');
+                }
+                
+                // Update availability for each day
+                const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+                for (let j = 0; j < days.length; j++) {
+                    const availabilitySelect = row.cells[3 + j].querySelector('select');
+                    if (availabilitySelect) {
+                        staffMember.availability[days[j]] = availabilitySelect.value;
+                    }
+                }
+            }
+        }
+
+        function updateLastUpdated() {
+            const now = new Date();
+            const options = { 
+                hour: 'numeric', 
+                minute: 'numeric',
+                hour12: true
+            };
+            const timeString = now.toLocaleTimeString('en-US', options);
+            
+            const lastUpdatedElement = document.getElementById('last-updated');
+            if (lastUpdatedElement) {
+                lastUpdatedElement.textContent = `Last updated: ${timeString}`;
+            }
+        }
+
+        function generateAllSchedules() {
+            const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+            days.forEach(day => generateDaySchedule(day));
+        }
+
+        function generateDaySchedule(day) {
+            // Clear previous schedule for this day
+            schedules[day] = {};
+            
+            // Get available staff for this day
+            const availableStaff = staffList.filter(staff => staff.availability[day] === 'available');
+            
+            // Handle mail handler assignment for mail days
+            let activeMail = null;
+            let mailHandlerReassigned = false;
+            
+            if (config.mailDays.includes(day)) {
+                // Find the preferred mail handler
+                const preferredMailHandler = staffList.find(staff => 
+                    staff.preferredMailHandler && staff.availability[day] === 'available');
+                
+                if (preferredMailHandler) {
+                    // Preferred handler is available
+                    activeMail = preferredMailHandler;
+                } else {
+                    // Preferred handler is unavailable, find a backup
+                    const backupMailHandler = staffList.find(staff => 
+                        staff.mailHandler && !staff.preferredMailHandler && staff.availability[day] === 'available');
+                    
+                    if (backupMailHandler) {
+                        // Use backup mail handler
+                        activeMail = backupMailHandler;
+                        mailHandlerReassigned = true;
+                    } else {
+                        // No mail handlers available, assign to first available regular staff
+                        const regularStaff = availableStaff.filter(staff => staff.type === 'Regular');
+                        if (regularStaff.length > 0) {
+                            activeMail = regularStaff[0];
+                            mailHandlerReassigned = true;
+                        }
+                    }
+                }
+            }
+            
+            // Critical staffing check - only 2 staff available (excluding special staff with fixed lunch)
+            const nonSpecialStaff = availableStaff.filter(staff => !staff.fixedLunch);
+            const criticalStaffing = nonSpecialStaff.length <= 2;
+            
+            // Sort by regular staff first, then mail handlers (for mail days), with special staff last
+            availableStaff.sort((a, b) => {
+                // Special staff with fixed lunch always go last
+                if (a.fixedLunch && !b.fixedLunch) return 1;
+                if (!a.fixedLunch && b.fixedLunch) return -1;
+                
+                if (a.type === 'Regular' && b.type !== 'Regular') return -1;
+                if (a.type !== 'Regular' && b.type === 'Regular') return 1;
+                
+                // On mail days, prioritize the active mail handler
+                if (config.mailDays.includes(day)) {
+                    if (activeMail && a.name === activeMail.name) return -1;
+                    if (activeMail && b.name === activeMail.name) return 1;
+                }
+                
+                return 0;
+            });
+            
+            // Initialize all staff as on duty for all time slots
+            availableStaff.forEach(staff => {
+                staff.schedule[day] = {};
+                timeSlots.forEach(slot => {
+                    staff.schedule[day][slot] = 'on-duty';
+                });
+            });
+            
+            // Set fixed lunch schedules first
+            const specialStaff = availableStaff.find(staff => staff.fixedLunch);
+            if (specialStaff && specialStaff.fixedLunchSlots) {
+                specialStaff.fixedLunchSlots.forEach(slot => {
+                    specialStaff.schedule[day][slot] = 'fixed-lunch';
+                });
+                
+                // Find a regular staff member to cover the special staff during their lunch
+                // Preferably one who is not a mail handler on a mail day
+                const regularStaff = availableStaff.filter(staff => 
+                    staff.type === 'Regular' && 
+                    (!config.mailDays.includes(day) || !staff.mailHandler || staff !== activeMail));
+                
+                // If no ideal candidate, use any regular staff
+                const coveringStaff = regularStaff.length > 0 ? 
+                    regularStaff[0] : 
+                    availableStaff.find(staff => staff.type === 'Regular');
+                
+                // If we found someone to cover, mark them as covering during special staff's lunch
+                if (coveringStaff) {
+                    specialStaff.fixedLunchSlots.forEach(slot => {
+                        coveringStaff.schedule[day][slot] = 'covering-special';
+                    });
+                    
+                    // Store who is covering in the schedule data
+                    schedules[day].specialCoveredBy = coveringStaff.name;
+                }
+            }
+            
+            // Determine if it's a mail day
+            const isMailDay = config.mailDays.includes(day);
+            
+            // If we're in critical staffing mode (only 2 staff):
+            // Try to schedule lunches centered around noon (12:00-12:30)
+            // while still ensuring adequate coverage
+            if (criticalStaffing && availableStaff.length === 2) {
+                const firstStaff = availableStaff[0];
+                const secondStaff = availableStaff[1];
+                
+                // If it's a mail day and we have an active mail handler, they take priority
+                if (isMailDay && activeMail) {
+                    const mailHandlerIndex = activeMail.name === firstStaff.name ? 0 : 1;
+                    const nonMailIndex = mailHandlerIndex === 0 ? 1 : 0;
+                    
+                    // Calculate lunch durations
+                    const mailLunchSlots = 3; // 45 minutes = 3 slots
+                    const regularLunchSlots = 2; // 30 minutes = 2 slots
+                    
+                    // Find mid-point slots (around noon)
+                    const midPoint = Math.floor(timeSlots.length / 2) - 1; // Center at 12:00-12:15
+                    
+                    // Schedule mail handler first (centered around noon)
+                    const mailStartSlot = Math.max(0, midPoint - Math.floor(mailLunchSlots / 2));
+                    for (let i = 0; i < mailLunchSlots; i++) {
+                        const slotIndex = Math.min(mailStartSlot + i, timeSlots.length - 1);
+                        availableStaff[mailHandlerIndex].schedule[day][timeSlots[slotIndex]] = 'mail-lunch';
+                    }
+                    
+                    // Schedule regular staff right before or after mail handler
+                    if (mailStartSlot > 0) {
+                        // Schedule regular staff before mail handler
+                        for (let i = 0; i < regularLunchSlots; i++) {
+                            const slotIndex = mailStartSlot - regularLunchSlots + i;
+                            if (slotIndex >= 0) {
+                                availableStaff[nonMailIndex].schedule[day][timeSlots[slotIndex]] = 'lunch';
+                            }
+                        }
+                    } else {
+                        // Schedule regular staff after mail handler
+                        const afterMailSlot = mailStartSlot + mailLunchSlots;
+                        for (let i = 0; i < regularLunchSlots; i++) {
+                            const slotIndex = afterMailSlot + i;
+                            if (slotIndex < timeSlots.length) {
+                                availableStaff[nonMailIndex].schedule[day][timeSlots[slotIndex]] = 'lunch';
+                            }
+                        }
+                    }
+                } else {
+                    // Calculate lunch durations
+                    const firstLunchDuration = (isMailDay && activeMail && activeMail.name === firstStaff.name) ? 
+                        config.mailDayLunchDuration : config.regularLunchDuration;
+                    const secondLunchDuration = (isMailDay && activeMail && activeMail.name === secondStaff.name) ? 
+                        config.mailDayLunchDuration : config.regularLunchDuration;
+                    
+                    // Convert durations to slots (15 min each)
+                    const firstSlotsNeeded = firstLunchDuration / 15;
+                    const secondSlotsNeeded = secondLunchDuration / 15;
+                    
+                    // Find mid-point slots (around noon)
+                    const midPoint = Math.floor(timeSlots.length / 2) - 1; // Center at 12:00-12:15
+                    
+                    // Schedule first staff centered around noon
+                    const firstStartSlot = Math.max(0, midPoint - Math.floor(firstSlotsNeeded / 2));
+                    for (let i = 0; i < firstSlotsNeeded; i++) {
+                        const slotIndex = Math.min(firstStartSlot + i, timeSlots.length - 1);
+                        firstStaff.schedule[day][timeSlots[slotIndex]] = (isMailDay && activeMail && activeMail.name === firstStaff.name) ? 
+                            'mail-lunch' : 'lunch';
+                    }
+                    
+                    // Schedule second staff right before or after first staff
+                    if (firstStartSlot > 0) {
+                        // Schedule second staff before first
+                        for (let i = 0; i < secondSlotsNeeded; i++) {
+                            const slotIndex = firstStartSlot - secondSlotsNeeded + i;
+                            if (slotIndex >= 0) {
+                                secondStaff.schedule[day][timeSlots[slotIndex]] = (isMailDay && activeMail && activeMail.name === secondStaff.name) ? 
+                                    'mail-lunch' : 'lunch';
+                            }
+                        }
+                    } else {
+                        // Schedule second staff after first
+                        const afterFirstSlot = firstStartSlot + firstSlotsNeeded;
+                        for (let i = 0; i < secondSlotsNeeded; i++) {
+                            const slotIndex = afterFirstSlot + i;
+                            if (slotIndex < timeSlots.length) {
+                                secondStaff.schedule[day][timeSlots[slotIndex]] = (isMailDay && activeMail && activeMail.name === secondStaff.name) ? 
+                                    'mail-lunch' : 'lunch';
+                            }
+                        }
+                    }
+                }
+            } else {
+                // Normal scheduling when we have more than 2 staff
+                
+                // Schedule active mail handler's lunch first on mail days
+                if (isMailDay && activeMail) {
+                    scheduleLunch(activeMail, day, true);
+                }
+                
+                // Schedule remaining regular staff
+                const regularStaff = availableStaff.filter(staff => 
+                    isMailDay ? 
+                        (staff.type === 'Regular' && (!activeMail || staff.name !== activeMail.name)) : 
+                        staff.type === 'Regular');
+                
+                regularStaff.forEach(staff => {
+                    scheduleLunch(staff, day, false);
+                });
+                
+                // Schedule backup staff
+                const backupStaff = availableStaff.filter(staff => staff.type === 'Backup');
+                backupStaff.forEach(staff => {
+                    scheduleLunch(staff, day, false);
+                });
+            }
+            
+            // Update the schedule for this day
+            schedules[day] = {
+                date: new Date(),
+                criticalStaffing: criticalStaffing,
+                mailDay: isMailDay,
+                activeMailHandler: activeMail ? activeMail.name : null,
+                mailHandlerReassigned: mailHandlerReassigned,
+                specialStaff: specialStaff ? specialStaff.name : null,
+                specialCoveredBy: schedules[day].specialCoveredBy || null,
+                staff: availableStaff.map(staff => {
+                    return {
+                        name: staff.name,
+                        type: staff.type,
+                        isMailHandler: activeMail && staff.name === activeMail.name,
+                        schedule: staff.schedule[day]
+                    };
+                })
+            };
+        }
+
+        function scheduleLunch(staff, day, isMailHandler) {
+            // Skip staff with fixed lunch breaks
+            if (staff.fixedLunch) {
+                return;
+            }
+            
+            // Get lunch duration
+            const lunchDuration = (isMailHandler && config.mailDays.includes(day)) 
+                ? config.mailDayLunchDuration 
+                : config.regularLunchDuration;
+            
+            // Convert duration to number of slots (15 min each)
+            const slotsNeeded = lunchDuration / 15;
+            
+            // For mail handlers on mail days, always schedule lunch at the beginning of the period
+            // as long as it doesn't violate minimum staffing requirements
+            if (isMailHandler && config.mailDays.includes(day)) {
+                let earliestPossibleSlot = 0;
+                let canScheduleEarly = true;
+                
+                // Find the earliest possible slot that maintains minimum staffing
+                for (let i = 0; i < timeSlots.length - slotsNeeded + 1; i++) {
+                    canScheduleEarly = true;
+                    
+                    // Check each potential lunch slot
+                    for (let j = i; j < i + slotsNeeded; j++) {
+                        const slot = timeSlots[j];
+                        
+                        // Count staff on duty if we schedule this lunch
+                        let onDutyCount = 0;
+                        staffList.forEach(s => {
+                            if (s.availability[day] === 'available' && 
+                                s.name !== staff.name && 
+                                (!s.schedule[day] || s.schedule[day][slot] === 'on-duty')) {
+                                onDutyCount++;
+                            }
+                        });
+                        
+                        if (onDutyCount < config.minStaffOnDuty) {
+                            canScheduleEarly = false;
+                            break;
+                        }
+                    }
+                    
+                    if (canScheduleEarly) {
+                        earliestPossibleSlot = i;
+                        break;
+                    }
+                }
+                
+                // Schedule lunch at the earliest possible slot
+                for (let i = earliestPossibleSlot; i < earliestPossibleSlot + slotsNeeded; i++) {
+                    const slot = timeSlots[i];
+                    staff.schedule[day][slot] = 'mail-lunch';
+                }
+                return;
+            }
+            
+            // For non-mail handlers or non-mail days, use the optimized algorithm
+            // that prioritizes lunches near noon when staffing is lower
+            let bestStartSlot = 0;
+            let bestMinCoverage = 0;  // Track the minimum coverage during lunch
+            let bestAvgCoverage = 0;  // Track the average coverage during lunch
+            
+            // Calculate the total available staff for this day
+            const totalAvailableStaff = staffList.filter(s => s.availability[day] === "available").length;
+            
+            // Calculate middle slot (around noon)
+            const midSlot = Math.floor(timeSlots.length / 2) - 1; // 12:00-12:15
+            
+            for (let i = 0; i <= timeSlots.length - slotsNeeded; i++) {
+                let canSchedule = true;
+                let minCoverage = Infinity;
+                let totalCoverage = 0;
+                
+                // Check coverage for each potential lunch slot
+                for (let j = i; j < i + slotsNeeded; j++) {
+                    const slot = timeSlots[j];
+                    
+                    // Count how many staff would be on duty if we schedule this lunch
+                    let onDutyCount = 0;
+                    let coveringSpecialCount = 0;
+                    staffList.forEach(s => {
+                        if (s.availability[day] === 'available' && 
+                            s.name !== staff.name) {
+                            
+                            // Check for the actual status in this time slot
+                            const slotStatus = s.schedule[day][slot];
+                            
+                            if (!slotStatus || slotStatus === 'on-duty') {
+                                onDutyCount++;
+                            } else if (slotStatus === 'covering-special') {
+                                // Staff covering special role are counted as on duty
+                                onDutyCount++;
+                                coveringSpecialCount++;
+                            }
+                        }
+                    });
+                    
+                    // If we're trying to schedule lunch for the person covering the special staff,
+                    // make sure someone else is available during that time
+                    const specialStaff = staffList.find(s => s.fixedLunch);
+                    if (specialStaff && 
+                        specialStaff.fixedLunchSlots && 
+                        specialStaff.fixedLunchSlots.includes(slot) &&
+                        staff.schedule[day][slot] === 'covering-special') {
+                        // We can't schedule lunch for this staff member in this slot
+                        // because they're covering the special staff
+                        canSchedule = false;
+                        break;
+                    }
+                    
+                    // Track minimum and total coverage
+                    minCoverage = Math.min(minCoverage, onDutyCount);
+                    totalCoverage += onDutyCount;
+                    
+                    // Immediately reject if this would violate minimum staffing
+                    if (onDutyCount < config.minStaffOnDuty) {
+                        canSchedule = false;
+                        break;
+                    }
+                }
+                
+                // Calculate average coverage for this lunch period
+                const avgCoverage = totalCoverage / slotsNeeded;
+                
+                // Calculate how close this slot is to noon (lower value = closer to noon)
+                const distanceFromNoon = Math.abs(i + (slotsNeeded / 2) - midSlot - 0.5);
+                
+                // Update best slot if this is better
+                if (canSchedule) {
+                    // First priority: highest minimum coverage
+                    if (minCoverage > bestMinCoverage) {
+                        bestStartSlot = i;
+                        bestMinCoverage = minCoverage;
+                        bestAvgCoverage = avgCoverage;
+                    } 
+                    // Second priority: if staffing is low, prioritize slots closer to noon
+                    else if (minCoverage === bestMinCoverage && totalAvailableStaff <= 4) {
+                        // Get distance from noon for current best slot
+                        const currentDistanceFromNoon = Math.abs(bestStartSlot + (slotsNeeded / 2) - midSlot - 0.5);
+                        
+                        // If this slot is closer to noon, use it
+                        if (distanceFromNoon < currentDistanceFromNoon) {
+                            bestStartSlot = i;
+                            bestAvgCoverage = avgCoverage;
+                        }
+                        // If equally close to noon, use the one with better average coverage
+                        else if (distanceFromNoon === currentDistanceFromNoon && avgCoverage > bestAvgCoverage) {
+                            bestStartSlot = i;
+                            bestAvgCoverage = avgCoverage;
+                        }
+                    }
+                    // Third priority for normal staffing: highest average coverage if minimum is the same
+                    else if (minCoverage === bestMinCoverage && totalAvailableStaff > 4 && avgCoverage > bestAvgCoverage) {
+                        bestStartSlot = i;
+                        bestAvgCoverage = avgCoverage;
+                    }
+                    // Fourth priority: if all else is equal, prefer slots closer to noon
+                    else if (minCoverage === bestMinCoverage && 
+                             Math.abs(avgCoverage - bestAvgCoverage) < 0.01 && 
+                             distanceFromNoon < Math.abs(bestStartSlot + (slotsNeeded / 2) - midSlot - 0.5)) {
+                        bestStartSlot = i;
+                    }
+                }
+            }
+            
+            // Schedule the lunch
+            for (let i = bestStartSlot; i < bestStartSlot + slotsNeeded; i++) {
+                const slot = timeSlots[i];
+                staff.schedule[day][slot] = 'lunch';
+            }
+        }
+
+        function displaySchedule(day) {
+            // Update header to show which day's schedule we're displaying
+            const scheduleHeader = document.getElementById('schedule-header');
+            if (scheduleHeader) {
+                scheduleHeader.textContent = `${day} Lunch Schedule${config.mailDays.includes(day) ? ' (Mail Day)' : ''}`;
+            }
+            
+            // Get the day's schedule data
+            const daySchedule = schedules[day] || {};
+            
+            // Get available staff
+            const availableStaff = staffList.filter(staff => staff.availability[day] === 'available');
+            
+            // Check if it's a critical staffing day
+            const criticalStaffing = availableStaff.length <= 2;
+            
+            // Show or hide critical staffing alert
+            const criticalStaffingAlert = document.getElementById('critical-staffing-alert');
+            if (criticalStaffingAlert) {
+                criticalStaffingAlert.style.display = criticalStaffing ? 'block' : 'none';
+            }
+            
+            // Show or hide mail handler alert
+            const mailHandlerAlert = document.getElementById('mail-handler-alert');
+            const mailHandlerMessage = document.getElementById('mail-handler-message');
+            if (mailHandlerAlert && mailHandlerMessage) {
+                if (config.mailDays.includes(day) && daySchedule.mailHandlerReassigned) {
+                    // Find preferred mail handler
+                    const preferredHandler = staffList.find(staff => staff.preferredMailHandler);
+                    const preferredName = preferredHandler ? preferredHandler.name : "Preferred mail handler";
+                    
+                    mailHandlerMessage.textContent = `${preferredName} is unavailable today. Current Mail Handler: ${daySchedule.activeMailHandler}`;
+                    mailHandlerAlert.style.display = 'block';
+                } else {
+                    mailHandlerAlert.style.display = 'none';
+                }
+            }
+            
+            // Show or hide special staff coverage alert
+            const specialStaffAlert = document.getElementById('special-staff-alert');
+            const specialStaffMessage = document.getElementById('special-staff-message');
+            
+            if (specialStaffAlert && specialStaffMessage) {
+                if (daySchedule.specialCoveredBy) {
+                    specialStaffMessage.textContent = `${daySchedule.specialCoveredBy} is assigned to cover Barret during their fixed lunch (12:30-1:00 PM).`;
+                    specialStaffAlert.style.display = 'block';
+                } else {
+                    specialStaffAlert.style.display = 'none';
+                }
+            }
+            
+            // Get schedule table
+            const table = document.getElementById('schedule-table');
+            if (!table) return;
+            
+            // Clear existing rows except header
+            while (table.rows.length > 1) {
+                table.deleteRow(1);
+            }
+            
+            // Add rows for each staff member
+            staffList.forEach(staff => {
+                // Skip if not available
+                if (staff.availability[day] !== 'available') return;
+                
+                const row = table.insertRow();
+                
+                // Check if this staff is the active mail handler for today
+                const isActiveMailHandler = daySchedule.activeMailHandler === staff.name;
+                
+                // Staff name
+                const nameCell = row.insertCell();
+                nameCell.textContent = staff.name;
+                
+                if (isActiveMailHandler) {
+                    nameCell.innerHTML += ' <span style="color: #FFD600; font-weight: bold;"></span>';
+                    nameCell.title = "Assigned mail handler for today";
+                }
+                
+                // Staff type
+                const typeCell = row.insertCell();
+                typeCell.textContent = staff.type;
+                if (staff.type === 'Backup') {
+                    typeCell.className = 'backup-staff';
+                }
+                
+                // Schedule for each time slot
+                timeSlots.forEach(slot => {
+                    const cell = row.insertCell();
+                    const slotStatus = staff.schedule[day]?.[slot] || 'on-duty';
+                    
+                    if (slotStatus === 'lunch') {
+                        cell.className = 'lunch-break';
+                        cell.textContent = 'Lunch';
+                    } else if (slotStatus === 'mail-lunch') {
+                        cell.className = 'mail-day-lunch';
+                        cell.textContent = '✉️ Lunch';
+                    } else if (slotStatus === 'fixed-lunch') {
+                        cell.className = 'fixed-lunch';
+                        cell.textContent = 'Fixed Lunch';
+                    } else if (slotStatus === 'covering-special') {
+                        cell.className = 'covering-special';
+                        cell.textContent = 'Covering Barret';
+                    } else {
+                        cell.className = 'staff-on-duty';
+                        cell.textContent = 'On Duty';
+                    }
+                    
+                    // Add special styling for critical staffing
+                    if (criticalStaffing) {
+                        cell.style.fontWeight = 'bold';
+                    }
+                });
+            });
+            
+            // Update staff on duty count
+            updateStaffOnDutyCount(day);
+        }
+
+        function updateStaffOnDutyCount(day) {
+            // Get staff on duty count table
+            const countTable = document.getElementById('staff-count-table');
+            if (!countTable) return;
+            
+            // Clear existing rows except header
+            while (countTable.rows.length > 1) {
+                countTable.deleteRow(1);
+            }
+            
+            // Add rows for regular staff and with backup
+            const regularRow = countTable.insertRow();
+            const firstCell = regularRow.insertCell();
+            firstCell.innerHTML = '<strong>Regular Staff</strong>';
+            
+            const backupRow = countTable.insertRow();
+            const firstCellBackup = backupRow.insertCell();
+            firstCellBackup.innerHTML = '<strong>With Backup</strong>';
+            
+            // Add a new row for coverage quality
+            const qualityRow = countTable.insertRow();
+            const firstCellQuality = qualityRow.insertCell();
+            firstCellQuality.innerHTML = '<strong>Coverage Quality</strong>';
+            
+            // Count staff on duty for each time slot
+            timeSlots.forEach(slot => {
+                let regularCount = 0;
+                let totalCount = 0;
+                
+                staffList.forEach(staff => {
+                    if (staff.availability[day] === 'available' &&
+                        (!staff.schedule[day] || staff.schedule[day][slot] === 'on-duty') &&
+                        staff.schedule[day][slot] !== 'fixed-lunch') {
+                        totalCount++;
+                        if (staff.type === 'Regular') {
+                            regularCount++;
+                        }
+                    }
+                });
+                
+                const regularCell = regularRow.insertCell();
+                regularCell.textContent = regularCount;
+                
+                const backupCell = backupRow.insertCell();
+                backupCell.textContent = totalCount;
+                
+                // Add quality indicator
+                const qualityCell = qualityRow.insertCell();
+                if (totalCount < config.minStaffOnDuty) {
+                    qualityCell.innerHTML = '‼️ Critical';
+                    qualityCell.style.backgroundColor = '#ffeaea';
+                    qualityCell.style.color = '#f44336';
+                } else if (regularCount < config.minStaffOnDuty) {
+                    qualityCell.innerHTML = '⚠️ Backup';
+                    qualityCell.style.backgroundColor = '#fff8e1';
+                } else if (totalCount === config.minStaffOnDuty) {
+                    qualityCell.innerHTML = '✓ Minimum';
+                    qualityCell.style.backgroundColor = '#e6f7ff';
+                } else if (totalCount > config.minStaffOnDuty + 1) {
+                    qualityCell.innerHTML = '✓✓ Excellent';
+                    qualityCell.style.backgroundColor = '#e6ffe6';
+                } else {
+                    qualityCell.innerHTML = '✓ Good';
+                    qualityCell.style.backgroundColor = '#f0f7ff';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
+

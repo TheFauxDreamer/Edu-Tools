@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Emergency List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #EEFBFA;
+        }
+
+        .upload-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .upload-box {
+            border: 2px dashed #ccc;
+            padding: 20px;
+            text-align: center;
+            border-radius: 4px;
+            margin: 10px 0;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
+
+        .upload-box.dragover {
+            border-color: #1a73e8;
+            background-color: #f8f9fa;
+        }
+
+        .upload-box:hover {
+            border-color: #666;
+        }
+
+        .year-group {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .year-title {
+            background-color: #1a73e8;
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .alpha-group {
+            margin-bottom: 20px;
+        }
+
+        .alpha-title {
+            background-color: #f0f0f0;
+            padding: 5px 10px;
+            margin: 10px 0;
+            font-weight: bold;
+            border-radius: 4px;
+        }
+
+        .generation-date {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 15px;
+            text-align: right;
+            font-style: italic;
+        }
+
+        .student-list-container {
+            width: 100%;
+        }
+
+        .student-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .student-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .print-button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            display: block;
+            margin: 20px auto;
+            box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+        }
+
+        .print-button:hover {
+            background-color: #c82333;
+            box-shadow: 0 6px 12px rgba(220, 53, 69, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .print-button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3);
+        }
+
+        .print-button::before {
+            content: "🖨️ ";
+            margin-right: 8px;
+        }
+
+        .error-message {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            display: none;
+        }
+
+        @media print {
+            @page {
+                margin: 1.5cm;
+                size: portrait;
+            }
+
+            body {
+                padding: 0;
+                background-color: white;
+            }
+
+            .upload-container, .print-section, .error-message {
+                display: none !important;
+            }
+
+            .year-group {
+                box-shadow: none;
+            }
+
+            .year-start {
+                page-break-before: always;
+                page-break-inside: avoid;
+            }
+
+            .alpha-group {
+                page-break-before: always;
+                box-shadow: none;
+                padding: 20px;
+                page-break-after: avoid;
+                page-break-inside: avoid;
+            }
+
+            .year-start .alpha-group {
+                page-break-before: auto;
+            }
+
+            .generation-date {
+                font-size: 10pt;
+                color: #333;
+                margin-bottom: 20px;
+                text-align: right;
+                font-style: italic;
+            }
+
+            .student-list-container {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 20px;
+            }
+
+            .student-list {
+                margin: 0;
+                padding: 0;
+            }
+
+            .student-list li {
+                break-inside: avoid;
+                padding: 4px 0;
+                font-size: 12pt;
+                line-height: 1.3;
+                border-bottom: 1px solid #eee;
+            }
+
+            .year-title {
+                margin-bottom: 20px;
+                background-color: transparent !important;
+                color: #000 !important;
+                border: 2px solid #000;
+                font-size: 14pt;
+                font-weight: bold;
+                text-align: center;
+            }
+
+            .alpha-title {
+                margin-bottom: 20px;
+            }
+
+            /* Hide all elements except what we want to print */
+            body > *:not(#output) {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="upload-container">
+        <h1>Compass Evacuation Student Lists</h1>
+        <p>How to generate the report:</br><strong>Compass > People Management > Active Students > Columns > ✅ Year Level (Current) > Save</strong></br></br>
+            Click the <strong>📄 Export CSV</strong> button</br>
+            Untick the pop-up so it'll download the csv file straight away instead of emailing you and all that.</br></br>
+            Drag the CSV file in the box below.
+        </p>
+        <div class="upload-box" id="uploadBox">
+            <p>Drop your CSV file here or click to upload</p>
+            <input type="file" id="fileInput" accept=".csv" style="display: none;">
+        </div>
+        <div class="error-message" id="errorMessage"></div>
+    </div>
+
+    <div class="print-section">
+        <button class="print-button" onclick="window.print()">Print Emergency List</button>
+    </div>
+
+    <div id="output"></div>
+
+    <script>
+        const uploadBox = document.getElementById('uploadBox');
+        const fileInput = document.getElementById('fileInput');
+        const output = document.getElementById('output');
+        const errorMessage = document.getElementById('errorMessage');
+
+        // Prevent default drag behaviors
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadBox.addEventListener(eventName, preventDefaults, false);
+            document.body.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        // Handle drag and drop visual feedback
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadBox.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadBox.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight(e) {
+            uploadBox.classList.add('dragover');
+        }
+
+        function unhighlight(e) {
+            uploadBox.classList.remove('dragover');
+        }
+
+        // Handle dropped files
+        uploadBox.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const file = dt.files[0];
+            
+            if (file && file.name.endsWith('.csv')) {
+                processFile(file);
+            } else {
+                showError('Please upload a .csv file');
+            }
+        }
+
+        // Handle click upload
+        uploadBox.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                processFile(file);
+            }
+        });
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+            setTimeout(() => {
+                errorMessage.style.display = 'none';
+            }, 5000);
+        }
+
+        function processFile(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const text = e.target.result;
+                    const students = parseCSVFile(text);
+                    if (students.length > 0) {
+                        displayStudents(students);
+                        errorMessage.style.display = 'none';
+                    } else {
+                        showError('No valid student records found in the file');
+                    }
+                } catch (error) {
+                    showError('Error processing file: ' + error.message);
+                }
+            };
+            reader.onerror = function() {
+                showError('Error reading file');
+            };
+            reader.readAsText(file);
+        }
+
+        function parseCSVFile(text) {
+            try {
+                const lines = text.split('\n');
+                if (lines.length < 2) {
+                    throw new Error('File is empty or missing data');
+                }
+
+                const headers = lines[0].split(',').map(h => h.replace(/"/g, '').trim());
+                
+                // Create index mapping for required fields
+                const indices = {
+                    fullName: headers.indexOf('Full Name'),
+                    baseRole: headers.indexOf('Base Role'),
+                    yearLevel: headers.indexOf('Year Level (Current)')
+                };
+
+                // Verify all required fields are present
+                if (indices.fullName === -1 || indices.yearLevel === -1) {
+                    throw new Error('Required columns (Full Name, Year Level (Current)) are missing from the file');
+                }
+
+                // Process data rows
+                return lines.slice(1)
+                    .filter(line => line.trim())
+                    .map(line => {
+                        const values = parseCSVLine(line);
+                        
+                        // Only process students
+                        if (values[indices.baseRole] !== 'Student') {
+                            return null;
+                        }
+
+                        const fullName = values[indices.fullName];
+                        const yearLevel = values[indices.yearLevel];
+                        
+                        if (!fullName || !yearLevel) {
+                            return null;
+                        }
+
+                        const nameData = parseFullName(fullName);
+                        const year = extractYearNumber(yearLevel);
+
+                        if (!year) {
+                            return null;
+                        }
+
+                        return {
+                            firstname: nameData.firstname,
+                            prefname: nameData.prefname,
+                            surname: nameData.surname,
+                            schoolyear_code: year
+                        };
+                    })
+                    .filter(student => student !== null);
+            } catch (error) {
+                throw new Error('Invalid file format: ' + error.message);
+            }
+        }
+
+        function parseCSVLine(line) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+            
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                
+                if (char === '"') {
+                    if (inQuotes && line[i + 1] === '"') {
+                        // Handle escaped quotes
+                        current += '"';
+                        i++; // Skip next quote
+                    } else {
+                        inQuotes = !inQuotes;
+                    }
+                } else if (char === ',' && !inQuotes) {
+                    result.push(current.trim());
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+            
+            result.push(current.trim());
+            return result;
+        }
+
+        function parseFullName(fullName) {
+            // Handle names like "Matthew (Matty) Heely" or "Alyx Vance"
+            const prefNameMatch = fullName.match(/^(.+?)\s+\((.+?)\)\s+(.+)$/);
+            
+            if (prefNameMatch) {
+                // Has preferred name in parentheses
+                return {
+                    firstname: prefNameMatch[1].trim(),
+                    prefname: prefNameMatch[2].trim(),
+                    surname: prefNameMatch[3].trim()
+                };
+            } else {
+                // No preferred name, split first and last
+                const nameParts = fullName.trim().split(' ');
+                if (nameParts.length >= 2) {
+                    const surname = nameParts[nameParts.length - 1];
+                    const firstname = nameParts.slice(0, -1).join(' ');
+                    return {
+                        firstname: firstname,
+                        prefname: null,
+                        surname: surname
+                    };
+                } else {
+                    // Single name, treat as surname
+                    return {
+                        firstname: '',
+                        prefname: null,
+                        surname: fullName.trim()
+                    };
+                }
+            }
+        }
+
+        function extractYearNumber(yearLevel) {
+            // Extract number from "Year 10" format
+            const match = yearLevel.match(/Year\s+(\d+)/i);
+            return match ? match[1] : null;
+        }
+
+        function getAlphaGroup(surname) {
+            const firstLetter = surname.charAt(0).toUpperCase();
+            if (firstLetter <= 'C') return 'A-C';
+            if (firstLetter <= 'H') return 'D-H';
+            if (firstLetter <= 'M') return 'I-M';
+            if (firstLetter <= 'P') return 'N-P';
+            if (firstLetter <= 'S') return 'Q-S';
+            return 'T-Z';
+        }
+
+        function formatDate(date) {
+            const options = {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            };
+            return date.toLocaleDateString('en-AU', options);
+        }
+
+        function displayStudents(students) {
+            // Get current date and time
+            const generationDate = formatDate(new Date());
+            
+            // Group students by school year
+            const yearGroups = {};
+            students.forEach(student => {
+                const year = student.schoolyear_code;
+                if (!yearGroups[year]) {
+                    yearGroups[year] = [];
+                }
+                yearGroups[year].push(student);
+            });
+
+            // Generate HTML
+            let html = '';
+            Object.keys(yearGroups).sort((a, b) => parseInt(a) - parseInt(b)).forEach(year => {
+                // Sort students by surname within each year group
+                yearGroups[year].sort((a, b) => a.surname.localeCompare(b.surname));
+
+                // Group by alphabet ranges
+                const alphaGroups = {
+                    'A-C': [], 'D-H': [], 'I-M': [],
+                    'N-P': [], 'Q-S': [], 'T-Z': []
+                };
+
+                yearGroups[year].forEach(student => {
+                    const alphaGroup = getAlphaGroup(student.surname);
+                    alphaGroups[alphaGroup].push(student);
+                });
+
+                html += `<div class="year-group">`;
+
+                let isFirstGroup = true;
+                Object.entries(alphaGroups).forEach(([group, groupStudents]) => {
+                    if (groupStudents.length > 0) {
+                        // Split students into two columns
+                        const midpoint = Math.ceil(groupStudents.length / 2);
+                        const firstColumn = groupStudents.slice(0, midpoint);
+                        const secondColumn = groupStudents.slice(midpoint);
+
+                        if (isFirstGroup) {
+                            html += `
+                                <div class="year-start">
+                                    <div class="year-title">Year ${year}</div>
+                            `;
+                        }
+
+                        html += `
+                            <div class="alpha-group">
+                                ${!isFirstGroup ? `<div class="year-title">Year ${year}</div>` : ''}
+                                <div class="generation-date">Generated: ${generationDate}</div>
+                                <div class="alpha-title">${group}</div>
+                                <div class="student-list-container">
+                                    <ul class="student-list">
+                        `;
+
+                        firstColumn.forEach(student => {
+                            const displayName = student.prefname ? 
+                                `${student.surname}, ${student.prefname}` : 
+                                `${student.surname}, ${student.firstname}`;
+                            html += `<li>${displayName}</li>`;
+                        });
+
+                        html += `
+                                    </ul>
+                                    <ul class="student-list">
+                        `;
+
+                        secondColumn.forEach(student => {
+                            const displayName = student.prefname ? 
+                                `${student.surname}, ${student.prefname}` : 
+                                `${student.surname}, ${student.firstname}`;
+                            html += `<li>${displayName}</li>`;
+                        });
+
+                        html += `
+                                    </ul>
+                                </div>
+                            </div>
+                        `;
+
+                        if (isFirstGroup) {
+                            html += `</div>`;
+                            isFirstGroup = false;
+                        }
+                    }
+                });
+
+                html += `</div>`;
+            });
+
+            output.innerHTML = html;
+        }
+    </script>
+</body>
+</html>

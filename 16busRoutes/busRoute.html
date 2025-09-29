@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Western Australia School Bus Routes</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: #f5f5f7;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            color: #1d1d1f;
+            padding: 1rem 2rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        h1 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            color: #6e6e73;
+            margin-top: 0.25rem;
+            font-weight: 400;
+        }
+
+        #map {
+            flex: 1;
+            width: 100%;
+        }
+
+        .info-panel {
+            position: absolute;
+            top: 100px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 1.5rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+            max-width: 200px;
+            z-index: 1000;
+            border: 1px solid rgba(0, 0, 0, 0.04);
+        }
+
+        .info-panel h3 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #6e6e73;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.75rem;
+        }
+
+        .route-count {
+            font-size: 3rem;
+            font-weight: 600;
+            color: #007aff;
+            line-height: 1;
+            margin: 0.5rem 0;
+        }
+
+        .search-panel {
+            position: absolute;
+            top: 100px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 1.5rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+            max-width: 320px;
+            z-index: 1000;
+            border: 1px solid rgba(0, 0, 0, 0.04);
+        }
+
+        .search-panel h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #1d1d1f;
+            margin-bottom: 1rem;
+            letter-spacing: -0.01em;
+        }
+
+        .search-panel input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: none;
+            background: #f5f5f7;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .search-panel input:focus {
+            outline: none;
+            background: #e8e8ed;
+            box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
+        }
+
+        .search-panel button {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: #007aff;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            margin-top: 0.75rem;
+        }
+
+        .search-panel button:hover {
+            background: #0051d5;
+        }
+
+        .search-panel button:active {
+            transform: scale(0.98);
+        }
+
+        .search-panel button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        #searchResult {
+            margin-top: 0.75rem;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            color: #6e6e73;
+            min-height: 20px;
+        }
+
+        #searchResult.success {
+            color: #34c759;
+        }
+
+        #searchResult.error {
+            color: #ff3b30;
+        }
+
+        #searchResult.info {
+            color: #6e6e73;
+        }
+
+        .route-highlight {
+            font-weight: 600;
+            color: #007aff;
+        }
+
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            z-index: 2000;
+            text-align: center;
+            border: 1px solid rgba(0, 0, 0, 0.04);
+        }
+
+        .loading p {
+            color: #6e6e73;
+            font-size: 1rem;
+        }
+
+        .spinner {
+            border: 3px solid #f5f5f7;
+            border-top: 3px solid #007aff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 1.5rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .data-load-error {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            z-index: 2000;
+            max-width: 500px;
+            border: 1px solid rgba(255, 59, 48, 0.2);
+        }
+
+        .data-load-error h3 {
+            color: #ff3b30;
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .data-load-error p {
+            color: #6e6e73;
+            line-height: 1.6;
+            margin: 0.5rem 0;
+        }
+
+        .leaflet-popup-content-wrapper {
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+        }
+
+        .popup-content {
+            padding: 0.75rem;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+        }
+
+        .popup-content h4 {
+            color: #007aff;
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .popup-content p {
+            margin: 0.5rem 0;
+            font-size: 0.875rem;
+            color: #6e6e73;
+        }
+
+        .popup-content strong {
+            color: #1d1d1f;
+            font-weight: 600;
+        }
+
+        .leaflet-top.leaflet-left {
+            top: auto;
+            bottom: 20px;
+            left: auto;
+            right: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .info-panel {
+                top: 90px;
+                right: 10px;
+                padding: 1rem;
+                max-width: 140px;
+            }
+
+            .route-count {
+                font-size: 2rem;
+            }
+
+            .search-panel {
+                top: 90px;
+                left: 10px;
+                right: 10px;
+                max-width: calc(100% - 180px);
+                padding: 1rem;
+            }
+
+            .search-panel h3 {
+                font-size: 1rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            header {
+                padding: 1rem 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Western Australia School Bus Routes</h1>
+        <div class="subtitle">Data downloaded from <a href="https://catalogue.data.wa.gov.au/dataset/school-bus-services-routes" target="_blank" rel="noopener noreferrer" style="color: #007aff; text-decoration: none;">data.wa.gov.au</a> on 27/09/2025</div>
+    </header>
+
+    <div id="map"></div>
+
+    <div class="search-panel">
+        <h3>Find School Routes</h3>
+        <input type="text" id="schoolSearch" placeholder="Search for a school...">
+        <div id="searchResult"></div>
+        <button id="searchButton">Search</button>
+    </div>
+
+    <div class="info-panel">
+        <h3>Routes</h3>
+        <div class="route-count" id="routeCount">0</div>
+    </div>
+
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>Loading routes...</p>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    <script>
+        console.log('Script starting...');
+        
+        function showError(message, details) {
+            console.error('Error:', message, details);
+            document.getElementById('loading').style.display = 'none';
+            
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error';
+            errorDiv.innerHTML = `
+                <h3>Error Loading Data</h3>
+                <p style="margin-top: 1rem;"><strong>${message}</strong></p>
+                ${details ? `<p style="margin-top: 0.5rem; font-size: 0.9rem;">${details}</p>` : ''}
+                <p style="margin-top: 1rem; font-size: 0.85rem; color: #6e6e73;">
+                    Check the browser console for more details.
+                </p>
+            `;
+            document.body.appendChild(errorDiv);
+        }
+
+        try {
+            console.log('Initializing map...');
+            const map = L.map('map').setView([-31.9505, 115.8605], 6);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 18
+            }).addTo(map);
+            console.log('Map initialized successfully');
+
+            const colors = [
+                '#007aff', '#5856d6', '#af52de', '#ff2d55',
+                '#ff3b30', '#ff9500', '#ffcc00', '#34c759'
+            ];
+
+            let routeCount = 0;
+            let allRoutes = [];
+            let userMarker = null;
+            let highlightedRoute = null;
+
+            function getColor(index) {
+                return colors[index % colors.length];
+            }
+
+            function createPopupContent(properties) {
+                let content = '<div class="popup-content">';
+                
+                if (properties.con_name) {
+                    content += `<h4>${properties.con_name}</h4>`;
+                }
+                
+                if (properties.descriptio) {
+                    content += `<p><strong>Description:</strong> ${properties.descriptio}</p>`;
+                }
+                
+                if (properties.serviceid) {
+                    content += `<p><strong>Service ID:</strong> ${properties.serviceid}</p>`;
+                }
+                
+                if (properties.con_id) {
+                    content += `<p><strong>Contract ID:</strong> ${properties.con_id}</p>`;
+                }
+                
+                if (properties.gid) {
+                    content += `<p><strong>Route GID:</strong> ${properties.gid}</p>`;
+                }
+                
+                content += '</div>';
+                return content;
+            }
+
+            console.log('Fetching GeoJSON files...');
+            
+            const file1Promise = fetch('School_Bus_Services_Routes_PTA_004_WA_GDA2020_Public_P1.geojson')
+                .then(response => {
+                    console.log('Part 1 response received:', response.status, response.ok);
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText} for Part 1`);
+                    }
+                    return response.text();
+                })
+                .then(text => {
+                    console.log('Part 1 text length:', text.length);
+                    try {
+                        return JSON.parse(text);
+                    } catch (parseError) {
+                        console.error('Part 1 JSON parse error:', parseError);
+                        throw new Error(`Failed to parse Part 1 JSON: ${parseError.message}`);
+                    }
+                });
+
+            const file2Promise = fetch('School_Bus_Services_Routes_PTA_004_WA_GDA2020_Public_P2.geojson')
+                .then(response => {
+                    console.log('Part 2 response received:', response.status, response.ok);
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText} for Part 2`);
+                    }
+                    return response.text();
+                })
+                .then(text => {
+                    console.log('Part 2 text length:', text.length);
+                    try {
+                        return JSON.parse(text);
+                    } catch (parseError) {
+                        console.error('Part 2 JSON parse error:', parseError);
+                        throw new Error(`Failed to parse Part 2 JSON: ${parseError.message}`);
+                    }
+                });
+
+            Promise.all([file1Promise, file2Promise])
+                .then(([data1, data2]) => {
+                    console.log('Both files loaded successfully');
+                    console.log('Part 1 features:', data1.features ? data1.features.length : 'none');
+                    console.log('Part 2 features:', data2.features ? data2.features.length : 'none');
+                    
+                    const combinedData = {
+                        type: "FeatureCollection",
+                        features: [...(data1.features || []), ...(data2.features || [])]
+                    };
+                    
+                    console.log('Combined total features:', combinedData.features.length);
+                    
+                    if (combinedData.features.length === 0) {
+                        throw new Error('No features found in either GeoJSON file');
+                    }
+
+                    document.getElementById('loading').style.display = 'none';
+                    console.log('Adding combined GeoJSON to map...');
+
+                    const geoJsonLayer = L.geoJSON(combinedData, {
+                        style: function(feature) {
+                            const color = getColor(routeCount);
+                            return {
+                                color: color,
+                                weight: 3,
+                                opacity: 0.7
+                            };
+                        },
+                        onEachFeature: function(feature, layer) {
+                            const routeIndex = routeCount;
+                            routeCount++;
+                            
+                            allRoutes.push({
+                                layer: layer,
+                                feature: feature,
+                                index: routeIndex,
+                                color: getColor(routeIndex)
+                            });
+                            
+                            if (feature.properties) {
+                                layer.bindPopup(createPopupContent(feature.properties));
+                            }
+                            
+                            layer.on('click', function() {
+                                const clickedRoute = allRoutes.find(r => r.layer === layer);
+                                if (clickedRoute) {
+                                    highlightRoute(clickedRoute);
+                                    
+                                    const schoolCoords = [-33.8597, 121.8695];
+                                    const routeBounds = layer.getBounds();
+                                    const relevantBounds = L.latLngBounds(routeBounds.getSouthWest(), routeBounds.getNorthEast());
+                                    relevantBounds.extend(schoolCoords);
+                                    
+                                    map.fitBounds(relevantBounds.pad(0.15));
+                                }
+                            });
+                            
+                            layer.on('mouseover', function() {
+                                this.setStyle({
+                                    weight: 5,
+                                    opacity: 1
+                                });
+                            });
+                            
+                            layer.on('mouseout', function() {
+                                const weight = (highlightedRoute === layer) ? 5 : 3;
+                                const opacity = (highlightedRoute === layer) ? 1 : 0.7;
+                                this.setStyle({
+                                    weight: weight,
+                                    opacity: opacity
+                                });
+                            });
+                        }
+                    }).addTo(map);
+
+                    console.log('GeoJSON added to map. Route count:', routeCount);
+
+                    document.getElementById('routeCount').textContent = routeCount;
+
+                    try {
+                        const bounds = geoJsonLayer.getBounds();
+                        map.fitBounds(bounds, { padding: [50, 50] });
+                        console.log('Map fitted to bounds');
+                    } catch (boundsError) {
+                        console.warn('Could not fit bounds:', boundsError);
+                    }
+
+                    setupAddressSearch();
+                })
+                .catch(error => {
+                    console.error('Error in fetch chain:', error);
+                    showError(
+                        error.message,
+                        'Make sure both School_Bus_Services_Routes_PTA_004_WA_GDA2020_Public_P1.geojson and School_Bus_Services_Routes_PTA_004_WA_GDA2020_Public_P2.geojson are in the same directory as this HTML file.'
+                    );
+                });
+
+            function findNearestRoute(lat, lng) {
+                let nearestRoute = null;
+                let minDistance = Infinity;
+
+                allRoutes.forEach(route => {
+                    const coords = route.layer.getLatLngs();
+                    const flatCoords = coords.flat(2);
+                    
+                    flatCoords.forEach(coord => {
+                        if (coord.lat && coord.lng) {
+                            const distance = map.distance([lat, lng], [coord.lat, coord.lng]);
+                            if (distance < minDistance) {
+                                minDistance = distance;
+                                nearestRoute = route;
+                            }
+                        }
+                    });
+                });
+
+                return { route: nearestRoute, distance: minDistance };
+            }
+
+            function highlightRoute(route) {
+                allRoutes.forEach(r => {
+                    r.layer.setStyle({
+                        weight: 3,
+                        opacity: 0.1
+                    });
+                    r.layer.bringToBack();
+                });
+
+                if (route) {
+                    route.layer.setStyle({
+                        weight: 5,
+                        opacity: 1
+                    });
+                    route.layer.bringToFront();
+                    highlightedRoute = route.layer;
+
+                    const bounds = route.layer.getBounds();
+                    const center = bounds.getCenter();
+                    route.layer.openPopup(center);
+                }
+            }
+
+            function resetRouteOpacity() {
+                allRoutes.forEach(r => {
+                    r.layer.setStyle({
+                        weight: 3,
+                        opacity: 0.7
+                    });
+                });
+                highlightedRoute = null;
+            }
+
+            function setupAddressSearch() {
+                const searchInput = document.getElementById('schoolSearch');
+                const searchButton = document.getElementById('searchButton');
+                const searchResult = document.getElementById('searchResult');
+
+                async function performSearch() {
+                    const address = searchInput.value.trim();
+                    
+                    if (!address) {
+                        searchResult.className = 'error';
+                        searchResult.textContent = 'Please enter school name';
+                        return;
+                    }
+
+                    searchButton.disabled = true;
+                    searchButton.textContent = 'Searching...';
+                    searchResult.className = 'info';
+                    searchResult.textContent = 'Looking up school...';
+
+                    try {
+                        const response = await fetch(
+                            `https://nominatim.openstreetmap.org/search?` +
+                            `q=${encodeURIComponent(address + ', Western Australia')}&` +
+                            `format=json&limit=1`
+                        );
+
+                        if (!response.ok) {
+                            throw new Error('Geocoding service unavailable');
+                        }
+
+                        const results = await response.json();
+
+                        if (results.length === 0) {
+                            searchResult.className = 'error';
+                            searchResult.textContent = 'School not found. This is a proof of concept and has its flaws tbh.';
+                            return;
+                        }
+
+                        const location = results[0];
+                        const lat = parseFloat(location.lat);
+                        const lng = parseFloat(location.lon);
+
+                        if (userMarker) {
+                            map.removeLayer(userMarker);
+                        }
+
+                        userMarker = L.marker([lat, lng], {
+                            icon: L.divIcon({
+                                className: 'user-location-marker',
+                                html: '<div style="background: #007aff; width: 16px; height: 16px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 8px rgba(0, 122, 255, 0.4);"></div>',
+                                iconSize: [16, 16]
+                            })
+                        }).addTo(map);
+
+                        userMarker.bindPopup(`<div class="popup-content"><h4>Your Location</h4><p>${location.display_name}</p></div>`);
+
+                        const { route, distance } = findNearestRoute(lat, lng);
+
+                        if (route) {
+                            highlightRoute(route);
+
+                            const distanceKm = (distance / 1000).toFixed(2);
+                            const routeName = route.feature.properties.con_name || 'Unknown Route';
+                            const routeDesc = route.feature.properties.descriptio || '';
+
+                            searchResult.className = 'success';
+                            searchResult.innerHTML = `
+                                <strong>Nearest Route</strong><br>
+                                <span class="route-highlight">${routeName}</span><br>
+                                ${routeDesc ? `${routeDesc}<br>` : ''}
+                                ${distanceKm} km away
+                            `;
+
+                            const bounds = L.latLngBounds([lat, lng], route.layer.getBounds().getCenter());
+                            map.fitBounds(bounds.pad(0.5));
+                        } else {
+                            searchResult.className = 'error';
+                            searchResult.textContent = 'No routes found nearby';
+                        }
+
+                    } catch (error) {
+                        console.error('Search error:', error);
+                        searchResult.className = 'error';
+                        searchResult.textContent = 'Search failed. Please try again.';
+                    } finally {
+                        searchButton.disabled = false;
+                        searchButton.textContent = 'Search';
+                    }
+                }
+
+                searchButton.addEventListener('click', performSearch);
+                searchInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        performSearch();
+                    }
+                });
+            }
+
+        } catch (error) {
+            console.error('Critical error:', error);
+            showError('Critical initialization error', error.message);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,3825 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Signature Generator v1.7.2</title>
+    <!--<script src="dependencies/FileSaverV2.0.5.js"></script>
+    <script src="dependencies/html2canvasV1.4.1.js"></script>
+    <script src="dependencies/jszipV3.10.1.js"></script>-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="logo-data.js"></script>
+    <script src="address-config.js"></script>
+</head>
+<style>
+    /* Design System Variables */
+    :root {
+        --primary-color: #007bff;
+        --secondary-color: #6c757d;
+        --success-color: #28a745;
+        --danger-color: #dc3545;
+        --border-color: #dee2e6;
+        --background-color: #f8f9fa;
+        --text-color: #212529;
+        --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+        --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+        --radius-sm: 4px;
+        --radius-md: 8px;
+        --spacing-xs: 0.25rem;
+        --spacing-sm: 0.5rem;
+        --spacing-md: 1rem;
+        --spacing-lg: 1.5rem;
+        --spacing-xl: 2rem;
+    }
+
+    /* Reset and Base Styles */
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        line-height: 1.5;
+        color: var(--text-color);
+        background-color: var(--background-color);
+    }
+
+    /* Layout */
+    .container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--spacing-xl);
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: var(--spacing-xl);
+        min-height: 100vh;
+    }
+
+    .form-section {
+        background: white;
+        padding: var(--spacing-xl);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-sm);
+        max-height: calc(100vh - 4rem);
+        overflow-y: auto;
+    }
+
+    .preview-section {
+        position: sticky;
+        top: var(--spacing-xl);
+        background: white;
+        padding: var(--spacing-xl);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-sm);
+        height: fit-content;
+    }
+
+    /* Typography */
+    h1 {
+        font-size: 1.75rem;
+        margin-bottom: var(--spacing-lg);
+        color: var(--primary-color);
+    }
+
+    h2 {
+        font-size: 1.2rem;
+        margin-bottom: var(--spacing-md);
+        color: var(--secondary-color);
+    }
+
+    /* Form Groups and Inputs */
+    .input-group {
+        background: var(--background-color);
+        padding: var(--spacing-lg);
+        border-radius: var(--radius-sm);
+        margin-bottom: var(--spacing-lg);
+    }
+
+    .form-group {
+        margin-bottom: var(--spacing-md);
+    }
+
+    label {
+        display: block;
+        margin-bottom: var(--spacing-xs);
+        font-weight: 500;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-sm);
+        font-size: 1rem;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input:focus,
+    select:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+    }
+
+    /* Color Options */
+    .color-options {
+        display: flex;
+        gap: var(--spacing-md);
+        margin: var(--spacing-sm) 0;
+    }
+
+    .color-option {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-sm);
+    }
+
+    /* Logo Upload */
+    .logo-upload-container {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-md);
+        margin-top: var(--spacing-sm);
+    }
+
+    .logo-upload-zone {
+        position: relative;
+        border: 2px dashed var(--border-color);
+        border-radius: var(--radius-sm);
+        padding: var(--spacing-lg);
+        background-color: #fff;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        text-align: center;
+        min-height: 69px;
+        max-height: 70px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .logo-upload-zone:hover {
+        border-color: var(--primary-color);
+        background-color: rgba(0, 123, 255, 0.05);
+    }
+
+    .logo-upload-zone.drag-over {
+        border-color: var(--primary-color);
+        background-color: rgba(0, 123, 255, 0.1);
+    }
+
+    .logo-upload-zone.has-logo {
+        border-style: solid;
+        border-color: var(--success-color);
+        background-color: rgba(40, 167, 69, 0.05);
+    }
+
+    .logo-upload-zone.has-logo .upload-icon {
+        display: none;
+    }
+
+    .logo-upload-zone.has-logo .upload-text {
+        color: var(--success-color);
+        font-weight: 500;
+    }
+
+    .logo-upload-zone.has-logo .upload-subtext {
+        display: none;
+    }
+
+    .logo-upload-zone input[type="file"] {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    .logo-preview {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        padding: var(--spacing-sm);
+        display: none;
+    }
+
+    .logo-preview img,
+    .logo-preview svg {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+
+    .logo-upload-zone.has-logo .logo-preview {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .upload-icon {
+        display: block;
+        margin: 0 auto var(--spacing-sm);
+        width: 40px;
+        height: 40px;
+        color: var(--secondary-color);
+    }
+
+    .upload-text {
+        display: block;
+        margin-bottom: var(--spacing-xs);
+        color: var(--secondary-color);
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    .upload-subtext {
+        display: block;
+        font-size: 0.8rem;
+        color: var(--secondary-color);
+        opacity: 0.8;
+    }
+
+    .logo-controls {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-md);
+        justify-content: flex-end;
+    }
+
+    .remove-logo-btn {
+        background: var(--danger-color);
+        color: white;
+        border: none;
+        padding: var(--spacing-sm) var(--spacing-md);
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        font-size: 0.875rem;
+        transition: background-color 0.2s;
+    }
+
+    .remove-logo-btn:hover:not(:disabled) {
+        background: #c82333;
+    }
+
+    .remove-logo-btn:disabled {
+        background: var(--secondary-color);
+        cursor: not-allowed;
+        opacity: 0.7;
+    }
+
+    /* Save Button */
+    .save-button {
+        background: var(--success-color);
+        color: white;
+        border: none;
+        padding: var(--spacing-md) var(--spacing-xl);
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        font-size: 1rem;
+        width: 100%;
+        margin-top: var(--spacing-md);
+        transition: background-color 0.2s;
+    }
+
+    .save-button:hover {
+        background: #218838;
+    }
+
+    /* Error States */
+    .error-message {
+        color: var(--danger-color);
+        font-size: 0.875rem;
+        margin-top: var(--spacing-xs);
+        display: none;
+    }
+
+    .input-error {
+        border-color: var(--danger-color);
+    }
+
+    /* Signature Preview Styles */
+    .signature-container {
+        padding: var(--spacing-lg);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-sm);
+        background-color: white;
+    }
+
+    .signature {
+        font-family: Arial, sans-serif;
+        line-height: 1.4;
+        color: #333;
+        background-color: white;
+        max-width: 500px;
+        display: grid;
+        grid-template-columns: 80px 1fr;
+        grid-template-areas:
+            "logo main"
+            "secondary-logo main"
+            "ack-logo ack";
+        gap: var(--spacing-lg);
+        position: relative;
+    }
+
+    .signature.no-secondary-logo {
+        grid-template-areas:
+            "logo main"
+            "ack-logo ack";
+    }
+
+    .signature.no-ack-logo {
+    grid-template-areas:
+        "logo main"
+        "secondary-logo main"
+        "ack ack";
+}
+
+.signature.no-secondary-logo.no-ack-logo {
+    grid-template-areas:
+        "logo main"
+        "ack ack";
+}
+
+    /* Logo Styles */
+    .logo,
+    .secondary-logo,
+    .acknowledgement-logo {
+        width: 80px;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--radius-sm);
+        overflow: hidden;
+    }
+
+    .logo {
+        grid-area: logo;
+    }
+
+    .secondary-logo {
+        grid-area: secondary-logo;
+        display: none;
+        margin-top: -10px;
+    }
+
+    .acknowledgement-logo {
+        grid-area: ack-logo;
+        width: 80px;
+        height: 80px;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--radius-sm);
+        overflow: hidden;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+    }
+
+    .acknowledgement-logo.visible {
+        display: flex;
+    }
+
+    .acknowledgement-logo.empty-logo {
+        margin-bottom: -20px;
+    }
+
+    .logo:not(:has(svg)):not(:has(img)),
+    .secondary-logo:not(:has(svg)):not(:has(img)),
+    .acknowledgement-logo:not(:has(svg)):not(:has(img)) {
+        background-color: #f0f0f0;
+    }
+
+    .acknowledgement-logo:not(:has(img)):not(:has(svg)) {
+    display: none !important;
+}
+
+
+    .logo img,
+    .logo svg,
+    .secondary-logo img,
+    .secondary-logo svg,
+    .acknowledgement-logo img,
+    .acknowledgement-logo svg {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+
+    /* Signature Content Styles */
+    .signature-content {
+        grid-area: main;
+    }
+
+    .name-container {
+        display: flex;
+        align-items: baseline;
+        gap: var(--spacing-sm);
+        margin-bottom: 2px;
+    }
+
+    .name {
+        font-size: 17px;
+        font-weight: bold;
+    }
+
+    .pronouns {
+        font-size: 12px;
+        color: #666;
+        font-weight: normal;
+    }
+
+    .title {
+        font-size: 13px;
+        color: #7f8c8d;
+        margin-bottom: 6px;
+    }
+
+    .divider {
+        height: 1px;
+        background-color: var(--border-color);
+        margin: var(--spacing-sm) 0;
+    }
+
+    .contact {
+        font-size: 13px;
+        line-height: 1.3;
+    }
+
+    .company-name {
+        font-weight: bold;
+        font-size: 14px;
+        margin-bottom: 2px;
+    }
+
+    .company-details {
+        color: #666;
+        font-size: 12px;
+        line-height: 1.3;
+    }
+
+    .acknowledgement {
+        grid-area: ack;
+        font-size: 11px;
+        font-style: italic;
+        color: #666;
+        line-height: 1.3;
+        margin-top: 0;
+    }
+
+    /* Tab Styles */
+    .tabs {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        border-bottom: 1px solid #dee2e6;
+        padding-bottom: 0;
+    }
+
+    .tab-button {
+        padding: 0.5rem 1rem;
+        background: none;
+        border: none;
+        border-bottom: 2px solid transparent;
+        cursor: pointer;
+        font-size: 1rem;
+        color: #6c757d;
+        transition: all 0.2s;
+    }
+
+    .tab-button:hover {
+        color: var(--primary-color);
+    }
+
+    .tab-button.active {
+        color: var(--primary-color);
+        border-bottom-color: var(--primary-color);
+        font-weight: 500;
+    }
+
+    /* Tab Content Visibility */
+    .tab-content {
+        display: none;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    .helper-text {
+        font-size: 0.85rem;
+        color: #666;
+        margin-top: 0.25rem;
+        font-style: italic;
+        line-height: 1.3;
+    }
+
+    .staff-preview .helper-text {
+        margin-bottom: 0.5rem;
+        color: #495057;
+        font-size: 0.85rem;
+        font-style: italic;
+    }
+
+    /* Individual and bulk specific content */
+    .individual-only,
+    .bulk-only {
+        display: none;
+    }
+
+    /* Show tab-specific content when active */
+    #individual-content-top.active .individual-only,
+    #individual-content-bottom.active .individual-only,
+    #bulk-content.active .bulk-only {
+        display: block;
+    }
+
+    /* Common sections should always be visible */
+    .common-section {
+        display: block !important;
+    }
+
+    .bulk-only {
+        background: linear-gradient(135deg,
+                #ffffff,
+                rgba(58, 134, 255, 0.15));
+        padding: var(--spacing-lg);
+        border-radius: var(--radius-sm);
+        margin-bottom: var(--spacing-lg);
+        border: 2px solid white;
+        transition: border-color 0.3s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
+
+    .bulk-only:hover {
+        box-shadow: var(--shadow-sm);
+        border-color: gold;
+    }
+
+    #staff-list {
+        margin: 1rem 0;
+        display: none;
+    }
+
+    #staff-select {
+        width: 100%;
+        min-height: 120px;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-sm);
+        padding: var(--spacing-xs);
+        font-size: 0.9rem;
+    }
+
+    #staff-select option {
+        padding: var(--spacing-xs) var(--spacing-sm);
+        cursor: pointer;
+    }
+
+    #staff-select option:hover {
+        background-color: var(--background-color);
+    }
+
+    .export-button {
+        width: 100%;
+        background: var(--success-color);
+        color: white;
+        border: none;
+        padding: var(--spacing-md);
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        font-size: 1rem;
+        margin-top: var(--spacing-md);
+        transition: background-color 0.2s;
+    }
+
+    .export-button:hover:not(:disabled) {
+        background: #218838;
+    }
+
+    .export-progress {
+        /* Match the button's width and margins */
+        width: 100%;
+        margin-top: var(--spacing-md);
+
+        /* Match the button's padding and height */
+        padding: var(--spacing-md);
+        min-height: calc(1rem + 2 * var(--spacing-md));
+        /* Match button height: font-size + 2 * padding */
+
+        /* Match the button's border radius */
+        border-radius: var(--radius-sm);
+
+        /* Other styles */
+        background-color: rgba(255, 255, 255, 0.95);
+        text-align: center;
+        display: none;
+        font-size: 1rem;
+        color: var(--text-color);
+        position: relative;
+        overflow: hidden;
+        border: 2px solid #ffd700;
+        box-shadow: var(--shadow-sm);
+        --progress: 0%;
+    }
+
+    /* Gold gradient progress bar */
+    .export-progress::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: var(--progress);
+        background: linear-gradient(135deg,
+                rgba(255, 215, 0, 0.1) 0%,
+                rgba(255, 223, 0, 0.4) 50%,
+                rgba(255, 215, 0, 0.8) 100%);
+        z-index: 0;
+        transition: width 0.4s ease-in-out;
+        animation: goldPulse 2s infinite;
+    }
+
+    @keyframes goldPulse {
+        0% {
+            opacity: 0.7;
+        }
+
+        50% {
+            opacity: 0.9;
+        }
+
+        100% {
+            opacity: 0.7;
+        }
+    }
+
+    .export-progress-text {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        font-weight: 500;
+        color: #5a4a00;
+    }
+
+    /* Progress states */
+    .export-progress[data-state="processing"] {
+        border-color: #ffd700;
+    }
+
+    .export-progress[data-state="complete"] {
+        border-color: #28a745;
+        background: rgba(255, 255, 255, 0.95);
+    }
+
+    .export-progress[data-state="error"] {
+        border-color: #dc3545;
+        background: rgba(255, 255, 255, 0.95);
+    }
+
+    .export-button:disabled {
+        background: var(--secondary-color);
+        cursor: not-allowed;
+        opacity: 0.7;
+    }
+
+    #bulk-import {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-sm);
+        margin-bottom: 1rem;
+    }
+
+    .bulk-upload-container {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-md);
+        margin-top: var(--spacing-sm);
+    }
+
+    .bulk-upload-zone {
+        position: relative;
+        border: 2px dashed var(--border-color);
+        border-radius: var(--radius-sm);
+        padding: var(--spacing-md);
+        background-color: #fff;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        text-align: center;
+        min-height: 69px;
+        max-height: 70px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .bulk-upload-zone:hover {
+        border-color: var(--primary-color);
+        background-color: rgba(0, 123, 255, 0.05);
+    }
+
+    .bulk-upload-zone.drag-over {
+        border-color: var(--primary-color);
+        background-color: rgba(0, 123, 255, 0.1);
+    }
+
+    .bulk-upload-zone.has-file {
+        border-style: solid;
+        border-color: var(--success-color);
+        background-color: rgba(40, 167, 69, 0.05);
+    }
+
+    .bulk-upload-zone.has-file .upload-icon {
+        display: none;
+    }
+
+    .bulk-upload-zone.has-file .upload-text {
+        color: var(--success-color);
+        font-weight: 500;
+    }
+
+    .bulk-upload-zone.has-file .upload-subtext {
+        display: none;
+    }
+
+    .bulk-upload-zone input[type="file"] {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    .staff-preview {
+        display: none;
+        margin-top: var(--spacing-sm);
+    }
+
+    .staff-preview.visible {
+        display: block;
+    }
+
+    /* Logo Preset Styles */
+    .logo-preset-container {
+        margin-bottom: var(--spacing-md);
+    }
+
+    .preset-label {
+        display: block;
+        margin-bottom: var(--spacing-sm);
+        font-weight: 500;
+    }
+
+    .logo-preset-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: var(--spacing-sm);
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .preset-logo-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: var(--spacing-sm);
+        border: 2px solid var(--border-color);
+        border-radius: var(--radius-sm);
+        background: white;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .preset-logo-btn:hover {
+        border-color: var(--primary-color);
+        background-color: rgba(0, 123, 255, 0.05);
+    }
+
+    .preset-logo-btn.selected {
+        border-color: var(--primary-color);
+        background-color: rgba(0, 123, 255, 0.1);
+    }
+
+    .preset-logo-btn img {
+        width: 40px;
+        height: 40px;
+        margin-bottom: var(--spacing-xs);
+        object-fit: contain;
+    }
+
+    .preset-logo-btn span {
+        font-size: 0.8rem;
+        color: var(--text-color);
+        text-align: center;
+    }
+
+    .preset-divider {
+        position: relative;
+        text-align: center;
+        margin: var(--spacing-md) 0;
+    }
+
+    .preset-divider::before,
+    .preset-divider::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        width: calc(50% - 30px);
+        height: 1px;
+        background-color: var(--border-color);
+    }
+
+    .preset-divider::before {
+        left: 0;
+    }
+
+    .preset-divider::after {
+        right: 0;
+    }
+
+    .preset-divider span {
+        background-color: white;
+        padding: 0 var(--spacing-sm);
+        color: var(--secondary-color);
+        font-size: 0.9rem;
+    }
+
+    .advanced-feature {
+        display: none;
+        /* This will properly collapse the space */
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        transition: opacity 0.3s ease-in-out, max-height 0.3s ease-in-out;
+    }
+
+    .advanced-feature.visible {
+        display: block;
+        max-height: 1000px;
+        /* Adjust this value based on your content */
+        opacity: 1;
+    }
+
+    .logo-preset-container .preset-divider.advanced-feature {
+        margin: 0;
+        padding: 0;
+        max-height: 0;
+    }
+
+    .logo-preset-container .preset-divider.advanced-feature.visible {
+        margin: var(--spacing-md) 0;
+        max-height: 50px;
+    }
+
+    .design-separator {
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: var(--spacing-md);
+        margin-bottom: var(--spacing-md);
+    }
+
+    /* Remove bottom border from last separator to avoid double borders */
+    .design-separator:last-child {
+        border-bottom: none;
+    }
+
+    /* Layout Options */
+    .layout-options {
+        display: flex;
+        gap: var(--spacing-md);
+        margin: var(--spacing-sm) 0;
+    }
+
+    .layout-option {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-sm);
+    }
+
+    /* External Company Signature Layout */
+    .signature.external-layout {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-xs);
+        /* Reduced from --spacing-md */
+    }
+
+    .signature.external-layout .acknowledgement-section {
+        display: flex;
+        align-items: flex-start;
+        margin-top: var(--spacing-xs);
+        /* Added to reduce space */
+    }
+
+    .signature.external-layout .acknowledgement-logo {
+        position: static;
+        width: 80px;
+        height: 80px;
+        margin: 0;
+        flex-shrink: 0;
+    }
+
+    .signature.external-layout .acknowledgement {
+        margin-top: 0;
+        padding-top: var(--spacing-xs);
+        /* Reduced padding */
+    }
+
+    /* Contact and Address Container */
+    .signature.external-layout .info-container {
+        display: flex;
+        gap: var(--spacing-md);
+        /*Fromt XL*/
+        align-items: start;
+        padding-bottom: var(--spacing-sm);
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .signature.external-layout .contact-section {
+        flex: 3;
+        /* Give contact section more space (75% of available width) */
+        position: relative;
+        padding-right: var(--spacing-xl);
+    }
+
+    .signature.external-layout .contact-section,
+    .signature.external-layout .address-section {
+        flex: 1;
+        position: relative;
+    }
+
+    .signature.external-layout .address-section {
+        flex: 1;
+        /* Address section takes less space (25% of available width) */
+        text-align: right;
+    }
+
+    .signature.external-layout .contact-section::after {
+        content: '';
+        position: absolute;
+        right: 0;
+        top: 0;
+        height: 100%;
+        width: 1px;
+        background-color: var(--border-color);
+    }
+
+    /* Logo Container for External Layout */
+    .signature.external-layout .logo-container {
+        display: flex;
+        align-items: center;
+        padding-top: var(--spacing-sm);
+        justify-content: space-between;
+    }
+
+    .signature.external-layout .logo {
+        width: 200px;
+        height: 80px;
+        margin: 0;
+    }
+
+    .signature.external-layout .secondary-logo-container {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-xl);
+    }
+
+    /* Logo Styles for External Layout */
+    .signature.external-layout .logo,
+    .signature.external-layout .secondary-logo {
+        width: 200px;
+        height: 80px;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--radius-sm);
+        overflow: hidden;
+    }
+
+    .signature.external-layout .secondary-logo {
+        width: 200px;
+        height: 80px;
+        margin: 0;
+    }
+
+    .signature.external-layout .logo img,
+    .signature.external-layout .logo svg,
+    .signature.external-layout .secondary-logo img,
+    .signature.external-layout .secondary-logo svg {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+
+    /* Logo Divider for External Layout */
+    .signature.external-layout .logo-divider {
+        width: 1px;
+        height: 60px;
+        background-color: var(--border-color);
+        margin: 0 var(--spacing-xl);
+    }
+
+    .signature.external-layout .logo:not(:has(svg)):not(:has(img)),
+    .signature.external-layout .secondary-logo:not(:has(svg)):not(:has(img)) {
+        background-color: #f0f0f0;
+    }
+
+    .signature.no-ack-logo .acknowledgement-logo {
+    display: none !important;
+    visibility: hidden !important;
+}
+
+    /* Acknowledgement Section */
+    .signature.external-layout .acknowledgement {
+        grid-area: ack;
+        text-align: left;
+        margin-top: var(--spacing-md);
+    }
+
+    .signature.external-layout .acknowledgement-logo {
+        position: relative;
+        margin: 0 var(--spacing-md) var(--spacing-sm) 0;
+    }
+
+    /* Modify the existing signature preview container for external layout */
+    .signature-container.external-preview {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: var(--spacing-lg);
+    }
+
+    /*.signature.external-layout .contact-section .contact {
+        word-break: break-word;
+    }*/
+
+    .signature.external-layout .company-details {
+        text-align: right;
+    }
+
+    @media print, (max-width: 1px) {
+    .signature.no-ack-logo .acknowledgement-logo {
+        display: none !important;
+        visibility: hidden !important;
+        position: absolute !important;
+        width: 0 !important;
+        height: 0 !important;
+        overflow: hidden !important;
+        clip: rect(0, 0, 0, 0) !important;
+    }
+}
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        .container {
+            grid-template-columns: 1fr;
+            gap: var(--spacing-md);
+        }
+
+        .preview-section {
+            position: static;
+        }
+
+        .form-section {
+            max-height: none;
+            overflow-y: visible;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .container {
+            padding: var(--spacing-md);
+        }
+
+        .form-section,
+        .preview-section {
+            padding: var(--spacing-md);
+        }
+
+        .input-group {
+            padding: var(--spacing-md);
+        }
+
+        .color-options {
+            flex-direction: column;
+            gap: var(--spacing-sm);
+        }
+    }
+</style>
+
+<body>
+    <div class="container">
+        <!-- Form Section -->
+        <section class="form-section">
+            <h1>Email Signature Generator</h1>
+
+            <div class="tabs">
+                <button class="tab-button active" data-tab="individual">Individual Signature</button>
+                <button class="tab-button" data-tab="bulk">Bulk Generation</button>
+            </div>
+
+            <!-- Individual Tab Content Part 1 (Personal & Contact) -->
+            <div id="individual-content-top" class="tab-content active">
+                <!-- Personal Information -->
+                <div class="input-group individual-only">
+                    <h2 style="color: #ffbe0b;">Personal Information</h2>
+                    <div class="form-group">
+                        <label for="name">Full Name</label>
+                        <input type="text" id="name" placeholder="John Doe">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pronouns">Pronouns (optional)</label>
+                        <select id="pronouns">
+                            <option value="">No pronouns</option>
+                            <option value="she/her">she/her</option>
+                            <option value="he/him">he/him</option>
+                            <option value="they/them">they/them</option>
+                            <option value="she/they">she/they</option>
+                            <option value="he/they">he/they</option>
+                            <option value="ze/hirs">ze/hirs</option>
+                            <option value="xe/xem">xe/xem</option>
+                            <!-- <option value="custom">Custom...</option> -->
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="custom-pronouns-group" style="display: none;">
+                        <label for="custom-pronouns">Custom Pronouns</label>
+                        <input type="text" id="custom-pronouns" placeholder="Enter your pronouns">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="title">Job Title</label>
+                        <input type="text" id="title" placeholder="Senior Developer">
+                    </div>
+                </div>
+
+                <!-- Contact Information -->
+                <div class="input-group individual-only">
+                    <h2 style="color: #fb5607;">Contact Information</h2>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" placeholder="name@education.wa.edu.au">
+                        <div id="email-error" class="error-message">
+                            Email must end with @education.wa.edu.au or @guest.education.wa.edu.au
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Phone</label>
+                        <input type="tel" id="phone" placeholder="(08) 9071 9555">
+                        <div id="phone-error" class="error-message">
+                            Please enter a valid 8-digit number or 5-digit extension (19XXX)
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="mobile">Mobile (optional)</label>
+                        <input type="tel" id="mobile" placeholder="04XX XXX XXX or +614XX XXX XXX">
+                        <div id="mobile-error" class="error-message">
+                            Mobile number must be 10 digits starting with 04 or +61
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Common Sections -->
+            <!-- Design Options -->
+            <div class="input-group common-section">
+                <h2 style="color: #ff006e;">Design Options</h2>
+                <div class="form-group design-separator">
+                    <label>Primary Colour</label>
+                    <div class="color-options">
+                        <label class="color-option">
+                            <input type="radio" name="color-individual" value="#588157" checked> Forest Green
+                        </label>
+                        <label class="color-option">
+                            <input type="radio" name="color-individual" value="#141414"> Black
+                        </label>
+                        <label class="color-option">
+                            <input type="radio" name="color-individual" value="#ae2012"> Red
+                        </label>
+                        <label class="color-option">
+                            <input type="radio" name="color-individual" value="#00008B"> Dark Blue
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group design-separator advanced-feature">
+                    <label>Force Signature Layout</label>
+                    <div class="layout-options">
+                        <label class="layout-option">
+                            <input type="radio" name="layout-style" value="standard" checked>
+                            Standard Layout
+                        </label>
+                        <label class="layout-option">
+                            <input type="radio" name="layout-style" value="external">
+                            External Company Layout
+                        </label>
+                    </div>
+                </div>
+                <div class="logo-preset-container" id="primary-logo-presets">
+                    <label class="preset-label">Select a preset logo:</label>
+                    <div class="logo-preset-grid" id="primary-preset-grid">
+                        <!-- Primary logo presets will be generated here -->
+                    </div>
+                    <div class="preset-divider advanced-feature" style="display: none;">
+                        <span>OR</span>
+                    </div>
+                </div>
+                <div class="design-separator">
+                    <div class="form-group advanced-feature" id="logo-upload" style="display: none;">
+
+                        <!-- Primary logo upload section remains unchanged -->
+                        <label for="logo">Primary Logo</label>
+                        <div class="logo-upload-container">
+                            <div class="logo-upload-zone">
+                                <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                    <polyline points="17 8 12 3 7 8" />
+                                    <line x1="12" y1="3" x2="12" y2="15" />
+                                </svg>
+                                <span class="upload-text">Drag and drop your logo here</span>
+                                <span class="upload-subtext">or click to browse</span>
+                                <input type="file" id="logo" accept="image/*,.svg">
+                                <div class="logo-preview"></div>
+                            </div>
+                            <div class="logo-controls">
+                                <button type="button" class="remove-logo-btn" id="remove-main-logo" disabled>
+                                    Remove
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="enable-secondary-logo">
+                        Enable Secondary Logo
+                    </label>
+                    <div class="helper-text">
+                        Add a second logo, used for specialised courses or program branding
+                    </div>
+                </div>
+                <div class="logo-preset-container" id="secondary-logo-presets" style="display: none;">
+                    <label class="preset-label">Select a preset secondary logo:</label>
+                    <div class="logo-preset-grid" id="secondary-preset-grid">
+                        <!-- Secondary logo presets will be generated here -->
+                    </div>
+                    <div class="preset-divider advanced-feature" style="display: none;">
+                        <span>OR</span>
+                    </div>
+                </div>
+                <div class="form-group advanced-feature" id="secondary-logo-upload" style="display: none;">
+
+                    <label for="secondary-logo">Secondary Logo</label>
+                    <div class="logo-upload-container">
+                        <div class="logo-upload-zone">
+                            <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline points="17 8 12 3 7 8" />
+                                <line x1="12" y1="3" x2="12" y2="15" />
+                            </svg>
+                            <span class="upload-text">Drag and drop your secondary logo image</span>
+                            <span class="upload-subtext">or click to browse</span>
+                            <input type="file" id="secondary-logo" accept="image/*,.svg">
+                            <div class="logo-preview"></div>
+                        </div>
+                        <div class="logo-controls">
+                            <button type="button" class="remove-logo-btn" id="remove-secondary-logo" disabled>
+                                Remove
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Acknowledgement -->
+            <div class="input-group common-section">
+                <h2 style="color: #8338ec;">Acknowledgement</h2>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="respect-country">
+                        Include Acknowledgement of Country
+                    </label>
+                </div>
+                <div class="logo-preset-container" id="acknowledgement-logo-presets" style="display: none;">
+                    <label class="preset-label">Select an optional preset acknowledgement logo:</label>
+                    <div class="logo-preset-grid" id="acknowledgement-preset-grid">
+                        <!-- Acknowledgement logo presets will be generated here -->
+                    </div>
+                    <div class="preset-divider advanced-feature" style="display: none;">
+                        <span>OR</span>
+                    </div>
+                </div>
+                <div class="form-group advanced-feature" id="acknowledgement-logo-upload" style="display: none;">
+
+                    <label for="acknowledgement-logo">Acknowledgement Logo (Optional)</label>
+                    <div class="logo-upload-container">
+                        <div class="logo-upload-zone">
+                            <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline points="17 8 12 3 7 8" />
+                                <line x1="12" y1="3" x2="12" y2="15" />
+                            </svg>
+                            <span class="upload-text">Drag and drop your acknowledgement logo here</span>
+                            <span class="upload-subtext">or click to browse</span>
+                            <input type="file" id="acknowledgement-logo" accept="image/*,.svg">
+                            <div class="logo-preview"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="logo-controls">
+                    <div class="logo-controls">
+                        <button type="button" class="remove-logo-btn" id="remove-ack-logo" disabled>
+                            Remove image
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Individual Tab Content Part 2 (Save Button) -->
+            <div id="individual-content-bottom" class="tab-content active">
+                <button onclick="saveAsImage()" class="save-button individual-only">Save Signature</button>
+            </div>
+
+            <!-- Bulk Tab Content -->
+            <div id="bulk-content" class="tab-content">
+                <div class="bulk-only">
+                    <h2 style="color: #3a86ff;">Bulk Generation</h2>
+                    <div class="form-group">
+                        <label for="bulk-import">Staff Data Import</label>
+                        <div class="bulk-upload-container">
+                            <div class="bulk-upload-zone">
+                                <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                    <polyline points="17 8 12 3 7 8" />
+                                    <line x1="12" y1="3" x2="12" y2="15" />
+                                </svg>
+                                <span class="upload-text">Drag and drop your staff data file here</span>
+                                <span class="upload-subtext">Accepts .json or .js files</span>
+                                <input type="file" id="bulk-import" accept=".js,.json">
+                                <div class="bulk-preview"></div>
+                            </div>
+                            <div class="staff-preview" id="staff-list">
+                                <div class="helper-text">
+                                    Preview and select individual staff members to check their signature details before
+                                    generating all signatures
+                                </div>
+                                <select id="staff-select" size="5"></select>
+                            </div>
+                        </div>
+                    </div>
+                    <button id="export-button" class="export-button" disabled onclick="exportAllSignatures()">Generate
+                        All Signatures</button>
+                    <div id="export-progress" class="export-progress"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Preview Section -->
+        <section class="preview-section">
+            <h2>Live Preview</h2>
+            <div id="signature-preview">
+                <div class="signature-container">
+                    <div class="signature no-secondary-logo">
+                        <!-- Logo -->
+                        <div class="logo">
+                            <img src="/logo.png" alt="Logo" onerror="handleLogoError(this)">
+                        </div>
+
+                        <!-- Secondary Logo (hidden by default) -->
+                        <div class="secondary-logo" style="display: none;">
+                            <img src="" alt="Secondary Logo" onerror="handleSecondaryLogoError(this)">
+                        </div>
+
+                        <!-- Main Content -->
+                        <div class="signature-content">
+                            <div class="name-container">
+                                <div class="name">John Doe</div>
+                                <div class="pronouns"></div>
+                            </div>
+                            <div class="title">Senior Developer</div>
+                            <div class="contact">
+                                <span class="label">Email:</span> john@example.com<br>
+                                <span class="label">Phone:</span> (08) 9071 9555
+                            </div>
+                            <div class="divider"></div>
+                            <div class="company-name">Esperance Senior High School</div>
+                            <div class="company-details">
+                                Lot 500 Pink Lake Road,<br>
+                                Esperance, WA 6450<br>
+                                www.esperanceshs.wa.edu.au
+                            </div>
+                        </div>
+
+                        <!-- Acknowledgement Logo -->
+                        <div class="acknowledgement-logo">
+                            <img src="" alt="Acknowledgement Logo" onerror="handleAckLogoError(this)">
+                        </div>
+
+                        <!-- Acknowledgement Text -->
+                        <div class="acknowledgement" style="display: none;">
+                            We respectfully acknowledge the traditional custodians of the land on which we stand, the
+                            Wudjari Nyungar people, and we recognise their continuing connection to land, sea and skies.
+                            We pay our respects to Elders past and present.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</body>
+<script>
+
+    // Define the EFTC specific address
+    const DEFAULT_ADDRESS = ADDRESS_CONFIG.MAIN_ADDRESS;
+    const SITEB_ADDRESS = ADDRESS_CONFIG.ADDITIONAL_ADDRESSES.SITE_B_ADDRESS;
+
+    // Konami code sequence
+    const konamiCode = [
+        'ArrowUp',
+        'ArrowUp',
+        'ArrowDown',
+        'ArrowDown',
+        'ArrowLeft',
+        'ArrowRight',
+        'ArrowLeft',
+        'ArrowRight'
+    ];
+
+    let konamiIndex = 0;
+    let advancedFeaturesEnabled = false;
+
+    // Add the key listener
+    document.addEventListener('keydown', function (e) {
+        // Get the key name
+        const key = e.key;
+
+        // Check if the key matches the current expected key in the sequence
+        if (key === konamiCode[konamiIndex]) {
+            konamiIndex++;
+
+            // If we've matched the entire sequence
+            if (konamiIndex === konamiCode.length) {
+                toggleAdvancedFeatures();
+                konamiIndex = 0; // Reset the index
+            }
+        } else {
+            konamiIndex = 0; // Reset on any wrong key
+
+            // If we get the first key wrong, check if it's the start of a new sequence
+            if (key === konamiCode[0]) {
+                konamiIndex = 1;
+            }
+        }
+    });
+
+    function checkUrlAndSwitchTab() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const mode = urlParams.get('mode');
+
+        if (mode === 'bulk') {
+            // Switch to bulk tab
+            switchTab('bulk');
+
+            // Also update the button states
+            document.querySelectorAll('.tab-button').forEach(button => {
+                if (button.getAttribute('data-tab') === 'bulk') {
+                    button.classList.add('active');
+                } else {
+                    button.classList.remove('active');
+                }
+            });
+        }
+    }
+
+
+    function toggleAdvancedFeatures() {
+        advancedFeaturesEnabled = !advancedFeaturesEnabled;
+        const advancedElements = document.querySelectorAll('.advanced-feature');
+
+        if (advancedFeaturesEnabled) {
+            // Show advanced features
+            advancedElements.forEach(element => {
+                // First make the element visible
+                element.style.display = 'block';
+
+                // Force a reflow before starting the transitions
+                void element.offsetHeight;
+
+                // Add the visible class to trigger transitions
+                element.classList.add('visible');
+            });
+
+            // Show notification
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #4CAF50;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        `;
+            notification.textContent = '⚡ Advanced Features Unlocked!';
+            document.body.appendChild(notification);
+
+            setTimeout(() => notification.style.opacity = '1', 100);
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        } else {
+            // Hide advanced features
+            advancedElements.forEach(element => {
+                element.classList.remove('visible');
+                // Wait for transitions to complete before hiding
+                setTimeout(() => {
+                    element.style.display = 'none';
+                }, 300);
+            });
+        }
+    }
+
+    // Function to update address based on selected logo
+    function updateAddressBasedOnLogo(logoKey) {
+        // If the secondary logo is disabled or no specific logo is selected, use default address
+        const enableSecondaryLogo = document.getElementById('enable-secondary-logo').checked;
+        if (!enableSecondaryLogo || logoKey === 'default') {
+            updateSignatureAddress(ADDRESS_CONFIG.MAIN_ADDRESS);
+            return;
+        }
+
+        // Find the matching address for the selected logo
+        const matchingAddress = Object.values(ADDRESS_CONFIG.ADDITIONAL_ADDRESSES)
+            .find(address => address.logoKey === logoKey);
+
+        // Use the matching address or fall back to default
+        updateSignatureAddress(matchingAddress || ADDRESS_CONFIG.MAIN_ADDRESS);
+    }
+
+
+    // Function to update the signature with new address
+    function updateSignatureAddress(address) {
+        const companyName = document.querySelector('.signature .company-name');
+        const companyDetails = document.querySelector('.signature .company-details');
+
+        if (companyName && companyDetails) {
+            companyName.textContent = address.name;
+            companyDetails.innerHTML = `
+            ${address.street}<br>
+            ${address.location}<br>
+            ${address.website}
+        `;
+        }
+    }
+
+    // Initialize event listeners when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function () {
+        // Add form input listeners
+        document.addEventListener('input', function (e) {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') {
+                updateSignature();
+            }
+        });
+
+        checkUrlAndSwitchTab();
+        // Add layout change listener
+        const layoutRadios = document.getElementsByName('layout-style');
+        layoutRadios.forEach(radio => {
+            radio.addEventListener('change', function () {
+                // Reinitialize preset grids when layout changes
+                initializePresetGrid('primary-preset-grid', presetLogos.primary, 'logo');
+                initializePresetGrid('secondary-preset-grid', presetLogos.secondary, 'secondary-logo');
+                initializePresetGrid('acknowledgement-preset-grid', presetLogos.acknowledgement, 'acknowledgement-logo');
+
+                // Update the layout
+                updateSignatureLayout();
+            });
+        });
+
+        // Initialize everything else as before
+        initializeLogoSelectors();
+        updateSignature();
+
+        const tabButtons = document.querySelectorAll('.tab-button');
+        tabButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const tabId = this.getAttribute('data-tab');
+                switchTab(tabId);
+            });
+        });
+
+        const secondaryLogoToggle = document.getElementById('enable-secondary-logo');
+        if (secondaryLogoToggle) {
+            secondaryLogoToggle.addEventListener('change', handleSecondaryLogoToggle);
+        }
+
+        // Add event listener to the secondary logo preset grid
+        document.getElementById('secondary-preset-grid').addEventListener('click', function (e) {
+            const button = e.target.closest('.preset-logo-btn');
+            if (!button) return;
+
+            // Get the logo key from the clicked button
+            const logoKey = button.dataset.logo;
+            updateAddressBasedOnLogo(logoKey);
+        });
+
+        // Add drag and drop functionality to all upload zones
+        document.querySelectorAll('.logo-upload-zone').forEach(zone => {
+            zone.addEventListener('dragenter', handleDragEnter);
+            zone.addEventListener('dragover', handleDragOver);
+            zone.addEventListener('dragleave', handleDragLeave);
+            zone.addEventListener('drop', handleDrop);
+        });
+
+        // Initialize logo selection functionality
+        initializeLogoSelectors();
+
+        // Initialize signature
+        updateSignature();
+
+        // Initialize tabs
+        initializeTabs();
+    });
+
+    function updateSignatureLayout(useExternalLayout = false) {
+        const signature = document.querySelector('.signature');
+        const container = document.querySelector('.signature-container');
+
+        if (useExternalLayout) {
+            signature.classList.add('external-layout');
+            container.classList.add('external-preview');
+        } else {
+            signature.classList.remove('external-layout');
+            container.classList.remove('external-preview');
+        }
+
+        // Refresh currently selected logos for the new layout
+        const selectedPrimaryLogo = document.querySelector('#primary-preset-grid .preset-logo-btn.selected');
+        const selectedSecondaryLogo = document.querySelector('#secondary-preset-grid .preset-logo-btn.selected');
+
+        if (selectedPrimaryLogo) {
+            const logoKey = selectedPrimaryLogo.dataset.logo;
+            if (logoKey && presetLogos.primary[logoKey]) {
+                const logoData = useExternalLayout && presetLogos.primary[logoKey].externalData
+                    ? presetLogos.primary[logoKey].externalData
+                    : presetLogos.primary[logoKey].data;
+                applyPresetLogo(logoKey, 'logo', logoData);
+            }
+        }
+
+        if (selectedSecondaryLogo) {
+            const logoKey = selectedSecondaryLogo.dataset.logo;
+            if (logoKey && presetLogos.secondary[logoKey]) {
+                const logoData = useExternalLayout && presetLogos.secondary[logoKey].externalData
+                    ? presetLogos.secondary[logoKey].externalData
+                    : presetLogos.secondary[logoKey].data;
+                applyPresetLogo(logoKey, 'secondary-logo', logoData);
+            }
+        }
+
+        updateSignature();
+    }
+
+
+    function getCurrentAddress() {
+        const selectedSecondaryLogo = document.querySelector('#secondary-preset-grid .preset-logo-btn.selected');
+        const enableSecondaryLogo = document.getElementById('enable-secondary-logo').checked;
+
+        if (!enableSecondaryLogo || !selectedSecondaryLogo) {
+            return DEFAULT_ADDRESS;
+        }
+
+        const logoKey = selectedSecondaryLogo.dataset.logo;
+        const matchingAddress = Object.values(ADDRESS_CONFIG.ADDITIONAL_ADDRESSES)
+            .find(address => address.logoKey === logoKey);
+
+        return matchingAddress || DEFAULT_ADDRESS;
+    }
+
+
+    function applyPresetLogo(presetKey, logoType, logoData) {
+        // Determine which logo container to update
+        let uploadZone, logoContainer, removeButton;
+        const layout = document.querySelector('input[name="layout-style"]:checked').value;
+        const presetCategory = logoType === 'logo' ? presetLogos.primary :
+            logoType === 'secondary-logo' ? presetLogos.secondary :
+                presetLogos.acknowledgement;
+
+        // Get the correct logo data based on layout
+        const currentLogoData = layout === 'external' && presetCategory[presetKey].externalData ?
+            presetCategory[presetKey].externalData :
+            logoData;
+
+        switch (logoType) {
+            case 'logo':
+                uploadZone = document.getElementById('logo').closest('.logo-upload-zone');
+                logoContainer = document.querySelector('.signature .logo');
+                removeButton = document.getElementById('remove-main-logo');
+                break;
+            case 'secondary-logo':
+                uploadZone = document.getElementById('secondary-logo').closest('.logo-upload-zone');
+                logoContainer = document.querySelector('.signature .secondary-logo');
+                removeButton = document.getElementById('remove-secondary-logo');
+                break;
+            case 'acknowledgement-logo':
+                uploadZone = document.getElementById('acknowledgement-logo').closest('.logo-upload-zone');
+                logoContainer = document.querySelector('.signature .acknowledgement-logo');
+                removeButton = document.getElementById('remove-ack-logo');
+                break;
+            default:
+                return;
+        }
+
+        // Update the logo preview in the upload zone
+        const previewDiv = uploadZone.querySelector('.logo-preview');
+        previewDiv.innerHTML = `<img src="${currentLogoData}" alt="Selected Logo">`;
+        uploadZone.classList.add('has-logo');
+        removeButton.disabled = false;
+
+        // Update the signature preview
+        logoContainer.innerHTML = `<img src="${currentLogoData}" alt="Selected Logo">`;
+        logoContainer.style.backgroundColor = 'transparent';
+
+        // Show logo container if it's the acknowledgement logo
+        if (logoType === 'acknowledgement-logo' && document.getElementById('respect-country').checked) {
+            logoContainer.classList.add('visible');
+            logoContainer.style.display = 'flex';
+            document.querySelector('.signature').classList.remove('no-ack-logo');
+        }
+
+        // Additional cleanup
+        uploadZone.querySelector('.upload-icon').style.display = 'none';
+        uploadZone.querySelector('.upload-text').style.display = 'none';
+        uploadZone.querySelector('.upload-subtext').style.display = 'none';
+    }
+
+    function initializeLogoSelectors() {
+        // Initialize each preset grid with its specific logos
+        initializePresetGrid('primary-preset-grid', presetLogos.primary, 'logo');
+        initializePresetGrid('secondary-preset-grid', presetLogos.secondary, 'secondary-logo');
+        initializePresetGrid('acknowledgement-preset-grid', presetLogos.acknowledgement, 'acknowledgement-logo');
+
+        // Select the first primary logo by default
+        const firstPrimaryLogo = document.querySelector('#primary-preset-grid .preset-logo-btn');
+        if (firstPrimaryLogo) {
+            firstPrimaryLogo.classList.add('selected');
+            const logoKey = firstPrimaryLogo.dataset.logo;
+            if (logoKey && presetLogos.primary[logoKey]) {
+                applyPresetLogo(logoKey, 'logo', presetLogos.primary[logoKey].data);
+            }
+        }
+
+        document.getElementById('respect-country').addEventListener('change', function () {
+            const uploadDiv = document.getElementById('acknowledgement-logo-upload');
+            const presetDiv = document.getElementById('acknowledgement-logo-presets');
+            const acknowledgement = document.querySelector('.acknowledgement');
+            const acknowledgementLogo = document.querySelector('.acknowledgement-logo');
+            const signatureContainer = document.querySelector('.signature');
+
+            if (this.checked) {
+                // Show related elements when checked
+                presetDiv.style.display = 'block';
+                acknowledgement.style.display = 'block';
+                signatureContainer.classList.add('no-ack-logo');
+
+                // Only show upload div if advanced features are enabled
+                if (advancedFeaturesEnabled) {
+                    uploadDiv.style.display = 'block';
+                    presetDiv.querySelector('.preset-divider').style.display = 'block';
+                }
+            } else {
+                // Hide elements when unchecked
+                presetDiv.style.display = 'none';
+                acknowledgement.style.display = 'none';
+                acknowledgementLogo.style.display = 'none';
+                uploadDiv.style.display = 'none';
+                presetDiv.querySelector('.preset-divider').style.display = 'none';
+                signatureContainer.classList.remove('no-ack-logo');
+
+                // Clear the acknowledgement logo selection
+                const uploadZone = document.getElementById('acknowledgement-logo').closest('.logo-upload-zone');
+                const input = document.getElementById('acknowledgement-logo');
+                clearLogo(uploadZone, input, acknowledgementLogo, '');
+
+                // Clear preset selection
+                const presetButtons = document.querySelectorAll('#acknowledgement-preset-grid .preset-logo-btn');
+                presetButtons.forEach(btn => btn.classList.remove('selected'));
+
+                // Clear the preview
+                acknowledgementLogo.innerHTML = '';
+                acknowledgementLogo.classList.remove('visible');
+            }
+        });
+
+    }
+
+    function handleSecondaryLogoToggle(event) {
+        const uploadDiv = document.getElementById('secondary-logo-upload');
+        const presetDiv = document.getElementById('secondary-logo-presets');
+        const secondaryLogo = document.querySelector('.signature .secondary-logo');
+        const signatureContainer = document.querySelector('.signature');
+
+        if (this.checked) {
+            // Show secondary logo elements
+            presetDiv.style.display = 'block';
+            secondaryLogo.style.display = 'flex';
+            signatureContainer.classList.remove('no-secondary-logo');
+
+            // Show advanced features if enabled
+            if (advancedFeaturesEnabled) {
+                uploadDiv.style.display = 'block';
+                presetDiv.querySelector('.preset-divider').style.display = 'block';
+            }
+
+            // If there's a selected preset, reapply it
+            const selectedPreset = document.querySelector('#secondary-preset-grid .preset-logo-btn.selected');
+            if (selectedPreset) {
+                const logoKey = selectedPreset.dataset.logo;
+                const logo = presetLogos.secondary[logoKey];
+                if (logo) {
+                    const layout = document.querySelector('input[name="layout-style"]:checked').value;
+                    const logoData = (layout === 'external' && logo.externalData) ?
+                        logo.externalData : logo.data;
+                    applyPresetLogo(logoKey, 'secondary-logo', logoData);
+                }
+            }
+        } else {
+            // Hide secondary logo elements
+            presetDiv.style.display = 'none';
+            secondaryLogo.style.display = 'none';
+            uploadDiv.style.display = 'none';
+            presetDiv.querySelector('.preset-divider').style.display = 'none';
+            signatureContainer.classList.add('no-secondary-logo');
+
+            // Clear the secondary logo
+            const uploadZone = document.getElementById('secondary-logo').closest('.logo-upload-zone');
+            const input = document.getElementById('secondary-logo');
+            clearLogo(uploadZone, input, secondaryLogo, 'SECONDARY LOGO');
+
+            // Reset to standard layout
+            const layoutRadios = document.getElementsByName('layout-style');
+            layoutRadios.forEach(radio => {
+                if (radio.value === 'standard') {
+                    radio.checked = true;
+                }
+            });
+            updateSignatureLayout(false);
+
+            // Clear preset selection
+            const presetButtons = document.querySelectorAll('#secondary-preset-grid .preset-logo-btn');
+            presetButtons.forEach(btn => btn.classList.remove('selected'));
+
+            // Reset to default address
+            updateAddressBasedOnLogo('default');
+        }
+
+        // Update signature after all changes
+        updateSignature();
+    }
+
+    function createInfoContainer(signatureContent, color, name, pronouns, title, email, phone, mobile, address) {
+        return `
+        <div class="name-container">
+            <div class="name" style="color: ${color}">${name}</div>
+            <div class="pronouns">${pronouns}</div>
+        </div>
+        <div class="title">${title}</div>
+        <div class="info-container">
+            <div class="contact-section">
+                <div class="contact">
+                    <span class="label" style="color: ${color}"><b>Email:</b></span> ${email}<br>
+                    <span class="label" style="color: ${color}"><b>Phone:</b></span> ${phone}
+                    ${mobile ? `<br><span class="label" style="color: ${color}"><b>Mobile:</b></span> ${mobile}` : ''}
+                </div>
+            </div>
+            <div class="address-section">
+                <div class="company-name" style="color: ${color}">${address.name}</div>
+                <div class="company-details">
+                    ${address.street}<br>
+                    ${address.location}<br>
+                    ${address.website}
+                </div>
+            </div>
+        </div>`;
+    }
+
+    function initializePresetGrid(gridId, presetCategory, logoType) {
+        const grid = document.getElementById(gridId);
+        if (!grid) return;
+
+        // Clear existing content
+        grid.innerHTML = '';
+
+        // Generate buttons for the preset category
+        Object.entries(presetCategory).forEach(([key, logo]) => {
+            const button = document.createElement('button');
+            button.className = 'preset-logo-btn';
+            button.type = 'button';
+            button.dataset.logo = key;
+            button.dataset.useExternalLayout = logo.useExternalLayout || false;
+
+            // Use the appropriate logo data based on layout
+            const layout = document.querySelector('input[name="layout-style"]:checked')?.value;
+            const logoData = (layout === 'external' && logo.externalData) ? logo.externalData : logo.data;
+
+            button.innerHTML = `
+            <img src="${logoData}" alt="${logo.name}">
+            <span>${logo.name}</span>
+        `;
+
+            button.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                // Remove selection from other buttons in this grid
+                grid.querySelectorAll('.preset-logo-btn').forEach(btn => {
+                    btn.classList.remove('selected');
+                });
+
+                // Add selection to clicked button
+                this.classList.add('selected');
+
+                // If this is the secondary logo grid, handle layout switching
+                if (gridId === 'secondary-preset-grid') {
+                    const shouldUseExternal = logo.useExternalLayout || false;
+                    const signatureContainer = document.querySelector('.signature');
+                    const secondaryLogo = document.querySelector('.signature .secondary-logo');
+
+                    // Ensure secondary logo is visible if enabled
+                    if (document.getElementById('enable-secondary-logo').checked) {
+                        secondaryLogo.style.display = 'flex';
+                        signatureContainer.classList.remove('no-secondary-logo');
+                    }
+
+                    // Switch layout if needed
+                    const layoutRadios = document.getElementsByName('layout-style');
+                    layoutRadios.forEach(radio => {
+                        if (radio.value === (shouldUseExternal ? 'external' : 'standard')) {
+                            radio.checked = true;
+                        }
+                    });
+
+                    // Update layout
+                    updateSignatureLayout(shouldUseExternal);
+
+                    // Update address
+                    updateAddressBasedOnLogo(key);
+
+                    // Ensure secondary logo remains visible after layout change
+                    if (document.getElementById('enable-secondary-logo').checked) {
+                        setTimeout(() => {
+                            secondaryLogo.style.display = 'flex';
+                            signatureContainer.classList.remove('no-secondary-logo');
+                        }, 0);
+                    }
+                }
+
+                // Apply the preset logo
+                const updatedLayout = document.querySelector('input[name="layout-style"]:checked').value;
+                const currentLogoData = (updatedLayout === 'external' && logo.externalData) ?
+                    logo.externalData : logo.data;
+
+                applyPresetLogo(key, logoType, currentLogoData);
+
+                // Final check to ensure visibility
+                if (gridId === 'secondary-preset-grid' && document.getElementById('enable-secondary-logo').checked) {
+                    const secondaryLogo = document.querySelector('.signature .secondary-logo');
+                    const signatureContainer = document.querySelector('.signature');
+                    secondaryLogo.style.display = 'flex';
+                    signatureContainer.classList.remove('no-secondary-logo');
+                }
+            });
+
+            grid.appendChild(button);
+        });
+    }
+
+    // Tab Management
+    function initializeTabs() {
+        const tabButtons = document.querySelectorAll('.tab-button');
+
+        tabButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const tabId = this.getAttribute('data-tab');
+                switchTab(tabId);
+            });
+        });
+
+        // Initialize with individual tab
+        switchTab('individual');
+    }
+
+    function switchTab(tabId) {
+        // Remove active class from all tab buttons and contents
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.classList.remove('active');
+        });
+        document.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.remove('active');
+        });
+
+        // Add active class to selected tab button
+        const selectedButton = document.querySelector(`[data-tab="${tabId}"]`);
+        if (selectedButton) {
+            selectedButton.classList.add('active');
+        }
+
+        if (tabId === 'bulk') {
+            // Show bulk content, hide individual content
+            document.getElementById('bulk-content').classList.add('active');
+            document.getElementById('individual-content-top').classList.remove('active');
+            document.getElementById('individual-content-bottom').classList.remove('active');
+        } else {
+            // Show individual content, hide bulk content
+            document.getElementById('individual-content-top').classList.add('active');
+            document.getElementById('individual-content-bottom').classList.add('active');
+            document.getElementById('bulk-content').classList.remove('active');
+        }
+
+        // Update signature if the function exists
+        if (typeof updateSignature === 'function') {
+            updateSignature();
+        }
+    }
+
+
+    // Logo Upload Handlers
+    function handleLogoUpload(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const fileInput = e.target;
+        const uploadZone = fileInput.closest('.logo-upload-zone');
+        const removeButton = uploadZone.parentElement.querySelector('.remove-logo-btn');
+        const previewDiv = uploadZone.querySelector('.logo-preview');
+
+        removeButton.disabled = false;
+
+        if (file.type === 'image/svg+xml') {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const svgContent = e.target.result;
+                previewDiv.innerHTML = svgContent;
+                const svg = previewDiv.querySelector('svg');
+                if (svg) {
+                    svg.style.width = '100%';
+                    svg.style.height = '100%';
+                }
+                uploadZone.classList.add('has-logo');
+                updateSignatureFromUpload(fileInput.id, file);
+            };
+            reader.readAsText(file);
+        } else {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                previewDiv.innerHTML = `<img src="${e.target.result}" alt="Logo Preview">`;
+                uploadZone.classList.add('has-logo');
+                updateSignatureFromUpload(fileInput.id, file);
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function updateSignatureFromUpload(inputId, file) {
+        const reader = new FileReader();
+        let logoContainer;
+        const signatureContainer = document.querySelector('.signature');
+
+        switch (inputId) {
+            case 'logo':
+                logoContainer = document.querySelector('.signature .logo');
+                break;
+            case 'secondary-logo':
+                logoContainer = document.querySelector('.signature .secondary-logo');
+                break;
+            case 'acknowledgement-logo':
+                logoContainer = document.querySelector('.signature .acknowledgement-logo');
+                if (document.getElementById('respect-country').checked) {
+                    logoContainer.style.display = 'flex';
+                    signatureContainer.classList.remove('no-ack-logo');
+                }
+                break;
+        }
+
+        const handleContent = (content, isSVG) => {
+            if (isSVG) {
+                logoContainer.innerHTML = content;
+                const svg = logoContainer.querySelector('svg');
+                if (svg) {
+                    svg.style.width = '100%';
+                    svg.style.height = '100%';
+                }
+            } else {
+                logoContainer.innerHTML = `<img src="${content}" alt="Logo">`;
+            }
+            logoContainer.style.backgroundColor = 'transparent';
+
+            if (inputId === 'acknowledgement-logo' && document.getElementById('respect-country').checked) {
+                logoContainer.classList.add('visible');
+                logoContainer.style.display = 'flex';
+                signatureContainer.classList.remove('no-ack-logo');
+            }
+        };
+
+        if (file.type === 'image/svg+xml') {
+            reader.onload = e => handleContent(e.target.result, true);
+            reader.readAsText(file);
+        } else {
+            reader.onload = e => handleContent(e.target.result, false);
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function clearLogo(uploadZone, input, logoContainer, defaultText = 'LOGO') {
+        const previewDiv = uploadZone.querySelector('.logo-preview');
+        const removeButton = uploadZone.parentElement.querySelector('.remove-logo-btn');
+
+        // Clear the upload zone
+        previewDiv.innerHTML = '';
+        uploadZone.classList.remove('has-logo');
+        input.value = '';
+        removeButton.disabled = true;
+
+        // Show original upload elements
+        uploadZone.querySelector('.upload-icon').style.display = 'block';
+        uploadZone.querySelector('.upload-text').style.display = 'block';
+        uploadZone.querySelector('.upload-subtext').style.display = 'block';
+
+        // Update signature logo container
+        logoContainer.innerHTML = defaultText;
+        logoContainer.style.backgroundColor = '#f0f0f0';
+    }
+
+    function handleLogoRemoval(event) {
+        const buttonId = event.target.id;
+        let uploadZone, input, logoContainer;
+        const signatureContainer = document.querySelector('.signature');
+
+        switch (buttonId) {
+            case 'remove-main-logo':
+                uploadZone = document.querySelector('#logo').closest('.logo-upload-zone');
+                input = document.getElementById('logo');
+                logoContainer = document.querySelector('.signature .logo');
+                clearLogo(uploadZone, input, logoContainer, 'LOGO');
+                break;
+            case 'remove-secondary-logo':
+                uploadZone = document.getElementById('secondary-logo').closest('.logo-upload-zone');
+                input = document.getElementById('secondary-logo');
+                logoContainer = document.querySelector('.signature .secondary-logo');
+                clearLogo(uploadZone, input, logoContainer, 'SECONDARY LOGO');
+                break;
+            case 'remove-ack-logo':
+                uploadZone = document.getElementById('acknowledgement-logo').closest('.logo-upload-zone');
+                input = document.getElementById('acknowledgement-logo');
+                logoContainer = document.querySelector('.signature .acknowledgement-logo');
+                logoContainer.classList.remove('visible');
+                signatureContainer.classList.add('no-ack-logo');
+                clearLogo(uploadZone, input, logoContainer, '');
+                break;
+        }
+    }
+
+    function loadStaffData(content) {
+        try {
+            const data = JSON.parse(content);
+            if (!data.staff || !Array.isArray(data.staff)) {
+                throw new Error('Invalid data format');
+            }
+
+            staffData = data.staff;
+            const staffSelect = document.getElementById('staff-select');
+            staffSelect.innerHTML = '';
+
+            staffData.forEach((staff, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = `${staff.name} - ${staff.department}`;
+                staffSelect.appendChild(option);
+            });
+
+            document.getElementById('staff-list').style.display = 'block';
+            document.getElementById('export-button').disabled = false;
+
+            if (staffData.length > 0) {
+                staffSelect.value = "0";
+                loadStaffMember(staffData[0]);
+            }
+
+            return `Loaded ${staffData.length} staff members`;
+        } catch (error) {
+            console.error('Staff data parsing error:', error);
+            throw new Error('Invalid staff data format');
+        }
+    }
+
+
+    // Drag and Drop Event Handlers
+    function handleDragEnter(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        this.classList.add('drag-over');
+    }
+
+    function handleDragOver(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        this.classList.add('drag-over');
+    }
+
+    function handleDragLeave(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        this.classList.remove('drag-over');
+    }
+
+    function handleDrop(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        this.classList.remove('drag-over');
+
+        const files = e.dataTransfer.files;
+        if (files.length) {
+            const fileInput = this.querySelector('input[type="file"]');
+            fileInput.files = files;
+            handleLogoUpload({ target: fileInput });
+        }
+    }
+
+    function handleBulkDragEnter(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        this.classList.add('drag-over');
+    }
+
+    function handleBulkDragOver(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        this.classList.add('drag-over');
+    }
+
+    function handleBulkDragLeave(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        this.classList.remove('drag-over');
+    }
+
+    function handleBulkDrop(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        this.classList.remove('drag-over');
+
+        const files = e.dataTransfer.files;
+        if (files.length) {
+            const fileInput = this.querySelector('input[type="file"]');
+            fileInput.files = files;
+            handleBulkFileSelect({ target: fileInput });
+        }
+    }
+
+    function handleBulkFileSelect(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const uploadZone = document.querySelector('.bulk-upload-zone');
+        const staffPreview = document.getElementById('staff-list');
+        const uploadText = uploadZone.querySelector('.upload-text');
+
+        uploadZone.classList.add('has-file');
+        uploadText.textContent = `File loaded: ${file.name}`;
+        staffPreview.classList.add('visible');
+
+        // Process the file as before
+        const reader = new FileReader();
+        reader.onload = handleFileLoad;
+        reader.readAsText(file);
+    }
+
+    function handleFileLoad(e) {
+        try {
+            let content = e.target.result;
+            let data;
+
+            if (content.includes('const staffData =')) {
+                // Remove 'const staffData =' and any trailing semicolon
+                content = content.replace(/^const\s+staffData\s*=\s*/, '').replace(/;\s*$/, '');
+            }
+
+            data = JSON.parse(content);
+
+            if (!data.staff || !Array.isArray(data.staff)) {
+                throw new Error('Invalid data format - missing staff array');
+            }
+
+            // Store the staff data and update UI
+            window.staffData = data.staff;
+            updateStaffList(data.staff);
+
+            // Enable the export button
+            const exportButton = document.getElementById('export-button');
+            if (exportButton) {
+                exportButton.disabled = false;
+            }
+
+            console.log(`Successfully loaded ${data.staff.length} staff members`);
+        } catch (error) {
+            console.error('Staff data parsing error:', error);
+            alert('Error parsing staff data: ' + error.message);
+
+            // Reset UI on error
+            const exportButton = document.getElementById('export-button');
+            if (exportButton) {
+                exportButton.disabled = true;
+            }
+            window.staffData = null;
+        }
+    }
+
+    function updateStaffList(staffData) {
+        const staffSelect = document.getElementById('staff-select');
+        const exportButton = document.getElementById('export-button');
+
+        staffSelect.innerHTML = '';
+
+        staffData.forEach((staff, index) => {
+            const option = document.createElement('option');
+            option.value = index;
+            option.textContent = `${staff.name} - ${staff.department}`;
+            staffSelect.appendChild(option);
+        });
+
+        if (staffData.length > 0) {
+            staffSelect.value = "0";
+            loadStaffMember(staffData[0]);
+
+            // Enable export button if we have staff data
+            if (exportButton) {
+                exportButton.disabled = false;
+            }
+        } else {
+            // Disable export button if no staff data
+            if (exportButton) {
+                exportButton.disabled = true;
+            }
+        }
+    }
+
+    document.getElementById('remove-main-logo').onclick = function () {
+        const uploadZone = document.getElementById('logo').closest('.logo-upload-zone');
+        const preview = uploadZone.querySelector('.logo-preview');
+        const logoContainer = document.querySelector('.signature .logo');
+
+        // Clear preview
+        preview.innerHTML = '';
+        uploadZone.classList.remove('has-logo');
+        document.getElementById('logo').value = '';
+        this.disabled = true;
+
+        // Reset upload zone display
+        uploadZone.querySelector('.upload-icon').style.display = 'block';
+        uploadZone.querySelector('.upload-text').style.display = 'block';
+        uploadZone.querySelector('.upload-subtext').style.display = 'block';
+
+        // Reset logo in signature
+        logoContainer.innerHTML = 'LOGO';
+        logoContainer.style.backgroundColor = '#f0f0f0';
+    };
+
+    document.getElementById('remove-secondary-logo').onclick = function () {
+        const uploadZone = document.getElementById('secondary-logo').closest('.logo-upload-zone');
+        const preview = uploadZone.querySelector('.logo-preview');
+        const logoContainer = document.querySelector('.signature .secondary-logo');
+
+        // Clear preview
+        preview.innerHTML = '';
+        uploadZone.classList.remove('has-logo');
+        document.getElementById('secondary-logo').value = '';
+        this.disabled = true;
+
+        // Reset upload zone display
+        uploadZone.querySelector('.upload-icon').style.display = 'block';
+        uploadZone.querySelector('.upload-text').style.display = 'block';
+        uploadZone.querySelector('.upload-subtext').style.display = 'block';
+
+        // Reset logo in signature
+        logoContainer.innerHTML = 'SECONDARY LOGO';
+        logoContainer.style.backgroundColor = '#f0f0f0';
+    };
+
+    document.getElementById('remove-ack-logo').onclick = function () {
+        const uploadZone = document.getElementById('acknowledgement-logo').closest('.logo-upload-zone');
+        const preview = uploadZone.querySelector('.logo-preview');
+        const logoContainer = document.querySelector('.signature .acknowledgement-logo');
+
+        // Clear preview
+        preview.innerHTML = '';
+        uploadZone.classList.remove('has-logo');
+        document.getElementById('acknowledgement-logo').value = '';
+        this.disabled = true;
+
+        // Reset upload zone display
+        uploadZone.querySelector('.upload-icon').style.display = 'block';
+        uploadZone.querySelector('.upload-text').style.display = 'block';
+        uploadZone.querySelector('.upload-subtext').style.display = 'block';
+
+        // Reset logo in signature
+        logoContainer.style.display = 'none';
+        document.querySelector('.signature').classList.add('no-ack-logo');
+    };
+
+
+    document.getElementById('enable-secondary-logo').onchange = function () {
+        const uploadDiv = document.getElementById('secondary-logo-upload');
+        const secondaryLogo = document.querySelector('.secondary-logo');
+        const signatureContainer = document.querySelector('.signature');
+
+        if (this.checked) {
+            uploadDiv.style.display = 'block';
+            secondaryLogo.style.display = 'flex';
+            signatureContainer.classList.remove('no-secondary-logo');
+        } else {
+            uploadDiv.style.display = 'none';
+            secondaryLogo.style.display = 'none';
+            signatureContainer.classList.add('no-secondary-logo');
+
+            // Trigger remove button click to clear the logo
+            document.getElementById('remove-secondary-logo').click();
+        }
+    };
+
+    document.getElementById('logo').onchange = handleLogoUpload;
+    document.getElementById('secondary-logo').onchange = handleLogoUpload;
+    document.getElementById('acknowledgement-logo').onchange = handleLogoUpload;
+
+    // Acknowledgement Toggle
+    document.getElementById('respect-country').onchange = function () {
+        const ackLogoUpload = document.getElementById('acknowledgement-logo-upload');
+        const acknowledgement = document.querySelector('.acknowledgement');
+        const acknowledgementLogo = document.querySelector('.acknowledgement-logo');
+        const signatureContainer = document.querySelector('.signature');
+
+        if (this.checked) {
+            ackLogoUpload.style.display = 'block';
+            acknowledgement.style.display = 'block';
+            acknowledgementLogo.style.display = 'flex';
+            signatureContainer.classList.add('no-ack-logo');
+        } else {
+            ackLogoUpload.style.display = 'none';
+            acknowledgement.style.display = 'none';
+            acknowledgementLogo.style.display = 'none';
+            signatureContainer.classList.remove('no-ack-logo');
+
+            // Trigger remove button click to clear the logo
+            document.getElementById('remove-ack-logo').click();
+        }
+    };
+
+    // Error Handlers for Signature Preview
+    function handleLogoError(img) {
+        const container = img.parentElement;
+        container.innerHTML = 'LOGO';
+        container.style.backgroundColor = '#f0f0f0';
+        document.getElementById('logo-upload').style.display = 'block';
+        document.getElementById('remove-main-logo').disabled = true;
+    }
+
+    function handleSecondaryLogoError(img) {
+        const container = img.parentElement;
+        container.innerHTML = 'SECOND LOGO';
+        container.style.backgroundColor = '#f0f0f0';
+    }
+
+    function handleAckLogoError(img) {
+        const container = img.parentElement;
+        container.innerHTML = 'ACK LOGO';
+        container.classList.add('empty-logo');
+    }
+
+    // Bulk import handler
+    document.getElementById('bulk-import').addEventListener('change', async function (e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            try {
+                let content = e.target.result;
+                let data;
+
+                if (file.name.endsWith('.js')) {
+                    // Create a safe evaluation context
+                    const evalContext = {
+                        staffData: null
+                    };
+
+                    // Evaluate the JS file in the context
+                    try {
+                        // Remove any potential harmful code and just keep the data
+                        content = content.replace(/^const\s+staffData\s*=\s*/, 'return ').replace(/;$/, '');
+                        const evalFunction = new Function(content);
+                        data = evalFunction();
+                    } catch (evalError) {
+                        console.error('Eval error:', evalError);
+                        throw new Error('Invalid JavaScript file format');
+                    }
+                } else {
+                    // For JSON files
+                    data = JSON.parse(content);
+                }
+
+                if (!data || !data.staff || !Array.isArray(data.staff)) {
+                    throw new Error('Invalid data format - missing staff array');
+                }
+
+                // Store the staff data globally
+                window.staffData = data.staff;
+
+                // Update the staff select dropdown
+                const staffSelect = document.getElementById('staff-select');
+                staffSelect.innerHTML = '';
+
+                data.staff.forEach((staff, index) => {
+                    const option = document.createElement('option');
+                    option.value = index;
+                    option.textContent = `${staff.name} - ${staff.department}`;
+                    staffSelect.appendChild(option);
+                });
+
+                // Show the staff list and enable export
+                document.getElementById('staff-list').style.display = 'block';
+                document.getElementById('export-button').disabled = false;
+
+                // Load the first staff member
+                if (data.staff.length > 0) {
+                    staffSelect.value = "0";
+                    loadStaffMember(data.staff[0]);
+                }
+
+                console.log(`Successfully loaded ${data.staff.length} staff members`);
+            } catch (error) {
+                console.error('Staff data parsing error:', error);
+                alert('Error parsing staff data: ' + error.message);
+            }
+        };
+        reader.readAsText(file);
+    });
+
+    // Staff selection handler
+    document.getElementById('staff-select').addEventListener('change', function () {
+        if (window.staffData && this.value !== '') {
+            const selectedStaff = window.staffData[parseInt(this.value)];
+            loadStaffMember(selectedStaff);
+        }
+    });
+
+    // Form Validation
+    function validateEmail(email) {
+        const allowedDomains = ADDRESS_CONFIG.EMAIL_DOMAINS;
+        const isValid = allowedDomains.some(domain => email.endsWith(domain));
+        const errorElement = document.getElementById('email-error');
+        const inputElement = document.getElementById('email');
+
+        if (!isValid) {
+            errorElement.style.display = 'block';
+            inputElement.classList.add('input-error');
+            inputElement.classList.remove('input-success');
+        } else {
+            errorElement.style.display = 'none';
+            inputElement.classList.remove('input-error');
+            inputElement.classList.add('input-success');
+        }
+        return isValid;
+    }
+
+    function formatPhone(value) {
+        if (!value) return '';
+        let numbers = value.replace(/\D/g, '');
+
+        if (numbers.length === 5 && numbers.startsWith('19')) {
+            numbers = ADDRESS_CONFIG.DEFAULT_AREA_CODE + '907' + numbers;
+            return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 6)} ${numbers.slice(6)}`;
+        } else if (numbers.length >= 8) {
+            if (!numbers.startsWith(ADDRESS_CONFIG.DEFAULT_AREA_CODE)) {
+                numbers = ADDRESS_CONFIG.DEFAULT_AREA_CODE + numbers;
+            }
+            numbers = numbers.slice(0, 10);
+            return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 6)} ${numbers.slice(6)}`;
+        }
+        return value;
+    }
+
+    function validatePhone(value) {
+        const numbers = value.replace(/\D/g, '');
+        const isExtension = numbers.length === 5 && numbers.startsWith('19');
+        const isFullNumber = numbers.length >= 8;
+
+        const errorElement = document.getElementById('phone-error');
+        const inputElement = document.getElementById('phone');
+
+        if (!value || isExtension || isFullNumber) {
+            errorElement.style.display = 'none';
+            inputElement.classList.remove('input-error');
+            return true;
+        } else {
+            errorElement.style.display = 'block';
+            inputElement.classList.add('input-error');
+            return false;
+        }
+    }
+
+    function formatMobile(value) {
+        if (!value) return '';
+        let cleaned = value.replace(/[^\d+]/g, '');
+
+        if (cleaned.startsWith('+61')) {
+            cleaned = '0' + cleaned.slice(3);
+        }
+
+        let numbers = cleaned.replace(/\D/g, '');
+
+        if (numbers.length === 10 && numbers.startsWith('04')) {
+            return `${numbers.slice(0, 4)} ${numbers.slice(4, 7)} ${numbers.slice(7)}`;
+        }
+        return value;
+    }
+
+    function validateMobile(value) {
+        if (!value) return true;
+        const cleaned = value.replace(/[^\d+]/g, '');
+        const isAustralianFormat = cleaned.length === 10 && cleaned.startsWith('04');
+        const isInternationalFormat = cleaned.length === 12 && cleaned.startsWith('+61') && cleaned[3] === '4';
+
+        const errorElement = document.getElementById('mobile-error');
+        const inputElement = document.getElementById('mobile');
+
+        if (isAustralianFormat || isInternationalFormat) {
+            errorElement.style.display = 'none';
+            inputElement.classList.remove('input-error');
+            return true;
+        } else {
+            errorElement.style.display = 'block';
+            inputElement.classList.add('input-error');
+            return false;
+        }
+    }
+
+    // Signature Update Functions
+    function updateSignature() {
+        // Get form values
+        const name = document.getElementById('name').value || ADDRESS_CONFIG.PREVIEW_DEFAULTS.name;
+        const title = document.getElementById('title').value || ADDRESS_CONFIG.PREVIEW_DEFAULTS.title;
+        const email = document.getElementById('email').value || ADDRESS_CONFIG.PREVIEW_DEFAULTS.email;
+        const phone = document.getElementById('phone').value || ADDRESS_CONFIG.DEFAULT_PHONE;
+        const mobile = document.getElementById('mobile').value;
+        const showAcknowledgement = document.getElementById('respect-country').checked;
+        const layout = document.querySelector('input[name="layout-style"]:checked').value;
+
+        // Get the selected color
+        const color = document.querySelector('input[name="color-individual"]:checked').value;
+
+        // Get the current address based on secondary logo selection
+        const address = getCurrentAddress();
+
+        // Update signature content
+        const signatureContent = document.querySelector('.signature-content');
+
+        if (layout === 'external') {
+            signatureContent.innerHTML = createInfoContainer(
+                signatureContent,
+                color,
+                name,
+                getPronouns(),
+                title,
+                email,
+                phone,
+                mobile,
+                address
+            );
+        } else {
+            signatureContent.innerHTML = `
+            <div class="name-container">
+                <div class="name" style="color: ${color}">${name}</div>
+                <div class="pronouns">${getPronouns()}</div>
+            </div>
+            <div class="title">${title}</div>
+            <div class="contact">
+                <span class="label" style="color: ${color}"><b>Email:</b></span> ${email}<br>
+                <span class="label" style="color: ${color}"><b>Phone:</b></span> ${phone}
+                ${mobile ? `<br><span class="label" style="color: ${color}"><b>Mobile:</b></span> ${mobile}` : ''}
+            </div>
+            <div class="divider"></div>
+            <div class="company-name" style="color: ${color}">${address.name}</div>
+            <div class="company-details">
+                ${address.street}<br>
+                ${address.location}<br>
+                ${address.website}
+            </div>
+        `;
+        }
+
+        // Get signature container and elements
+        const signatureContainer = document.querySelector('.signature');
+        const acknowledgement = document.querySelector('.acknowledgement');
+        const acknowledgementLogo = document.querySelector('.acknowledgement-logo');
+        const secondaryLogo = document.querySelector('.secondary-logo');
+        const enableSecondaryLogo = document.getElementById('enable-secondary-logo').checked;
+
+        // Handle layout-specific updates
+        if (layout === 'external') {
+            signatureContainer.classList.add('external-layout');
+
+            // Handle logo container for external layout
+            let logoContainer = signatureContainer.querySelector('.logo-container');
+
+            // Only create new container if it doesn't exist
+            if (!logoContainer) {
+                logoContainer = document.createElement('div');
+                logoContainer.className = 'logo-container';
+
+                const logoDivider = document.createElement('div');
+                logoDivider.className = 'logo-divider';
+
+                // Find or create logo elements
+                let logo = signatureContainer.querySelector('.logo');
+                let secondaryLogo = signatureContainer.querySelector('.secondary-logo');
+
+                // If logos aren't found, they might be inside another container
+                if (!logo) {
+                    logo = document.createElement('div');
+                    logo.className = 'logo';
+                    logo.innerHTML = signatureContainer.querySelector('.logo')?.innerHTML || '';
+                }
+
+                if (!secondaryLogo) {
+                    secondaryLogo = document.createElement('div');
+                    secondaryLogo.className = 'secondary-logo';
+                    secondaryLogo.innerHTML = signatureContainer.querySelector('.secondary-logo')?.innerHTML || '';
+                }
+
+                // Build the container
+                logoContainer.appendChild(logo);
+                logoContainer.appendChild(logoDivider);
+                logoContainer.appendChild(secondaryLogo);
+
+                // Add the container after signature content
+                signatureContent.after(logoContainer);
+            }
+
+            // Update logo visibility
+            if (enableSecondaryLogo) {
+                logoContainer.style.display = 'flex';
+                const secondaryLogo = logoContainer.querySelector('.secondary-logo');
+                if (secondaryLogo) secondaryLogo.style.display = 'flex';
+                signatureContainer.classList.remove('no-secondary-logo');
+            } else {
+                logoContainer.style.display = 'none';
+                const secondaryLogo = logoContainer.querySelector('.secondary-logo');
+                if (secondaryLogo) secondaryLogo.style.display = 'none';
+                signatureContainer.classList.add('no-secondary-logo');
+            }
+        } else {
+            signatureContainer.classList.remove('external-layout');
+
+            // Restore original layout
+            const logoContainer = signatureContainer.querySelector('.logo-container');
+            if (logoContainer) {
+                const logo = logoContainer.querySelector('.logo');
+                const secondaryLogo = logoContainer.querySelector('.secondary-logo');
+
+                // Preserve logo content
+                if (logo) {
+                    const newLogo = document.createElement('div');
+                    newLogo.className = 'logo';
+                    newLogo.innerHTML = logo.innerHTML;
+                    signatureContainer.insertBefore(newLogo, signatureContainer.firstChild);
+                }
+
+                if (secondaryLogo) {
+                    const newSecondaryLogo = document.createElement('div');
+                    newSecondaryLogo.className = 'secondary-logo';
+                    newSecondaryLogo.innerHTML = secondaryLogo.innerHTML;
+                    signatureContainer.insertBefore(newSecondaryLogo, signatureContent);
+                }
+
+                logoContainer.remove();
+            }
+
+            // Handle secondary logo visibility in standard layout
+            if (enableSecondaryLogo) {
+                secondaryLogo.style.display = 'flex';
+                signatureContainer.classList.remove('no-secondary-logo');
+            } else {
+                secondaryLogo.style.display = 'none';
+                signatureContainer.classList.add('no-secondary-logo');
+            }
+        }
+
+        // Handle acknowledgement visibility (common to both layouts)
+        if (showAcknowledgement) {
+            if (layout === 'external') {
+                // Create or update acknowledgement section for external layout
+                let ackSection = signatureContainer.querySelector('.acknowledgement-section');
+                if (!ackSection) {
+                    ackSection = document.createElement('div');
+                    ackSection.className = 'acknowledgement-section';
+
+                    // Move existing elements to the section
+                    if (acknowledgementLogo) {
+                        acknowledgementLogo.remove();
+                        ackSection.appendChild(acknowledgementLogo);
+                    }
+                    if (acknowledgement) {
+                        acknowledgement.remove();
+                        ackSection.appendChild(acknowledgement);
+                    }
+
+                    signatureContainer.appendChild(ackSection);
+                }
+
+                ackSection.style.display = 'flex';
+                acknowledgement.style.display = 'block';
+
+                if (!acknowledgementLogo.querySelector('img, svg')) {
+                    acknowledgementLogo.style.display = 'none';
+                } else {
+                    acknowledgementLogo.style.display = 'flex';
+                }
+            } else {
+                // Handle switch back to standard layout
+                const ackSection = signatureContainer.querySelector('.acknowledgement-section');
+                if (ackSection) {
+                    // Move elements back to their original positions
+                    const ackLogo = ackSection.querySelector('.acknowledgement-logo');
+                    const ackText = ackSection.querySelector('.acknowledgement');
+
+                    if (ackLogo) {
+                        ackLogo.remove();
+                        signatureContainer.appendChild(ackLogo);
+                    }
+                    if (ackText) {
+                        ackText.remove();
+                        signatureContainer.appendChild(ackText);
+                    }
+
+                    ackSection.remove();
+                }
+
+                acknowledgement.style.display = 'block';
+                if (!acknowledgementLogo.querySelector('img, svg')) {
+                    signatureContainer.classList.add('no-ack-logo');
+                    acknowledgementLogo.style.display = 'none';
+                } else {
+                    acknowledgementLogo.classList.add('visible');
+                    acknowledgementLogo.style.display = 'flex';
+                    signatureContainer.classList.remove('no-ack-logo');
+                }
+            }
+        } else {
+            if (layout === 'external') {
+                const ackSection = signatureContainer.querySelector('.acknowledgement-section');
+                if (ackSection) {
+                    ackSection.style.display = 'none';
+                }
+            } else {
+                // Clean up any external layout remnants
+                const ackSection = signatureContainer.querySelector('.acknowledgement-section');
+                if (ackSection) {
+                    const ackLogo = ackSection.querySelector('.acknowledgement-logo');
+                    const ackText = ackSection.querySelector('.acknowledgement');
+
+                    if (ackLogo) {
+                        ackLogo.remove();
+                        signatureContainer.appendChild(ackLogo);
+                    }
+                    if (ackText) {
+                        ackText.remove();
+                        signatureContainer.appendChild(ackText);
+                    }
+
+                    ackSection.remove();
+                }
+
+                acknowledgement.style.display = 'none';
+                acknowledgementLogo.style.display = 'none';
+                acknowledgementLogo.classList.remove('visible');
+                signatureContainer.classList.remove('no-ack-logo');
+            }
+        }
+    };
+
+    function getPronouns() {
+        const pronounsSelect = document.getElementById('pronouns');
+        if (!pronounsSelect.value) return '';
+        if (pronounsSelect.value === 'custom') {
+            const customPronouns = document.getElementById('custom-pronouns').value;
+            return customPronouns ? `(${customPronouns})` : '';
+        }
+        return `(${pronounsSelect.value})`;
+    }
+
+    // Event Listeners
+    document.getElementById('pronouns').addEventListener('change', function () {
+        const customGroup = document.getElementById('custom-pronouns-group');
+        customGroup.style.display = this.value === 'custom' ? 'block' : 'none';
+        updateSignature();
+    });
+
+    document.getElementById('email').addEventListener('input', function (e) {
+        validateEmail(this.value);
+        updateSignature();
+    });
+
+    document.getElementById('phone').addEventListener('blur', function () {
+        if (this.value) {
+            const formatted = formatPhone(this.value);
+            this.value = formatted;
+            validatePhone(formatted);
+            updateSignature();
+        }
+    });
+
+    document.getElementById('mobile').addEventListener('blur', function () {
+        if (this.value) {
+            const formatted = formatMobile(this.value);
+            this.value = formatted;
+            validateMobile(formatted);
+        } else {
+            document.getElementById('mobile-error').style.display = 'none';
+            this.classList.remove('input-error');
+        }
+    });
+
+
+    document.getElementById('respect-country').addEventListener('change', function () {
+        const uploadDiv = document.getElementById('acknowledgement-logo-upload');
+        const presetDiv = document.getElementById('acknowledgement-logo-presets');
+        const acknowledgement = document.querySelector('.acknowledgement');
+        const acknowledgementLogo = document.querySelector('.acknowledgement-logo');
+        const signatureContainer = document.querySelector('.signature');
+
+        if (this.checked) {
+            // Show elements when checked
+            presetDiv.style.display = 'block';
+            acknowledgement.style.display = 'block';
+            signatureContainer.classList.add('no-ack-logo');
+
+            // Only show upload div if advanced features are enabled
+            if (advancedFeaturesEnabled) {
+                uploadDiv.style.display = 'block';
+                presetDiv.querySelector('.preset-divider').style.display = 'block';
+            }
+        } else {
+            // Hide elements when unchecked
+            presetDiv.style.display = 'none';
+            acknowledgement.style.display = 'none';
+            acknowledgementLogo.style.display = 'none';
+            uploadDiv.style.display = 'none';
+            presetDiv.querySelector('.preset-divider').style.display = 'none';
+            signatureContainer.classList.remove('no-ack-logo');
+
+            // Clear the acknowledgement logo
+            const uploadZone = document.getElementById('acknowledgement-logo').closest('.logo-upload-zone');
+            const previewDiv = uploadZone.querySelector('.logo-preview');
+            const removeButton = document.getElementById('remove-ack-logo');
+
+            // Reset upload zone
+            previewDiv.innerHTML = '';
+            uploadZone.classList.remove('has-logo');
+            document.getElementById('acknowledgement-logo').value = '';
+            removeButton.disabled = true;
+
+            // Show original upload elements
+            uploadZone.querySelector('.upload-icon').style.display = 'block';
+            uploadZone.querySelector('.upload-text').style.display = 'block';
+            uploadZone.querySelector('.upload-subtext').style.display = 'block';
+
+            // Clear logo in signature
+            acknowledgementLogo.innerHTML = '';
+            acknowledgementLogo.classList.remove('visible');
+            acknowledgementLogo.style.display = 'none';
+
+            // Clear any selected preset logos
+            const presetButtons = document.querySelectorAll('#acknowledgement-preset-grid .preset-logo-btn');
+            presetButtons.forEach(btn => btn.classList.remove('selected'));
+        }
+    });
+
+    // Logo Event Listeners
+    document.getElementById('logo').addEventListener('change', handleLogoUpload);
+    document.getElementById('secondary-logo').addEventListener('change', handleSecondaryLogoUpload);
+    document.getElementById('acknowledgement-logo').addEventListener('change', handleAcknowledgementLogoUpload);
+
+    // Remove Logo Button Handlers
+    document.getElementById('remove-main-logo').addEventListener('click', handleMainLogoRemoval);
+    document.getElementById('remove-main-logo').addEventListener('click', handleMainLogoRemoval);
+    document.getElementById('remove-secondary-logo').addEventListener('click', handleSecondaryLogoRemoval);
+    document.getElementById('remove-ack-logo').addEventListener('click', handleAckLogoRemoval);
+
+    // Bulk Operations Functions
+    let staffData = null;
+
+    document.getElementById('staff-select')?.addEventListener('change', function (e) {
+        if (staffData && staffData[this.value]) {
+            loadStaffMember(staffData[this.value]);
+        }
+    });
+
+    document.getElementById('bulk-import')?.addEventListener('change', async function (e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            try {
+                let content = e.target.result;
+
+                if (file.name.endsWith('.js')) {
+                    content = content.replace('const staffData =', '');
+                    content = content.replace(/;$/, '');
+                }
+
+                const data = JSON.parse(content);
+                if (data.staff && Array.isArray(data.staff)) {
+                    staffData = data.staff;
+
+                    const staffSelect = document.getElementById('staff-select');
+                    staffSelect.innerHTML = '';
+
+                    staffData.forEach((staff, index) => {
+                        const option = document.createElement('option');
+                        option.value = index;
+                        option.textContent = `${staff.name} - ${staff.department}`;
+                        staffSelect.appendChild(option);
+                    });
+
+                    document.getElementById('staff-list').style.display = 'block';
+                    document.getElementById('export-button').disabled = false;
+
+                    // Load the first staff member and update signature
+                    if (staffData.length > 0) {
+                        staffSelect.value = "0";
+                        loadStaffMember(staffData[0]);
+                    }
+
+                    // Update status message
+                    const statusMessage = document.createElement('div');
+                    statusMessage.className = 'status-message success';
+                    statusMessage.textContent = `Loaded ${staffData.length} staff members`;
+                    const bulkOperations = document.querySelector('.bulk-operations');
+                    const existingStatus = bulkOperations.querySelector('.status-message');
+                    if (existingStatus) existingStatus.remove();
+                    bulkOperations.insertBefore(statusMessage, document.getElementById('staff-list'));
+                }
+            } catch (error) {
+                console.error('Import error:', error);
+                const statusMessage = document.createElement('div');
+                statusMessage.className = 'status-message error';
+                statusMessage.textContent = 'Error importing staff data. Please check the file format.';
+                const bulkOperations = document.querySelector('.bulk-operations');
+                const existingStatus = bulkOperations.querySelector('.status-message');
+                if (existingStatus) existingStatus.remove();
+                bulkOperations.insertBefore(statusMessage, document.getElementById('staff-list'));
+            }
+        };
+        reader.readAsText(file);
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // Logo upload listeners
+        const logoInputs = ['logo', 'secondary-logo', 'acknowledgement-logo'];
+        logoInputs.forEach(id => {
+            const input = document.getElementById(id);
+            if (input) {
+                input.addEventListener('change', handleLogoUpload);
+            }
+        });
+        // Logo upload listeners
+        document.getElementById('logo').addEventListener('change', handleLogoUpload);
+        document.getElementById('secondary-logo').addEventListener('change', handleLogoUpload);
+        document.getElementById('acknowledgement-logo').addEventListener('change', handleLogoUpload);
+
+        // Logo remove button listeners
+        document.getElementById('remove-main-logo').addEventListener('click', handleLogoRemoval);
+        document.getElementById('remove-secondary-logo').addEventListener('click', handleLogoRemoval);
+        document.getElementById('remove-ack-logo').addEventListener('click', handleLogoRemoval);
+
+        // Logo remove button listeners
+        const removeButtons = ['remove-main-logo', 'remove-secondary-logo', 'remove-ack-logo'];
+        removeButtons.forEach(id => {
+            const button = document.getElementById(id);
+            if (button) {
+                button.addEventListener('click', handleLogoRemoval);
+            }
+        });
+
+        const bulkUploadZone = document.querySelector('.bulk-upload-zone');
+        const bulkImport = document.getElementById('bulk-import');
+
+        // Drag and drop handlers for bulk upload
+        bulkUploadZone.addEventListener('dragenter', handleBulkDragEnter);
+        bulkUploadZone.addEventListener('dragover', handleBulkDragOver);
+        bulkUploadZone.addEventListener('dragleave', handleBulkDragLeave);
+        bulkUploadZone.addEventListener('drop', handleBulkDrop);
+
+        // File input change handler
+        bulkImport.addEventListener('change', handleBulkFileSelect);
+
+        // Acknowledgement Toggle
+        document.getElementById('respect-country').addEventListener('change', function () {
+            const ackLogoUpload = document.getElementById('acknowledgement-logo-upload');
+            const acknowledgement = document.querySelector('.acknowledgement');
+            const acknowledgementLogo = document.querySelector('.acknowledgement-logo');
+            const signatureContainer = document.querySelector('.signature');
+
+            if (this.checked) {
+                ackLogoUpload.style.display = 'block';
+                acknowledgement.style.display = 'block';
+                signatureContainer.classList.add('no-ack-logo');
+            } else {
+                ackLogoUpload.style.display = 'none';
+                acknowledgement.style.display = 'none';
+                acknowledgementLogo.style.display = 'none';
+                signatureContainer.classList.remove('no-ack-logo');
+
+                // Clear the acknowledgement logo when disabled
+                const uploadZone = document.getElementById('acknowledgement-logo').closest('.logo-upload-zone');
+                const input = document.getElementById('acknowledgement-logo');
+                clearLogo(uploadZone, input, acknowledgementLogo, 'ACK LOGO');
+            }
+        });
+    });
+
+    // Export Functions
+    async function saveAsImage() {
+        if (!validateEmail(document.getElementById('email').value)) {
+            alert('Please enter a valid email address before saving.');
+            return;
+        }
+
+        if (!validatePhone(document.getElementById('phone').value)) {
+            alert('Please enter a valid phone number before saving.');
+            return;
+        }
+
+        const mobileValue = document.getElementById('mobile').value;
+        if (mobileValue && !validateMobile(mobileValue)) {
+            alert('Please enter a valid mobile number or leave it empty.');
+            return;
+        }
+
+        const container = document.querySelector('.signature-container');
+        const signature = document.querySelector('.signature');
+
+        // Important: Apply styles before cloning
+        if (!document.getElementById('enable-secondary-logo').checked) {
+            signature.classList.add('no-secondary-logo');
+            const secondaryLogo = signature.querySelector('.secondary-logo');
+            if (secondaryLogo) {
+                secondaryLogo.style.display = 'none';
+                secondaryLogo.style.visibility = 'hidden';
+            }
+        }
+
+        // Create temporary container and apply correct styles
+        const tempContainer = container.cloneNode(true);
+        tempContainer.style.position = 'absolute';
+        tempContainer.style.left = '-9999px';
+        // Remove any borders from the temporary container
+        tempContainer.style.border = 'none';
+        document.body.appendChild(tempContainer);
+
+        const tempSignature = tempContainer.querySelector('.signature');
+        const tempSecondaryLogo = tempContainer.querySelector('.secondary-logo');
+        const tempAckLogo = tempContainer.querySelector('.acknowledgement-logo');
+
+        // Ensure secondary logo is hidden in temporary container if disabled
+        if (!document.getElementById('enable-secondary-logo').checked) {
+            tempSignature.classList.add('no-secondary-logo');
+            if (tempSecondaryLogo) {
+                tempSecondaryLogo.style.display = 'none';
+                tempSecondaryLogo.style.visibility = 'hidden';
+                tempSecondaryLogo.remove();
+            }
+        }
+
+        // Fix: Properly handle acknowledgement logo
+        if (!document.getElementById('respect-country').checked) {
+            tempSignature.classList.add('no-ack-logo');
+            if (tempAckLogo) {
+                tempAckLogo.style.display = 'none';
+                tempAckLogo.style.visibility = 'hidden';
+                tempAckLogo.remove();
+            }
+        } else {
+            // Even if acknowledgement is checked, remove empty logo containers
+            if (tempAckLogo && !tempAckLogo.querySelector('img, svg')) {
+                tempAckLogo.style.display = 'none';
+                tempAckLogo.style.visibility = 'hidden';
+                tempAckLogo.remove();
+                tempSignature.classList.add('no-ack-logo');
+            }
+        }
+
+        // Create and append temporary styles
+        const styleElement = document.createElement('style');
+        styleElement.textContent = `
+        .signature-container {
+            padding: 12px !important;
+            background-color: white !important;
+            border: none !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+        }
+        .signature {
+            background-color: white !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
+        .signature.no-secondary-logo .secondary-logo { 
+            display: none !important; 
+            visibility: hidden !important; 
+        }
+        .signature.no-ack-logo .acknowledgement-logo {
+            display: none !important;
+            visibility: hidden !important;
+        }
+        .logo, .secondary-logo, .acknowledgement-logo {
+            width: 80px !important;
+            height: 80px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            overflow: hidden !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
+        .signature.external-layout .logo,
+        .signature.external-layout .secondary-logo {
+            width: 200px !important;
+            height: 80px !important;
+        }
+        .logo img, .secondary-logo img, .acknowledgement-logo img {
+            max-width: 100% !important;
+            max-height: 80px !important;
+            width: auto !important;
+            height: auto !important;
+            object-fit: contain !important;
+            object-position: center !important;
+        }
+        .divider {
+            background-color: var(--border-color) !important;
+            border: none !important;
+            margin: 8px 0 !important;
+        }
+    `;
+        document.head.appendChild(styleElement);
+
+        try {
+            // Process images in the temporary container
+            const images = tempContainer.querySelectorAll('img');
+            await Promise.all(Array.from(images).map(img => {
+                return new Promise((resolve) => {
+                    if (img.complete) {
+                        const aspectRatio = img.naturalWidth / img.naturalHeight;
+                        const maxHeight = 80;
+                        const newHeight = Math.min(img.naturalHeight, maxHeight);
+                        const newWidth = Math.round(newHeight * aspectRatio);
+                        img.style.width = newWidth + 'px';
+                        img.style.height = newHeight + 'px';
+                        resolve();
+                    } else {
+                        img.onload = () => {
+                            const aspectRatio = img.naturalWidth / img.naturalHeight;
+                            const maxHeight = 80;
+                            const newHeight = Math.min(img.naturalHeight, maxHeight);
+                            const newWidth = Math.round(newHeight * aspectRatio);
+                            img.style.width = newWidth + 'px';
+                            img.style.height = newHeight + 'px';
+                            resolve();
+                        };
+                        img.onerror = resolve;
+                    }
+                });
+            }));
+
+            const canvas = await html2canvas(tempContainer, {
+                backgroundColor: 'white',
+                scale: 2,
+                logging: false,
+                useCORS: true,
+                onclone: function (clonedDoc) {
+                    // Remove borders and styling from cloned elements
+                    const clonedContainer = clonedDoc.querySelector('.signature-container');
+                    const clonedSignature = clonedDoc.querySelector('.signature');
+
+                    if (clonedContainer) {
+                        clonedContainer.style.border = 'none';
+                        clonedContainer.style.boxShadow = 'none';
+                        clonedContainer.style.borderRadius = '0';
+                        clonedContainer.style.padding = '12px';
+                    }
+
+                    if (clonedSignature) {
+                        clonedSignature.style.border = 'none';
+                        clonedSignature.style.boxShadow = 'none';
+                    }
+
+                    // Handle secondary logo in cloned document
+                    if (!document.getElementById('enable-secondary-logo').checked) {
+                        clonedSignature.classList.add('no-secondary-logo');
+                        const clonedSecondaryLogo = clonedDoc.querySelector('.secondary-logo');
+                        if (clonedSecondaryLogo) {
+                            clonedSecondaryLogo.style.display = 'none';
+                            clonedSecondaryLogo.style.visibility = 'hidden';
+                            clonedSecondaryLogo.remove();
+                        }
+                    }
+
+                    // Fix: Handle acknowledgement logo in cloned document
+                    if (!document.getElementById('respect-country').checked) {
+                        clonedSignature.classList.add('no-ack-logo');
+                        const clonedAckLogo = clonedDoc.querySelector('.acknowledgement-logo');
+                        if (clonedAckLogo) {
+                            clonedAckLogo.style.display = 'none';
+                            clonedAckLogo.style.visibility = 'hidden';
+                            clonedAckLogo.remove();
+                        }
+                    } else {
+                        // Even if enabled, remove empty acknowledgement logo containers
+                        const clonedAckLogo = clonedDoc.querySelector('.acknowledgement-logo');
+                        if (clonedAckLogo && !clonedAckLogo.querySelector('img, svg')) {
+                            clonedAckLogo.style.display = 'none';
+                            clonedAckLogo.style.visibility = 'hidden';
+                            clonedAckLogo.remove();
+                            clonedSignature.classList.add('no-ack-logo');
+                        }
+                    }
+                }
+            });
+
+            // Generate filename and save
+            const staffName = document.getElementById('name').value || 'email-signature';
+            const fileName = staffName.toLowerCase()
+                .replace(/\s+/g, '-')
+                .replace(/[^a-z0-9-]/g, '')
+                + '-signature.png';
+
+            const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+            saveAs(blob, fileName);
+
+        } catch (error) {
+            console.error('Error saving image:', error);
+            alert('Error saving signature image. Please try again.');
+        } finally {
+            // Clean up
+            document.body.removeChild(tempContainer);
+            document.head.removeChild(styleElement);
+
+            // Restore original state through updateSignature
+            updateSignature();
+        }
+    }
+
+    async function exportAllSignatures() {
+    if (!window.staffData || window.staffData.length === 0) {
+        alert('Please import staff data first');
+        return;
+    }
+
+    const container = document.querySelector('.signature-container');
+    const progressDiv = document.getElementById('export-progress');
+    const exportButton = document.getElementById('export-button');
+
+    // Create temporary styles for export
+    const styleElement = document.createElement('style');
+    styleElement.textContent = `
+        .signature-container {
+            padding: 20px;
+            background-color: white;
+            max-width: none !important;
+            width: auto !important;
+        }
+        .logo, .secondary-logo, .acknowledgement-logo {
+            width: 80px !important;
+            height: 80px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            overflow: hidden !important;
+        }
+        .signature.external-layout .logo,
+        .signature.external-layout .secondary-logo {
+            width: 200px !important;
+            height: 80px !important;
+        }
+        .logo img, .secondary-logo img, .acknowledgement-logo img {
+            max-width: 100% !important;
+            max-height: 80px !important;
+            width: auto !important;
+            height: auto !important;
+            object-fit: contain !important;
+            object-position: center !important;
+        }
+        .signature.external-layout .logo img,
+        .signature.external-layout .secondary-logo img {
+            max-width: 200px !important;
+            max-height: 80px !important;
+        }
+        /* Critical fixes for secondary logo */
+        .signature.no-secondary-logo .secondary-logo {
+            display: none !important;
+            visibility: hidden !important;
+            position: absolute !important;
+            width: 0 !important;
+            height: 0 !important;
+            overflow: hidden !important;
+        }
+        /* Critical fixes for acknowledgement logo */
+        .signature.no-ack-logo .acknowledgement-logo {
+            display: none !important;
+            visibility: hidden !important;
+            position: absolute !important;
+            width: 0 !important;
+            height: 0 !important;
+            overflow: hidden !important;
+        }
+        .acknowledgement-logo:not(:has(img)):not(:has(svg)) {
+            display: none !important;
+            position: absolute !important;
+            width: 0 !important;
+            height: 0 !important;
+        }
+        /* Fix grid layout when items are hidden */
+        .signature.no-ack-logo {
+            grid-template-areas:
+                "logo main"
+                "secondary-logo main"
+                "ack ack" !important;
+        }
+        .signature.no-secondary-logo.no-ack-logo {
+            grid-template-areas:
+                "logo main"
+                "ack ack" !important;
+        }
+        .signature.no-secondary-logo {
+            grid-template-areas:
+                "logo main"
+                "ack-logo ack" !important;
+        }
+        /* Ensure acknowledgement text is properly displayed */
+        .acknowledgement {
+            grid-area: ack;
+            font-size: 11px;
+            font-style: italic;
+            color: #666;
+            line-height: 1.3;
+            margin-top: 10px;
+            width: 100%;
+        }
+    `;
+    document.head.appendChild(styleElement);
+
+    try {
+        exportButton.style.display = 'none';
+        progressDiv.innerHTML = '<div class="export-progress-text"></div>';
+        progressDiv.style.display = 'block';
+        progressDiv.setAttribute('data-state', 'processing');
+        container.classList.add('no-border');
+
+        // Store original state
+        const originalState = {
+            name: document.getElementById('name').value,
+            email: document.getElementById('email').value,
+            phone: document.getElementById('phone').value,
+            mobile: document.getElementById('mobile').value,
+            title: document.getElementById('title').value,
+            pronouns: document.getElementById('pronouns').value,
+            customPronouns: document.getElementById('custom-pronouns').value,
+            respectCountry: document.getElementById('respect-country').checked,
+            enableSecondaryLogo: document.getElementById('enable-secondary-logo').checked
+        };
+
+        const zip = new JSZip();
+        const totalStaff = window.staffData.length;
+        const progressText = progressDiv.querySelector('.export-progress-text');
+
+        for (let i = 0; i < totalStaff; i++) {
+            const staff = window.staffData[i];
+            const progress = ((i + 1) / totalStaff) * 100;
+            progressText.textContent = `Processing ${i + 1} of ${totalStaff}: ${staff.name}`;
+            progressDiv.style.setProperty('--progress', `${progress}%`);
+
+            loadStaffMember(staff);
+            await new Promise(resolve => setTimeout(resolve, 100));
+
+            try {
+                const tempContainer = container.cloneNode(true);
+                tempContainer.style.position = 'absolute';
+                tempContainer.style.left = '-9999px';
+                document.body.appendChild(tempContainer);
+                
+                // Apply additional fixes to the temporary container
+                const tempSignature = tempContainer.querySelector('.signature');
+                const tempSecondaryLogo = tempContainer.querySelector('.secondary-logo');
+                const tempAckLogo = tempContainer.querySelector('.acknowledgement-logo');
+                const tempAcknowledgement = tempContainer.querySelector('.acknowledgement');
+                const isRespectCountry = document.getElementById('respect-country').checked;
+                const enableSecondaryLogo = document.getElementById('enable-secondary-logo').checked;
+                
+                // CRITICAL: Secondary logo handling - FULLY REMOVE from DOM
+                if (!enableSecondaryLogo) {
+                    tempSignature.classList.add('no-secondary-logo');
+                    if (tempSecondaryLogo) {
+                        tempSecondaryLogo.parentNode.removeChild(tempSecondaryLogo);
+                    }
+                }
+                
+                // Acknowledgement logo handling
+                if (!isRespectCountry) {
+                    tempSignature.classList.add('no-ack-logo');
+                    if (tempAckLogo) {
+                        tempAckLogo.parentNode.removeChild(tempAckLogo);
+                    }
+                    if (tempAcknowledgement) {
+                        tempAcknowledgement.style.display = 'none';
+                    }
+                } else {
+                    // Ensure acknowledgement text is displayed
+                    if (tempAcknowledgement) {
+                        tempAcknowledgement.style.display = 'block';
+                        tempAcknowledgement.style.gridArea = 'ack';
+                        tempAcknowledgement.style.width = '100%';
+                        tempAcknowledgement.style.marginTop = '10px';
+                    }
+                    
+                    // Check for empty acknowledgement logo
+                    if (tempAckLogo && !tempAckLogo.querySelector('img, svg')) {
+                        tempSignature.classList.add('no-ack-logo');
+                        tempAckLogo.parentNode.removeChild(tempAckLogo);
+                    }
+                }
+
+                // Pre-process images
+                const images = tempContainer.querySelectorAll('img');
+                await Promise.all(Array.from(images).map(img => {
+                    return new Promise((resolve) => {
+                        if (img.complete) {
+                            const aspectRatio = img.naturalWidth / img.naturalHeight;
+                            const maxHeight = 80;
+                            const newHeight = Math.min(img.naturalHeight, maxHeight);
+                            const newWidth = Math.round(newHeight * aspectRatio);
+                            img.style.width = newWidth + 'px';
+                            img.style.height = newHeight + 'px';
+                            resolve();
+                        } else {
+                            img.onload = () => {
+                                const aspectRatio = img.naturalWidth / img.naturalHeight;
+                                const maxHeight = 80;
+                                const newHeight = Math.min(img.naturalHeight, maxHeight);
+                                const newWidth = Math.round(newHeight * aspectRatio);
+                                img.style.width = newWidth + 'px';
+                                img.style.height = newHeight + 'px';
+                                resolve();
+                            };
+                            img.onerror = resolve;
+                        }
+                    });
+                }));
+
+                const canvas = await html2canvas(tempContainer, {
+                    backgroundColor: 'white',
+                    scale: 2,
+                    logging: false,
+                    useCORS: true,
+                    onclone: function (clonedDoc) {
+                        const clonedSignature = clonedDoc.querySelector('.signature');
+                        const clonedContainer = clonedDoc.querySelector('.signature-container');
+                        const isRespectCountry = document.getElementById('respect-country').checked;
+                        const enableSecondaryLogo = document.getElementById('enable-secondary-logo').checked;
+                        
+                        // Fix container styles
+                        if (clonedContainer) {
+                            clonedContainer.style.maxWidth = 'none';
+                            clonedContainer.style.width = 'auto';
+                            clonedContainer.style.padding = '20px';
+                            clonedContainer.style.border = 'none';
+                            clonedContainer.style.boxShadow = 'none';
+                        }
+                        
+                        // CRITICAL: Handle secondary logo - FULLY REMOVE from DOM
+                        if (!enableSecondaryLogo) {
+                            clonedSignature.classList.add('no-secondary-logo');
+                            const clonedSecondaryLogo = clonedDoc.querySelector('.secondary-logo');
+                            if (clonedSecondaryLogo) {
+                                if (clonedSecondaryLogo.parentNode) {
+                                    clonedSecondaryLogo.parentNode.removeChild(clonedSecondaryLogo);
+                                }
+                            }
+                            
+                            // Adjust grid template for no secondary logo
+                            if (isRespectCountry) {
+                                clonedSignature.style.gridTemplateAreas = '"logo main" "ack-logo ack"';
+                                clonedSignature.style.gridTemplateRows = 'auto auto';
+                            } else {
+                                clonedSignature.style.gridTemplateAreas = '"logo main"';
+                                clonedSignature.style.gridTemplateRows = 'auto';
+                            }
+                        }
+                        
+                        // Handle acknowledgement logo and text
+                        if (!isRespectCountry) {
+                            clonedSignature.classList.add('no-ack-logo');
+                            const clonedAckLogo = clonedDoc.querySelector('.acknowledgement-logo');
+                            const clonedAcknowledgement = clonedDoc.querySelector('.acknowledgement');
+                            
+                            if (clonedAckLogo && clonedAckLogo.parentNode) {
+                                clonedAckLogo.parentNode.removeChild(clonedAckLogo);
+                            }
+                            
+                            if (clonedAcknowledgement) {
+                                clonedAcknowledgement.style.display = 'none';
+                            }
+                        } else {
+                            // Fix for acknowledgement text
+                            const clonedAcknowledgement = clonedDoc.querySelector('.acknowledgement');
+                            if (clonedAcknowledgement) {
+                                clonedAcknowledgement.style.display = 'block';
+                                clonedAcknowledgement.style.gridArea = 'ack';
+                                clonedAcknowledgement.style.width = '100%';
+                                clonedAcknowledgement.style.marginTop = '10px'; 
+                                
+                                // Make sure it spans both columns in grid
+                                if (!enableSecondaryLogo) {
+                                    clonedSignature.style.gridTemplateAreas = '"logo main" "ack ack"';
+                                } else {
+                                    clonedSignature.style.gridTemplateAreas = '"logo main" "secondary-logo main" "ack ack"';
+                                }
+                            }
+                            
+                            // Check for empty acknowledgement logo
+                            const clonedAckLogo = clonedDoc.querySelector('.acknowledgement-logo');
+                            if (clonedAckLogo && !clonedAckLogo.querySelector('img, svg')) {
+                                clonedSignature.classList.add('no-ack-logo');
+                                if (clonedAckLogo.parentNode) {
+                                    clonedAckLogo.parentNode.removeChild(clonedAckLogo);
+                                }
+                            }
+                        }
+
+                        // Final scaling check in cloned document
+                        clonedDoc.querySelectorAll('img').forEach(img => {
+                            const parent = img.closest('.logo, .secondary-logo, .acknowledgement-logo');
+                            if (parent) {
+                                const maxHeight = 80;
+                                const aspectRatio = img.naturalWidth / img.naturalHeight;
+                                const newHeight = Math.min(img.naturalHeight, maxHeight);
+                                const newWidth = Math.round(newHeight * aspectRatio);
+                                img.style.width = newWidth + 'px';
+                                img.style.height = newHeight + 'px';
+                            }
+                        });
+                    }
+                });
+
+                const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+                const fileName = staff.name
+                    .toLowerCase()
+                    .replace(/\s+/g, '-')
+                    .replace(/[^a-z0-9-]/g, '')
+                    + '-signature.png';
+
+                zip.file(fileName, blob);
+                document.body.removeChild(tempContainer);
+            } catch (error) {
+                console.error(`Error processing ${staff.name}:`, error);
+            }
+        }
+
+        progressText.textContent = 'Creating zip file...';
+        progressDiv.style.setProperty('--progress', '100%');
+
+        const content = await zip.generateAsync({ type: 'blob' });
+        saveAs(content, 'all-signatures.zip');
+
+        // Restore original state
+        document.getElementById('name').value = originalState.name;
+        document.getElementById('email').value = originalState.email;
+        document.getElementById('phone').value = originalState.phone;
+        document.getElementById('mobile').value = originalState.mobile;
+        document.getElementById('title').value = originalState.title;
+        document.getElementById('pronouns').value = originalState.pronouns;
+        document.getElementById('custom-pronouns').value = originalState.customPronouns;
+        document.getElementById('respect-country').checked = originalState.respectCountry;
+        document.getElementById('enable-secondary-logo').checked = originalState.enableSecondaryLogo;
+
+        updateSignature();
+
+        progressText.textContent = 'Export complete!';
+        progressDiv.setAttribute('data-state', 'complete');
+        setTimeout(() => {
+            progressDiv.style.display = 'none';
+            progressDiv.style.setProperty('--progress', '0%');
+            progressDiv.removeAttribute('data-state');
+            exportButton.style.display = 'block';
+        }, 15000);
+    } catch (error) {
+        console.error('Export error:', error);
+        alert('Error creating signatures. Please try again.');
+        progressDiv.querySelector('.export-progress-text').textContent = 'Export failed!';
+        progressDiv.setAttribute('data-state', 'error');
+    } finally {
+        document.head.removeChild(styleElement);
+        container.classList.remove('no-border');
+    }
+}
+
+    // Staff Data Helper Functions
+    function parsePhoneNumber(phoneString) {
+        if (!phoneString) {
+            return {
+                phone: ADDRESS_CONFIG.DEFAULT_PHONE,
+                mobile: ''
+            };
+        }
+
+        let result = {
+            phone: '',
+            mobile: ''
+        };
+
+        const parts = phoneString.split('/').map(part => part.trim());
+
+        if (parts[0]) {
+            const extension = parts[0].replace(/\D/g, '');
+            if (extension.length === 5 && extension.startsWith('19')) {
+                result.phone = `(08) 907${extension}`;
+            } else {
+                result.phone = parts[0];
+            }
+        }
+
+        if (parts[1]) {
+            const mobileMatch = parts[1].match(/04\d{2}[\s-]*\d{3}[\s-]*\d{3}/);
+            if (mobileMatch) {
+                const isPPrivate = parts[1].includes('(P)');
+                if (!isPPrivate) {
+                    result.mobile = mobileMatch[0].replace(/\D/g, '');
+                }
+            }
+        }
+
+        return result;
+    }
+
+    function loadStaffMember(staffMember) {
+        if (!staffMember) return;
+
+        // Update form fields
+        document.getElementById('name').value = staffMember.name || '';
+        document.getElementById('email').value = staffMember.email || '';
+        document.getElementById('title').value = staffMember.department || '';
+
+        // Parse and set phone numbers
+        const phoneNumbers = parsePhoneNumber(staffMember.phoneNumber);
+        document.getElementById('phone').value = phoneNumbers.phone;
+        document.getElementById('mobile').value = phoneNumbers.mobile;
+
+        // Reset other fields to defaults
+        document.getElementById('pronouns').value = '';
+        document.getElementById('custom-pronouns').value = '';
+        document.getElementById('custom-pronouns-group').style.display = 'none';
+
+        // Update the signature preview
+        updateSignature();
+    }
+</script>
+
+</html>

@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Campus Map</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f0f0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Navigation Bar */
+        .navbar {
+            background: #2196F3;
+            color: white;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .navbar h1 {
+            font-size: 1.5rem;
+            margin-right: auto;
+        }
+
+        .search-container {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        #searchInput {
+            padding: 0.5rem;
+            width: 250px;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .clear-search {
+            padding: 0.5rem 1rem;
+            background: #e53935;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        /* Main Content Layout */
+        .main-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Map Section */
+        .map-section {
+            flex: 1;
+            padding: 1rem;
+            overflow: auto;
+        }
+
+        /* Floor Selector Bottom Right */
+        .map-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .floor-selector {
+            position: absolute;
+            bottom: 1rem;     /* Changed from top to bottom */
+            right: 1rem;
+            z-index: 10;
+            display: flex;
+            gap: 0.5rem;
+            background: white;
+            padding: 0.5rem;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 300px;
+            background: white;
+            padding: 1rem;
+            border-left: 1px solid #ddd;
+            overflow-y: auto;
+        }
+
+        .sidebar-section {
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-section h2 {
+            margin-bottom: 1rem;
+            color: #333;
+            font-size: 1.2rem;
+        }
+
+        /* Building and Floor Filters */
+        .filter-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .building-btn, .floor-btn {
+            padding: 0.5rem 1rem;
+            border: 2px solid #2196F3;
+            background: white;
+            color: #2196F3;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .building-btn {
+            text-align: left;
+        }
+
+        .building-btn.active, .floor-btn.active {
+            background: #2196F3;
+            color: white;
+        }
+
+        /* Room Styles */
+        .room {
+            fill: #e0e0e0;
+            stroke: #000;
+            stroke-width: 2;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            opacity: 1;
+        }
+
+        .room.highlighted, .room:hover:not(.dimmed) {
+            fill: #ffd700;
+            opacity: 1 !important;
+        }
+
+        .room.dimmed {
+            opacity: 0.2;
+            cursor: default;
+        }
+
+        .room.dimmed:hover {
+            fill: #e0e0e0;
+        }
+
+        .building-label {
+            font-size: 14px;
+            fill: #666;
+            font-weight: bold;
+            transition: opacity 0.3s ease;
+        }
+
+        .building-label.dimmed {
+            opacity: 0.2;
+        }
+
+        /* Room Information Panel */
+        .info-panel {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            display: none;
+        }
+
+        .info-panel.visible {
+            display: block;
+        }
+
+        .info-panel h3 {
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .info-panel p {
+            margin-bottom: 0.5rem;
+        }
+
+        .asbestos-warning {
+            color: #d32f2f;
+            font-weight: bold;
+            padding: 0.5rem;
+            background-color: #ffebee;
+            border-radius: 4px;
+            margin-top: 0.5rem;
+        }
+
+/* Zoom Controls */
+.zoom-controls {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            background: white;
+            padding: 0.5rem;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .zoom-btn {
+            width: 32px;
+            height: 32px;
+            border: 2px solid #2196F3;
+            background: white;
+            color: #2196F3;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .zoom-btn:hover {
+            background: #2196F3;
+            color: white;
+        }
+
+        /* Update map styles for zoom/pan */
+        .floor-map svg {
+            transform-origin: center;
+            will-change: transform;
+            cursor: grab;
+        }
+
+        /* Update Floor Maps to add padding at bottom for buttons */
+        .floor-map {
+            display: none;
+            background: white;
+            padding: 1rem;
+            padding-bottom: 4rem;  /* Added padding at bottom for floor selector */
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-top: 1rem;
+        }
+
+        .floor-map.active {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Top Navigation Bar -->
+    <div class="navbar">
+        <h1>Campus Building Map</h1>
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search for a room...">
+            <button class="clear-search" id="clearSearch">Clear</button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Map Section -->
+        <div class="map-section">
+            <div class="map-container">
+
+                <!-- Zoom Controls -->
+                <div class="zoom-controls">
+                    <button class="zoom-btn" id="zoomIn">+</button>
+                    <button class="zoom-btn" id="zoomOut">-</button>
+                </div>
+                <!-- Floor Selector -->
+                <div class="floor-selector">
+                    <button class="floor-btn active" data-floor="ground">Ground Floor</button>
+                    <button class="floor-btn" data-floor="first">First Floor</button>
+                </div>
+                
+                <!-- Ground Floor Map -->
+                <div class="floor-map active" id="ground-floor">
+                    <svg viewBox="0 0 1000 800" width="100%" height="auto">
+                        <!-- Science Block -->
+                        <text x="50" y="30" class="building-label">Science Block</text>
+                        <!-- Main Hallway -->
+                        <rect x="50" y="50" width="400" height="40" 
+                              fill="#f5f5f5" stroke="#000" stroke-width="2"/>
+                        
+                        <!-- Labs left side -->
+                        <rect id="room101" class="room" x="50" y="90" width="120" height="100" 
+                              data-name="Chemistry Lab 101" 
+                              data-features="Fume Hoods, Safety Showers, Chemical Storage" 
+                              data-key="S-G1" 
+                              data-floor="ground"
+                              data-building="science"
+                              data-asbestos="false"/>
+                        
+                        <rect id="room102" class="room" x="50" y="190" width="120" height="100" 
+                              data-name="Physics Lab 102" 
+                              data-features="Optical Benches, Electronics Workstations" 
+                              data-key="S-G2" 
+                              data-floor="ground"
+                              data-building="science"
+                              data-asbestos="true"/>
+                        
+                        <!-- Labs right side -->
+                        <rect id="room103" class="room" x="170" y="90" width="140" height="80" 
+                              data-name="Prep Room 103" 
+                              data-features="Equipment Storage, Preparation Benches" 
+                              data-key="S-G3" 
+                              data-floor="ground"
+                              data-building="science"
+                              data-asbestos="false"/>
+                        
+                        <rect id="room104" class="room" x="170" y="170" width="140" height="120" 
+                              data-name="Research Lab 104" 
+                              data-features="Advanced Equipment, Data Collection Stations" 
+                              data-key="S-G4" 
+                              data-floor="ground"
+                              data-building="science"
+                              data-asbestos="false"/>
+                        
+                        <!-- Office section -->
+                        <rect id="room105" class="room" x="310" y="90" width="70" height="60" 
+                              data-name="Faculty Office 105" 
+                              data-features="Desk, Meeting Area" 
+                              data-key="S-G5" 
+                              data-floor="ground"
+                              data-building="science"
+                              data-asbestos="false"/>
+                        
+                        <rect id="room106" class="room" x="310" y="150" width="70" height="60" 
+                              data-name="Faculty Office 106" 
+                              data-features="Desk, Whiteboard" 
+                              data-key="S-G6" 
+                              data-floor="ground"
+                              data-building="science"
+                              data-asbestos="false"/>
+                        
+                        <!-- Storage and utilities -->
+                        <rect id="room107" class="room" x="380" y="90" width="70" height="140" 
+                              data-name="Storage 107" 
+                              data-features="Chemical Storage, Safety Equipment" 
+                              data-key="S-G7" 
+                              data-floor="ground"
+                              data-building="science"
+                              data-asbestos="true"/>
+
+                        <!-- Arts Center -->
+                        <text x="50" y="350" class="building-label">Arts Center</text>
+                        <!-- Main Hallway -->
+                        <rect x="50" y="370" width="500" height="40" 
+                              fill="#f5f5f5" stroke="#000" stroke-width="2"/>
+                        
+                        <!-- Large Studio Spaces -->
+                        <rect id="room201" class="room" x="50" y="410" width="200" height="150" 
+                              data-name="Painting Studio 201" 
+                              data-features="Easels, Natural Lighting, Storage Space" 
+                              data-key="A-G1" 
+                              data-floor="ground"
+                              data-building="arts"
+                              data-asbestos="false"/>
+                        
+                        <rect id="room202" class="room" x="250" y="410" width="180" height="150" 
+                              data-name="Sculpture Workshop 202" 
+                              data-features="Power Tools, Material Storage, Work Benches" 
+                              data-key="A-G2" 
+                              data-floor="ground"
+                              data-building="arts"
+                              data-asbestos="false"/>
+                        
+                        <!-- Smaller spaces -->
+                        <rect id="room203" class="room" x="430" y="410" width="120" height="75" 
+                              data-name="Digital Lab 203" 
+                              data-features="Computer Workstations, Tablets" 
+                              data-key="A-G3" 
+                              data-floor="ground"
+                              data-building="arts"
+                              data-asbestos="false"/>
+                        
+                        <rect id="room204" class="room" x="430" y="485" width="120" height="75" 
+                              data-name="Photography Studio 204" 
+                              data-features="Dark Room, Studio Lights" 
+                              data-key="A-G4" 
+                              data-floor="ground"
+                              data-building="arts"
+                              data-asbestos="true"/>
+
+                        <!-- Library -->
+                        <text x="600" y="30" class="building-label">Library</text>
+                        <!-- Main Entrance and Circulation Desk Area -->
+                        <rect x="600" y="50" width="350" height="40" 
+                              fill="#f5f5f5" stroke="#000" stroke-width="2"/>
+                        
+                        <!-- Main Reading Room -->
+                        <rect id="room301" class="room" x="600" y="90" width="200" height="180" 
+                              data-name="Main Reading Room" 
+                              data-features="Study Tables, Reference Section, Computer Stations" 
+                              data-key="L-G1" 
+                              data-floor="ground"
+                              data-building="library"
+                              data-asbestos="false"/>
+                        
+                        <!-- Stack Areas -->
+                        <rect id="room302" class="room" x="800" y="90" width="150" height="120" 
+                              data-name="Book Stacks A-M" 
+                              data-features="Book Shelves, Study Carrels" 
+                              data-key="L-G2" 
+                              data-floor="ground"
+                              data-building="library"
+                              data-asbestos="false"/>
+                        
+                        <rect id="room303" class="room" x="800" y="210" width="150" height="60" 
+                              data-name="Periodicals Room" 
+                              data-features="Magazine Racks, Newspaper Section" 
+                              data-key="L-G3" 
+                              data-floor="ground"
+                              data-building="library"
+                              data-asbestos="false"/>
+
+                        <!-- Study Rooms -->
+                        <rect id="room304" class="room" x="600" y="270" width="70" height="50" 
+                              data-name="Study Room 1" 
+                              data-features="Group Table, Whiteboard" 
+                              data-key="L-G4" 
+                              data-floor="ground"
+                              data-building="library"
+                              data-asbestos="false"/>
+                        
+                        <rect id="room305" class="room" x="670" y="270" width="70" height="50" 
+                              data-name="Study Room 2" 
+                              data-features="Group Table, Display Screen" 
+                              data-key="L-G5" 
+                              data-floor="ground"
+                              data-building="library"
+                              data-asbestos="false"/>
+
+                        <!-- Add doors -->
+                        <g fill="none" stroke="#000" stroke-width="2">
+                            <!-- Science Block Doors -->
+                            <line x1="90" y1="50" x2="110" y2="50"/>
+                            <line x1="230" y1="50" x2="250" y2="50"/>
+                            <line x1="370" y1="50" x2="390" y2="50"/>
+                            
+                            <!-- Arts Center Doors -->
+                            <line x1="90" y1="370" x2="110" y2="370"/>
+                            <line x1="270" y1="370" x2="290" y2="370"/>
+                            <line x1="450" y1="370" x2="470" y2="370"/>
+                            
+                            <!-- Library Doors -->
+                            <line x1="640" y1="50" x2="660" y2="50"/>
+                            <line x1="820" y1="50" x2="840" y2="50"/>
+                        </g>
+                    </svg>
+                </div>
+<!-- First Floor Map -->
+<div class="floor-map" id="first-floor">
+    <svg viewBox="0 0 1000 800" width="100%" height="auto">
+        <!-- Science Block First Floor -->
+        <text x="50" y="30" class="building-label">Science Block</text>
+        <!-- Main Hallway -->
+        <rect x="50" y="50" width="400" height="40" 
+              fill="#f5f5f5" stroke="#000" stroke-width="2"/>
+        
+        <!-- Advanced Labs -->
+        <rect id="room401" class="room" x="50" y="90" width="180" height="120" 
+              data-name="Advanced Chemistry Lab" 
+              data-features="Spectroscopy Equipment, Research Stations, Gas Lines" 
+              data-key="S-F1" 
+              data-floor="first"
+              data-building="science"
+              data-asbestos="false"/>
+        
+        <rect id="room402" class="room" x="50" y="210" width="180" height="100" 
+              data-name="Molecular Biology Lab" 
+              data-features="PCR Machines, Microscopes, Cold Storage" 
+              data-key="S-F2" 
+              data-floor="first"
+              data-building="science"
+              data-asbestos="true"/>
+        
+        <!-- Research Spaces -->
+        <rect id="room403" class="room" x="230" y="90" width="120" height="100" 
+              data-name="Research Suite 403" 
+              data-features="Specialized Equipment, Data Analysis Stations" 
+              data-key="S-F3" 
+              data-floor="first"
+              data-building="science"
+              data-asbestos="false"/>
+        
+        <rect id="room404" class="room" x="230" y="190" width="120" height="120" 
+              data-name="Graduate Research Lab" 
+              data-features="Workstations, Project Areas" 
+              data-key="S-F4" 
+              data-floor="first"
+              data-building="science"
+              data-asbestos="false"/>
+        
+        <!-- Faculty Area -->
+        <rect id="room405" class="room" x="350" y="90" width="100" height="80" 
+              data-name="Department Office" 
+              data-features="Reception, Conference Room" 
+              data-key="S-F5" 
+              data-floor="first"
+              data-building="science"
+              data-asbestos="false"/>
+        
+        <!-- Arts Center First Floor -->
+        <text x="50" y="350" class="building-label">Arts Center</text>
+        <!-- Main Hallway -->
+        <rect x="50" y="370" width="500" height="40" 
+              fill="#f5f5f5" stroke="#000" stroke-width="2"/>
+        
+        <!-- Gallery Space -->
+        <rect id="room501" class="room" x="50" y="410" width="250" height="200" 
+              data-name="Main Gallery" 
+              data-features="Exhibition Space, Track Lighting, Display Cases" 
+              data-key="A-F1" 
+              data-floor="first"
+              data-building="arts"
+              data-asbestos="false"/>
+        
+        <!-- Studios -->
+        <rect id="room502" class="room" x="300" y="410" width="120" height="100" 
+              data-name="Advanced Studio 502" 
+              data-features="Individual Work Spaces, Storage Units" 
+              data-key="A-F2" 
+              data-floor="first"
+              data-building="arts"
+              data-asbestos="true"/>
+        
+        <rect id="room503" class="room" x="420" y="410" width="130" height="100" 
+              data-name="Digital Media Lab" 
+              data-features="High-End Computers, Rendering Stations" 
+              data-key="A-F3" 
+              data-floor="first"
+              data-building="arts"
+              data-asbestos="false"/>
+        
+        <!-- Library First Floor -->
+        <text x="600" y="30" class="building-label">Library</text>
+        <!-- Main Hallway -->
+        <rect x="600" y="50" width="350" height="40" 
+              fill="#f5f5f5" stroke="#000" stroke-width="2"/>
+        
+        <!-- Special Collections -->
+        <rect id="room601" class="room" x="600" y="90" width="180" height="160" 
+              data-name="Special Collections" 
+              data-features="Rare Books, Climate Control, Reading Area" 
+              data-key="L-F1" 
+              data-floor="first"
+              data-building="library"
+              data-asbestos="true"/>
+        
+        <!-- Additional Stack Areas -->
+        <rect id="room602" class="room" x="780" y="90" width="170" height="160" 
+              data-name="Book Stacks N-Z" 
+              data-features="Book Shelves, Study Areas" 
+              data-key="L-F2" 
+              data-floor="first"
+              data-building="library"
+              data-asbestos="false"/>
+        
+        <!-- Media Center -->
+        <rect id="room603" class="room" x="600" y="250" width="150" height="120" 
+              data-name="Media Center" 
+              data-features="Audio/Visual Equipment, Editing Suites" 
+              data-key="L-F3" 
+              data-floor="first"
+              data-building="library"
+              data-asbestos="false"/>
+        
+        <!-- Group Study Areas -->
+        <rect id="room604" class="room" x="750" y="250" width="200" height="120" 
+              data-name="Collaborative Learning Space" 
+              data-features="Modular Furniture, Smart Boards, Discussion Pods" 
+              data-key="L-F4" 
+              data-floor="first"
+              data-building="library"
+              data-asbestos="false"/>
+
+        <!-- Add doors -->
+        <g fill="none" stroke="#000" stroke-width="2">
+            <!-- Science Block Doors -->
+            <line x1="90" y1="50" x2="110" y2="50"/>
+            <line x1="230" y1="50" x2="250" y2="50"/>
+            <line x1="370" y1="50" x2="390" y2="50"/>
+            
+            <!-- Arts Center Doors -->
+            <line x1="90" y1="370" x2="110" y2="370"/>
+            <line x1="270" y1="370" x2="290" y2="370"/>
+            <line x1="450" y1="370" x2="470" y2="370"/>
+            
+            <!-- Library Doors -->
+            <line x1="640" y1="50" x2="660" y2="50"/>
+            <line x1="820" y1="50" x2="840" y2="50"/>
+        </g>
+    </svg>
+</div>
+</div>
+</div>
+
+<!-- Sidebar -->
+<div class="sidebar">
+<!-- Building Filter -->
+<div class="sidebar-section">
+<h2>Building Filter</h2>
+<div class="filter-buttons">
+    <button class="building-btn active" data-building="all">All Buildings</button>
+    <button class="building-btn" data-building="science">Science Block</button>
+    <button class="building-btn" data-building="arts">Arts Center</button>
+    <button class="building-btn" data-building="library">Library</button>
+</div>
+</div>
+
+<!-- Room Information -->
+<div class="sidebar-section">
+<h2>Room Information</h2>
+<div class="info-panel" id="info-panel">
+    <h3 id="room-name"></h3>
+    <p><strong>Key:</strong> <span id="room-key"></span></p>
+    <p><strong>Building:</strong> <span id="room-building"></span></p>
+    <p><strong>Floor:</strong> <span id="room-floor"></span></p>
+    <p><strong>Features:</strong> <span id="room-features"></span></p>
+    <div id="room-asbestos" class="asbestos-warning"></div>
+</div>
+</div>
+</div>
+</div>
+
+
+                <script>
+                    const rooms = document.querySelectorAll('.room');
+                    const infoPanel = document.getElementById('info-panel');
+                    const searchInput = document.getElementById('searchInput');
+                    const clearSearchBtn = document.getElementById('clearSearch');
+                    const floorBtns = document.querySelectorAll('.floor-btn');
+                    const floorMaps = document.querySelectorAll('.floor-map');
+                    const buildingBtns = document.querySelectorAll('.building-btn');
+                    const buildingLabels = document.querySelectorAll('.building-label');
+            
+                    // Building filtering functionality
+                    buildingBtns.forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            const building = btn.dataset.building;
+                            
+                            // Update button states
+                            buildingBtns.forEach(b => b.classList.remove('active'));
+                            btn.classList.add('active');
+                            
+                            // Update room and label opacity based on building
+                            rooms.forEach(room => {
+                                room.classList.remove('highlighted', 'search-highlighted', 'dimmed');
+                                if (building !== 'all' && room.dataset.building !== building) {
+                                    room.classList.add('dimmed');
+                                }
+                            });
+            
+                            // Update building labels opacity
+                            buildingLabels.forEach(label => {
+                                const labelBuilding = label.textContent.toLowerCase().split(' ')[0];
+                                label.classList.remove('dimmed');
+                                if (building !== 'all' && !labelBuilding.includes(building)) {
+                                    label.classList.add('dimmed');
+                                }
+                            });
+            
+                            // Clear search but maintain current floor
+                            clearSearch(true, false);
+                        });
+                    });
+            
+                    // Floor switching functionality
+                    floorBtns.forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            const floor = btn.dataset.floor;
+                            if (!searchInput.value.trim()) {  // Only allow manual floor switching if no search is active
+                                showFloor(floor);
+                            }
+                        });
+                    });
+            
+                    // Show room info on hover
+                    rooms.forEach(room => {
+                        room.addEventListener('mouseenter', (e) => {
+                            if (!e.target.classList.contains('dimmed')) {
+                                showRoomInfo(e.target);
+                                infoPanel.style.display = 'block';
+                                
+                                // Remove highlight from other rooms if they're not search results
+                                rooms.forEach(r => {
+                                    if (!r.classList.contains('dimmed') && 
+                                        !r.classList.contains('search-highlighted')) {
+                                        r.classList.remove('highlighted');
+                                    }
+                                });
+                                
+                                // Add highlight to hovered room
+                                if (!e.target.classList.contains('search-highlighted')) {
+                                    e.target.classList.add('highlighted');
+                                }
+                            }
+                        });
+            
+                        room.addEventListener('mouseleave', (e) => {
+                            // Only remove highlight if it's not from search
+                            if (!e.target.classList.contains('search-highlighted')) {
+                                e.target.classList.remove('highlighted');
+                            }
+                            
+                            if (document.querySelectorAll('.room.search-highlighted').length !== 1) {
+                                infoPanel.style.display = 'none';
+                            }
+                        });
+                    });
+            
+                    // Search functionality
+                    searchInput.addEventListener('input', (e) => {
+                        const searchTerm = e.target.value.toLowerCase().trim();
+                        let matchedRooms = [];
+                        
+                        // Get currently selected building
+                        const activeBuilding = document.querySelector('.building-btn.active').dataset.building;
+                        
+                        // If search is cleared, return to ground floor
+                        if (!searchTerm) {
+                            showFloor('ground');
+                        }
+                        
+                        rooms.forEach(room => {
+                            const roomName = room.dataset.name.toLowerCase();
+                            const roomKey = room.dataset.key.toLowerCase();
+                            
+                            room.classList.remove('highlighted', 'search-highlighted');
+                            
+                            // Check if room should be included in search based on building filter
+                            if (activeBuilding === 'all' || room.dataset.building === activeBuilding) {
+                                if (searchTerm && (roomName.includes(searchTerm) || roomKey.includes(searchTerm))) {
+                                    room.classList.add('highlighted', 'search-highlighted');
+                                    room.classList.remove('dimmed');
+                                    matchedRooms.push(room);
+            
+                                    // Show the floor containing the matched room
+                                    const floor = room.dataset.floor;
+                                    showFloor(floor);
+                                }
+                            }
+                        });
+            
+                        // Handle info panel display
+                        if (matchedRooms.length === 1) {
+                            showRoomInfo(matchedRooms[0]);
+                            infoPanel.style.display = 'block';
+                        } else if (matchedRooms.length === 0 || !searchTerm) {
+                            infoPanel.style.display = 'none';
+                        }
+                    });
+            
+                    function clearSearch(maintainFloor = false, resetBuilding = false) {
+                        searchInput.value = '';
+                        
+                        // Reset building filter if requested
+                        if (resetBuilding) {
+                            buildingBtns.forEach(btn => {
+                                btn.classList.remove('active');
+                                if (btn.dataset.building === 'all') {
+                                    btn.classList.add('active');
+                                }
+                            });
+            
+                            // Reset all room dimming
+                            rooms.forEach(room => {
+                                room.classList.remove('dimmed');
+                            });
+            
+                            // Reset building labels
+                            buildingLabels.forEach(label => {
+                                label.classList.remove('dimmed');
+                            });
+                        } else {
+                            const activeBuilding = document.querySelector('.building-btn.active').dataset.building;
+                            rooms.forEach(room => {
+                                if (activeBuilding !== 'all' && room.dataset.building !== activeBuilding) {
+                                    room.classList.add('dimmed');
+                                } else {
+                                    room.classList.remove('dimmed');
+                                }
+                            });
+                        }
+                        
+                        // Only switch back to ground floor if not maintaining floor
+                        if (!maintainFloor) {
+                            showFloor('ground');
+                        }
+                        
+                        rooms.forEach(room => {
+                            room.classList.remove('highlighted', 'search-highlighted');
+                        });
+                        
+                        infoPanel.style.display = 'none';
+                    }
+            
+                    // Clear search button functionality (resets everything)
+                    clearSearchBtn.addEventListener('click', () => clearSearch(false, true));
+            
+                    function showFloor(floor) {
+                        // Update floor buttons
+                        floorBtns.forEach(btn => {
+                            btn.classList.remove('active');
+                            if (btn.dataset.floor === floor) {
+                                btn.classList.add('active');
+                            }
+                        });
+                        
+                        // Update floor maps
+                        floorMaps.forEach(map => {
+                            map.classList.remove('active');
+                            if (map.id === `${floor}-floor`) {
+                                map.classList.add('active');
+                            }
+                        });
+                    }
+            
+        // Zoom and Pan functionality
+        const maps = document.querySelectorAll('.floor-map svg');
+        const zoomInBtn = document.getElementById('zoomIn');
+        const zoomOutBtn = document.getElementById('zoomOut');
+        
+        let currentScale = 1;
+        const minScale = 1;
+        const maxScale = 3;
+        const scaleStep = 0.2;
+
+        // Initialize pan variables
+        let isPanning = false;
+        let startPoint = { x: 0, y: 0 };
+        let currentTranslate = { x: 0, y: 0 };
+        let previousTranslate = { x: 0, y: 0 };
+
+        // Zoom Controls
+        zoomInBtn.addEventListener('click', () => {
+            if (currentScale < maxScale) {
+                currentScale = Math.min(maxScale, currentScale + scaleStep);
+                maps.forEach(map => updateMapTransform(map));
+            }
+        });
+
+        zoomOutBtn.addEventListener('click', () => {
+            if (currentScale > minScale) {
+                currentScale = Math.max(minScale, currentScale - scaleStep);
+                if (currentScale === minScale) {
+                    currentTranslate = { x: 0, y: 0 };
+                    previousTranslate = { x: 0, y: 0 };
+                }
+                maps.forEach(map => updateMapTransform(map));
+            }
+        });
+
+        maps.forEach(map => {
+            // Pan Controls
+            map.addEventListener('mousedown', (e) => {
+                if (currentScale > 1) {
+                    isPanning = true;
+                    map.style.cursor = 'grabbing';
+                    startPoint = {
+                        x: e.clientX - previousTranslate.x,
+                        y: e.clientY - previousTranslate.y
+                    };
+                }
+            });
+
+            map.addEventListener('mousemove', (e) => {
+                if (!isPanning) return;
+                
+                e.preventDefault();
+                
+                currentTranslate = {
+                    x: e.clientX - startPoint.x,
+                    y: e.clientY - startPoint.y
+                };
+
+                requestAnimationFrame(() => {
+                    updateMapTransform(map);
+                });
+            });
+
+            const endPan = () => {
+                if (isPanning) {
+                    isPanning = false;
+                    map.style.cursor = 'grab';
+                    previousTranslate = currentTranslate;
+                }
+            };
+
+            map.addEventListener('mouseup', endPan);
+            map.addEventListener('mouseleave', endPan);
+
+            // Touch support
+            map.addEventListener('touchstart', (e) => {
+                if (currentScale > 1) {
+                    isPanning = true;
+                    const touch = e.touches[0];
+                    startPoint = {
+                        x: touch.clientX - previousTranslate.x,
+                        y: touch.clientY - previousTranslate.y
+                    };
+                }
+            }, { passive: false });
+
+            map.addEventListener('touchmove', (e) => {
+                if (!isPanning) return;
+                
+                e.preventDefault();
+                const touch = e.touches[0];
+                
+                currentTranslate = {
+                    x: touch.clientX - startPoint.x,
+                    y: touch.clientY - startPoint.y
+                };
+
+                requestAnimationFrame(() => {
+                    updateMapTransform(map);
+                });
+            }, { passive: false });
+
+            map.addEventListener('touchend', endPan);
+            map.addEventListener('touchcancel', endPan);
+        });
+
+        function updateMapTransform(map) {
+            if (currentScale === minScale) {
+                map.style.transform = 'scale(1) translate(0, 0)';
+                return;
+            }
+
+            const mapRect = map.getBoundingClientRect();
+            const containerRect = map.parentElement.getBoundingClientRect();
+            
+            // Calculate the maximum allowed translation
+            const maxX = (mapRect.width * (currentScale - 1)) / 2;
+            const maxY = (mapRect.height * (currentScale - 1)) / 2;
+            
+            // Constrain translation
+            currentTranslate.x = Math.min(Math.max(currentTranslate.x, -maxX), maxX);
+            currentTranslate.y = Math.min(Math.max(currentTranslate.y, -maxY), maxY);
+            
+            map.style.transform = `scale(${currentScale}) translate(${currentTranslate.x / currentScale}px, ${currentTranslate.y / currentScale}px)`;
+        }
+
+        // Reset zoom and pan when switching floors
+        floorBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (!searchInput.value.trim()) {
+                    resetZoomAndPan();
+                }
+            });
+        });
+
+        // Reset zoom and pan when clearing search
+        clearSearchBtn.addEventListener('click', resetZoomAndPan);
+
+        function resetZoomAndPan() {
+            currentScale = 1;
+            currentTranslate = { x: 0, y: 0 };
+            previousTranslate = { x: 0, y: 0 };
+            maps.forEach(map => {
+                map.style.transform = 'scale(1) translate(0, 0)';
+                map.style.cursor = 'grab';
+            });
+        }
+
+        // Add grab cursor to maps when zoomed
+        const updateMapCursor = () => {
+            maps.forEach(map => {
+                map.style.cursor = currentScale > 1 ? 'grab' : 'default';
+            });
+        };
+
+        // Update cursor when zooming
+        zoomInBtn.addEventListener('click', updateMapCursor);
+        zoomOutBtn.addEventListener('click', updateMapCursor);
+            
+                    function showRoomInfo(room) {
+                        document.getElementById('room-name').textContent = room.dataset.name;
+                        document.getElementById('room-key').textContent = room.dataset.key;
+                        document.getElementById('room-building').textContent = 
+                            capitalizeFirstLetter(room.dataset.building) + 
+                            (room.dataset.building === 'science' ? ' Block' : 
+                             room.dataset.building === 'arts' ? ' Center' : '');
+                        document.getElementById('room-floor').textContent = 
+                            room.dataset.floor === 'ground' ? 'Ground Floor' : 'First Floor';
+                        document.getElementById('room-features').textContent = room.dataset.features;
+                        
+                        // Update asbestos warning
+                        const asbestosWarning = document.getElementById('room-asbestos');
+                        if (room.dataset.asbestos === 'true') {
+                            asbestosWarning.textContent = '⚠️ WARNING: This room contains asbestos';
+                            asbestosWarning.style.display = 'block';
+                        } else {
+                            asbestosWarning.style.display = 'none';
+                        }
+                    }
+            
+                    function capitalizeFirstLetter(string) {
+                        return string.charAt(0).toUpperCase() + string.slice(1);
+                    }
+                </script>
+            </body>
+            </html>

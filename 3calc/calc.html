@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/icon.png">
+    <title>School Year Calculator</title>
+    <style>
+        /* Styles for the page layout */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            padding: 20px;
+        }
+
+        #calculator {
+            max-width: 400px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            position: relative;
+            display: inline-block;
+        }
+
+        sup {
+            font-size: 0.7em;
+            color: #ff0000; /* Default colour */
+            position: absolute;
+            top: 5px;
+            right: -15px; /* Adjust the distance from the title */
+            transform: rotate(30deg);
+            transform-origin: 100% 0;
+            text-shadow: 0.5px 0.5px #e6e6e6;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #4caf50;
+            color: #fff;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #result {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Main content of the page -->
+<div id="calculator">
+    <h2>School Year Calculator <sup id="supers">v2.2</sup></h2>
+    <!-- Dropdown for selecting the current year -->
+    <label for="yearDropdown">Select Current Year:</label>
+    <select id="yearDropdown" onchange="updateAndCalculate()"></select>
+    <!-- Input field for entering birthdate -->
+    <label for="birthdate">Enter Birthdate:</label>
+    <input type="date" id="birthdate" required onchange="updateAndCalculate()"> <!-- add this with proper values if manual default wanted. value="0000-00-00" --> 
+    <div id="result"></div>
+    <noscript>
+        <h2> It looks like you've got Javascript disabled. We can't do the calculations without it. Please contact your IT department or CSC.</h2>
+    </noscript>
+</div>
+
+<script>
+    // Get the current date and year
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+
+    // Generate a list of years for the dropdown
+    const yearList = Array.from({ length: 8 }, (_, i) => currentYear - 1 + i);
+
+    // Get the dropdown element
+    const yearDropdown = document.getElementById("yearDropdown");
+
+    // Populate the dropdown with the generated years
+    yearList.forEach(year => {
+        const option = document.createElement("option");
+        option.value = year;
+        option.text = year;
+        if (year === currentYear) {
+            option.selected = true;
+        }
+        yearDropdown.add(option);
+    });
+
+    // List of input elements to listen for changes
+    const inputElements = ["yearDropdown", "birthdate"];
+
+    // Add event listeners to input elements
+    inputElements.forEach((elementId) => {
+        const inputElement = document.getElementById(elementId);
+        inputElement.addEventListener("change", updateAndCalculate);
+    });
+
+    // Not required but if needed for some reason in future. Call colourCheck on page load
+    // colourCheck();
+
+    // Function to update and recalculate on input changes
+    function updateAndCalculate() {
+        updateDateRanges();
+        calculateSchoolYear();
+    }
+
+    // Function to update date ranges based on the selected year
+    function updateDateRanges() {
+        const selectedYear = yearDropdown.value;
+        window.schoolYears = getSchoolYears(selectedYear);
+    }
+
+    // Function to calculate the school year based on birthdate
+    function calculateSchoolYear() {
+        const birthdate = new Date(document.getElementById('birthdate').value);
+        const schoolYears = window.schoolYears || getSchoolYears(yearDropdown.value);
+        let schoolYear = '! Check Date !';
+
+        // Iterate through school years to find a match
+        for (const year of schoolYears) {
+            if (birthdate >= year.start && birthdate <= year.end) {
+                schoolYear = year.year;
+                break;
+            }
+        }
+
+        // Display the calculated school year
+        document.getElementById('result').innerHTML = `School Year: ${schoolYear}`;
+        // Change the colour based on the last two letters of the schoolYear
+        colourCheck(schoolYear);
+    }
+
+    // Random colour generator.
+    // This is a bit broken now I've added the changing of the schoolYear variable based on content.
+    function getRandomColour() {
+        var letters = '0123456789ABCDEF';
+        var ranColour = '#';
+        for (var i = 0; i < 6; i++) {
+            ranColour += letters[Math.floor(Math.random() * 17)];
+        }
+        return ranColour;
+    }
+
+    // Changes the  colour of the html superscript based on the colour generated above.
+    // This is a bit broken now I've added the changing of the schoolYear variable based on content.
+    function changeColour() {
+        var targetElement = document.getElementById('supers');
+        targetElement.style.color = getRandomColour();
+    }
+
+
+    // Function to check the last two letters of schoolYear var and apply colour accordingly
+    function colourCheck(schoolYear) {
+        const lastTwoLetters = schoolYear.slice(-2).toLowerCase();
+        let colourCh;
+
+        switch (lastTwoLetters) {
+            // Yes I know this isn't needed but it's here is they want them to be green or something...
+            case 'en':
+            case 'ry':
+            case ' 1':
+            case ' 2':
+            case ' 3':
+            case ' 4':
+            case ' 5':
+            case ' 6':
+                colorCh = 'blue';
+                break;
+            case '18':
+            case 'ol':
+            case 'ng':
+                colorCh = 'red';
+                break;
+            case ' !':
+                colorCh = 'orange';
+                break;
+            case 'en':
+            default:
+                colorCh = 'black';
+        }
+
+        // Apply the colour to the result text
+        document.getElementById('result').innerHTML = `School Year: <span style="color:${colorCh}">${schoolYear}</span>`;
+        changeColour(colorCh);
+    }
+
+    // Calculates what year the student is in based upon the currently selected year from the dropdown.
+    function getSchoolYears(currentYear) {
+        const startYear = parseInt(currentYear - 12);
+        const endYear = startYear - 1;
+
+        return [
+            // This is what you change if the State decides to adjust school intake dates again.
+            { start: new Date(`${startYear + 8}-07-01`), end: new Date(`${startYear + 15}-06-30`), year: 'Too Young' },
+            { start: new Date(`${startYear + 7}-07-01`), end: new Date(`${startYear + 8}-06-30`), year: 'Kindergarten' },
+            { start: new Date(`${startYear + 6}-07-01`), end: new Date(`${startYear + 7}-06-30`), year: 'Pre-primary' },
+            { start: new Date(`${startYear + 5}-07-01`), end: new Date(`${startYear + 6}-06-30`), year: ' 1' },
+            { start: new Date(`${startYear + 4}-07-01`), end: new Date(`${startYear + 5}-06-30`), year: ' 2' },
+            { start: new Date(`${startYear + 3}-07-01`), end: new Date(`${startYear + 4}-06-30`), year: ' 3' },
+            { start: new Date(`${startYear + 2}-07-01`), end: new Date(`${startYear + 3}-06-30`), year: ' 4' },
+            { start: new Date(`${startYear + 1}-07-01`), end: new Date(`${startYear + 2}-06-30`), year: ' 5' },
+            { start: new Date(`${startYear}-07-01`), end: new Date(`${startYear + 1}-06-30`), year: ' 6' },
+            { start: new Date(`${endYear}-07-01`), end: new Date(`${startYear}-06-30`), year: 7 },
+            { start: new Date(`${endYear - 1}-07-01`), end: new Date(`${endYear}-06-30`), year: 8 },
+            { start: new Date(`${endYear - 2}-07-01`), end: new Date(`${endYear -1}-06-30`), year: 9 },
+            { start: new Date(`${endYear - 3}-07-01`), end: new Date(`${endYear - 2}-06-30`), year: 10 },
+            { start: new Date(`${endYear - 4}-07-01`), end: new Date(`${endYear - 3}-06-30`), year: 11 },
+            { start: new Date(`${endYear - 5}-07-01`), end: new Date(`${endYear - 4}-06-30`), year: 12 },
+            { start: new Date(`${endYear - 20}-07-01`), end: new Date(`${endYear - 5}-06-30`), year: 'Over 18' },
+        ];
+    }
+    // Initialize schoolYears with the current year
+    window.schoolYears = getSchoolYears(currentYear);
+</script>
+
+</body>
+<!-- Built by Paul Sharpe 25/01/2024.
+     it was impossible to decipher that word document we used and prone to mistakes manually updating it every year.
+     Hopefully with this, we won't accidentally enrol any year 6 students again... -->
+</html>

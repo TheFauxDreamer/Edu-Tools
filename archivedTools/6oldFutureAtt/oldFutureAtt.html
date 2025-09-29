@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Future Attendance Viewer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .help-button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s ease;
+        }
+
+        .help-button:hover {
+            background-color: #2980b9;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            position: absolute;
+            right: 15px;
+            top: 10px;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #000;
+        }
+
+        .modal h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        .modal-legend {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        .modal-legend-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .upload-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .file-input {
+            margin-bottom: 15px;
+        }
+
+        input[type="file"] {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        .process-btn {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-left: 10px;
+        }
+
+        .process-btn:hover {
+            background-color: #2980b9;
+        }
+
+        .process-btn:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+
+        .legend {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        .legend h3 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .legend-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .student-section {
+            margin-bottom: 40px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .student-header {
+            color: white;
+            padding: 15px 20px;
+        }
+
+        .student-header.color-0 {
+            background-color: #e74c3c;
+        }
+
+        /* Red */
+        .student-header.color-1 {
+            background-color: #f39c12;
+        }
+
+        /* Orange */
+        .student-header.color-2 {
+            background-color: #f1c40f;
+        }
+
+        /* Yellow */
+        .student-header.color-3 {
+            background-color: #27ae60;
+        }
+
+        /* Green */
+        .student-header.color-4 {
+            background-color: #3498db;
+        }
+
+        /* Blue */
+        .student-header.color-5 {
+            background-color: #9b59b6;
+        }
+
+        /* Purple */
+        .student-header.color-6 {
+            background-color: #e91e63;
+        }
+
+        /* Pink */
+        .student-header.color-7 {
+            background-color: #16a085;
+        }
+
+        /* Teal */
+        .student-header.color-8 {
+            background-color: #8e44ad;
+        }
+
+        /* Violet */
+        .student-header.color-9 {
+            background-color: #d35400;
+        }
+
+        /* Dark Orange */
+
+        .student-header h2 {
+            margin-bottom: 5px;
+        }
+
+        .student-info {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .attendance-entries {
+            padding: 20px;
+        }
+
+        .attendance-entry {
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+            border-left: 4px solid;
+        }
+
+        .entry-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .date-range {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .attendance-code {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .code-badge {
+            background-color: #f8f9fa;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .period-info {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        .period-all {
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .period-partial {
+            color: #e67e22;
+            font-weight: bold;
+        }
+
+        .duration {
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* Color coding for different attendance types */
+        .entry-E {
+            border-left-color: #27ae60;
+            background-color: #d5f4e6;
+        }
+
+        .entry-M {
+            border-left-color: #e74c3c;
+            background-color: #fadbd8;
+        }
+
+        .entry-W {
+            border-left-color: #8e44ad;
+            background-color: #ebdef0;
+        }
+
+        .entry-L {
+            border-left-color: #f39c12;
+            background-color: #fef5e7;
+        }
+
+        .entry-R {
+            border-left-color: #3498db;
+            background-color: #d6eaf8;
+        }
+
+        .entry-C {
+            border-left-color: #16a085;
+            background-color: #d1f2eb;
+        }
+
+        .entry-N {
+            border-left-color: #e67e22;
+            background-color: #fdeaa7;
+        }
+
+        .entry-V {
+            border-left-color: #9b59b6;
+            background-color: #e8daef;
+        }
+
+        .entry-Z {
+            border-left-color: #c0392b;
+            background-color: #fadbd8;
+        }
+
+        .entry-U {
+            border-left-color: #7f8c8d;
+            background-color: #eaeded;
+        }
+
+        .entry-K {
+            border-left-color: #d35400;
+            background-color: #fef9e7;
+        }
+
+        .entry-X {
+            border-left-color: #e74c3c;
+            background-color: #fadbd8;
+        }
+
+        .entry-T {
+            border-left-color: #8b0000;
+            background-color: #f1c2c2;
+        }
+
+        .entry-Y {
+            border-left-color: #2c3e50;
+            background-color: #d5dbdb;
+        }
+
+        .entry-Q {
+            border-left-color: #6c757d;
+            background-color: #f8f9fa;
+        }
+
+        .no-data {
+            text-align: center;
+            color: #666;
+            padding: 40px;
+            font-style: italic;
+        }
+
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            border: 1px solid #f5c6cb;
+        }
+
+        .pattern-analysis {
+            background-color: #e8f4f8;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3498db;
+        }
+
+        .pattern-analysis h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .pattern-item {
+            margin-bottom: 12px;
+            padding: 12px;
+            background-color: white;
+            border-radius: 3px;
+            font-size: 14px;
+            border: 1px solid #ddd;
+        }
+
+        .pattern-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .pattern-header:hover {
+            background-color: #f8f9fa;
+        }
+
+        .pattern-title {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .pattern-summary {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        .expand-icon {
+            font-size: 18px;
+            color: #3498db;
+            transition: transform 0.3s ease;
+        }
+
+        .expand-icon.expanded {
+            transform: rotate(90deg);
+        }
+
+        .pattern-details {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+            display: none;
+        }
+
+        .pattern-details.expanded {
+            display: block;
+        }
+
+        .pattern-entry {
+            padding: 8px 12px;
+            margin-bottom: 6px;
+            border-radius: 3px;
+            border-left: 3px solid;
+            font-size: 13px;
+        }
+
+        .day-of-week {
+            font-size: 12px;
+            color: #7f8c8d;
+            font-weight: normal;
+        }
+
+        .recurring-pattern {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 8px;
+            border-radius: 3px;
+            margin-top: 5px;
+            font-weight: bold;
+            color: #856404;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>
+            Student Attendance Viewer
+            <button class="help-button" onclick="openModal()" title="View legend and help information">?</button>
+        </h1>
+
+        <div class="upload-section">
+            <div class="file-input">
+                <input type="file" id="xmlFile" accept=".xml" onchange="processFile()" />
+                <button class="process-btn" onclick="processFile()" style="display: none;">Process Attendance
+                    Data</button>
+            </div>
+            <p>Generate this XML from SEQTA: Spanner > Attendance Admin > Reporting > SIS Attendance (full)</p>
+        </div>
+
+        <div id="results"></div>
+
+        <!-- Modal -->
+        <div id="helpModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal()">&times;</span>
+
+                <h3>Attendance Code Legend</h3>
+                <p>Generate this XML from SEQTA: Spanner > Attendance Admin > Reporting > SIS Attendance (full)</br>
+                Select a year group at a time. And set the date range to 11/09/2025 to 17/12/2025. Then Print & upload here.</br></br>
+                </p>
+                <div class="modal-legend">
+                    <div class="modal-legend-grid">
+                        <div><strong>E</strong> - Educational Activity</div>
+                        <div><strong>M</strong> - Medical or Sick Bay</div>
+                        <div><strong>W</strong> - Withdrawn</div>
+                        <div><strong>L</strong> - Late</div>
+                        <div><strong>R</strong> - Reasonable Cause</div>
+                        <div><strong>C</strong> - Cultural Absence</div>
+                        <div><strong>N</strong> - Notified as Sick</div>
+                        <div><strong>V</strong> - Vacation</div>
+                        <div><strong>Z</strong> - Suspended</div>
+                        <div><strong>U</strong> - Absence - cause not established</div>
+                        <div><strong>K</strong> - Unauthorised Vacation</div>
+                        <div><strong>X</strong> - Unacceptable Reason</div>
+                        <div><strong>T</strong> - Truant</div>
+                        <div><strong>Y</strong> - School Closure</div>
+                        <div><strong>Q</strong> - Not required to attend</div>
+                    </div>
+                </div>
+
+                <h3>Teaching Period Mapping</h3>
+                <div class="modal-legend">
+                    <p><strong>XML Periods → Teaching Periods:</strong> 1→1, 2→2, 4→3, 5→4, 7→5</p>
+                    <div style="margin-top: 15px;">
+                        <div style="margin-bottom: 8px;">
+                            <span style="color: #27ae60;">●</span> <strong>All 5 teaching periods</strong> - Code
+                            applies to all periods
+                        </div>
+                        <div style="margin-bottom: 8px;">
+                            <span style="color: #e67e22;">●</span> <strong>Specific periods only</strong> - Code applies
+                            to some periods
+                        </div>
+                        <div>
+                            <span style="color: #9b59b6;">🌈</span> <strong>Student headers</strong> - Rainbow colors
+                            help distinguish between students
+                        </div>
+                    </div>
+                </div>
+
+                <h3>How to Use</h3>
+                <div class="modal-legend">
+                    <ol style="margin-left: 20px; line-height: 1.6;">
+                        <li><strong>Upload XML:</strong> Select your attendance XML file and click "Process"</li>
+                        <li><strong>Review Patterns:</strong> Look for recurring patterns (🔄) that can be entered as
+                            rules</li>
+                        <li><strong>Manual Entry:</strong> Use individual entries for one-off attendance codes</li>
+                        <li><strong>Period Mapping:</strong> Remember that periods 1,2,4,5,7 map to teaching periods
+                            1,2,3,4,5</li>
+                        <li><strong>Notes:</strong> Comments from the old system are preserved and consolidated when
+                            possible</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function processFile() {
+            const fileInput = document.getElementById('xmlFile');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                showError('Please select an XML file first.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                try {
+                    const xmlContent = e.target.result;
+                    const parser = new DOMParser();
+                    const xmlDoc = parser.parseFromString(xmlContent, 'text/xml');
+
+                    if (xmlDoc.getElementsByTagName('parsererror').length > 0) {
+                        throw new Error('Invalid XML file');
+                    }
+
+                    processAttendanceData(xmlDoc);
+                } catch (error) {
+                    showError('Error processing file: ' + error.message);
+                }
+            };
+
+            reader.readAsText(file);
+        }
+
+        let globalPatternCounter = 0; // Global counter for unique pattern IDs
+        let studentColorCounter = 0; // Global counter for student header colors
+
+        function processAttendanceData(xmlDoc) {
+            const pupils = xmlDoc.getElementsByTagName('Pupil');
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '';
+
+            // Reset global counters for each file processing
+            globalPatternCounter = 0;
+            studentColorCounter = 0;
+
+            if (pupils.length === 0) {
+                resultsDiv.innerHTML = '<div class="no-data">No student data found in the XML file.</div>';
+                return;
+            }
+
+            let totalStudents = 0;
+            let studentsWithAttendanceIssues = 0;
+
+            for (let pupil of pupils) {
+                totalStudents++;
+                const studentData = extractStudentData(pupil);
+
+                // Only display students who have non-present attendance data
+                if (studentData.absences.length > 0) {
+                    studentsWithAttendanceIssues++;
+                    const attendanceRanges = consolidateAttendance(studentData.absences);
+                    const patterns = analyzePatterns(studentData.absences);
+                    displayStudentResults(studentData, attendanceRanges, patterns);
+                }
+            }
+
+            // Add summary at the top
+            const summaryDiv = document.createElement('div');
+            summaryDiv.className = 'summary';
+            summaryDiv.style.backgroundColor = '#e8f4f8';
+            summaryDiv.style.padding = '20px';
+            summaryDiv.style.borderRadius = '8px';
+            summaryDiv.style.marginBottom = '30px';
+            summaryDiv.style.border = '1px solid #3498db';
+
+            summaryDiv.innerHTML = `
+                <h3 style="margin-bottom: 10px; color: #2c3e50;">📊 Processing Summary</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <div>
+                        <strong>Total Students Processed:</strong> ${totalStudents}
+                    </div>
+                    <div>
+                        <strong style="color: #e67e22;">Students Requiring Manual Entry:</strong> ${studentsWithAttendanceIssues}
+                    </div>
+                    <div>
+                        <strong style="color: #27ae60;">Students with Only Present (/) Codes:</strong> ${totalStudents - studentsWithAttendanceIssues}
+                    </div>
+                </div>
+                ${studentsWithAttendanceIssues === 0 ?
+                    '<div style="margin-top: 15px; padding: 10px; background-color: #d5f4e6; border-radius: 4px; color: #27ae60;"><strong>🎉 Great news!</strong> All students have only present codes - no manual data entry required!</div>' :
+                    '<div style="margin-top: 15px; font-size: 14px; color: #666;"><em>Note: Students with only present (/) codes are hidden as they don\'t require manual entry.</em></div>'
+                }
+            `;
+
+            // Insert summary at the beginning
+            resultsDiv.insertBefore(summaryDiv, resultsDiv.firstChild);
+
+            if (studentsWithAttendanceIssues === 0 && totalStudents > 0) {
+                const noIssuesDiv = document.createElement('div');
+                noIssuesDiv.className = 'no-data';
+                noIssuesDiv.innerHTML = 'All students have perfect attendance (only present codes). No manual data entry needed! 🎉';
+                resultsDiv.appendChild(noIssuesDiv);
+            }
+        }
+
+        function extractStudentData(pupil) {
+            const studentRef = pupil.getElementsByTagName('StudentRef')[0]?.textContent || 'N/A';
+            const surname = pupil.getElementsByTagName('Surname')[0]?.textContent || '';
+            const firstname = pupil.getElementsByTagName('Firstname')[0]?.textContent || '';
+            const dob = pupil.getElementsByTagName('DOB')[0]?.textContent || '';
+            const gender = pupil.getElementsByTagName('Gender')[0]?.textContent || '';
+
+            const absences = [];
+            const absenceElements = pupil.getElementsByTagName('Absence');
+
+            // Teaching periods mapping: XML period -> Teaching period
+            const teachingPeriods = { 1: 1, 2: 2, 4: 3, 5: 4, 7: 5 };
+
+            for (let absence of absenceElements) {
+                const date = absence.getElementsByTagName('Date')[0]?.textContent;
+                const comment = absence.getElementsByTagName('Comment')[0]?.textContent || '';
+                const periods = absence.getElementsByTagName('Periods');
+
+                const periodData = {};
+                let hasNonPresentCodes = false;
+
+                // Collect all period codes
+                for (let period of periods) {
+                    const code = period.getElementsByTagName('Code')[0]?.textContent;
+                    const periodFrom = parseInt(period.getElementsByTagName('PeriodFrom')[0]?.textContent);
+
+                    // Only track teaching periods
+                    if (teachingPeriods[periodFrom]) {
+                        const teachingPeriod = teachingPeriods[periodFrom];
+                        periodData[teachingPeriod] = code;
+
+                        if (code && code !== '/') {
+                            hasNonPresentCodes = true;
+                        }
+                    }
+                }
+
+                if (hasNonPresentCodes) {
+                    const analysisResult = analyzePeriods(periodData);
+                    absences.push({
+                        date: new Date(date),
+                        dateString: date,
+                        periodData: periodData,
+                        comment: comment,
+                        periodAnalysis: analysisResult
+                    });
+                }
+            }
+
+            return {
+                studentRef,
+                name: `${firstname} ${surname}`.trim(),
+                dob,
+                gender,
+                absences: absences.sort((a, b) => a.date - b.date)
+            };
+        }
+
+        function analyzePeriods(periodData) {
+            // Get all non-present codes from the periods
+            const nonPresentCodes = {};
+            const allTeachingPeriods = [1, 2, 3, 4, 5];
+
+            for (let period of allTeachingPeriods) {
+                const code = periodData[period];
+                if (code && code !== '/') {
+                    if (!nonPresentCodes[code]) {
+                        nonPresentCodes[code] = [];
+                    }
+                    nonPresentCodes[code].push(period);
+                }
+            }
+
+            // Determine if all periods have the same non-present code
+            const codeKeys = Object.keys(nonPresentCodes);
+
+            if (codeKeys.length === 0) {
+                return { type: 'present', code: '/', periods: [] };
+            } else if (codeKeys.length === 1 && nonPresentCodes[codeKeys[0]].length === 5) {
+                return {
+                    type: 'all_periods',
+                    code: codeKeys[0],
+                    periods: nonPresentCodes[codeKeys[0]]
+                };
+            } else {
+                return {
+                    type: 'partial_periods',
+                    codes: nonPresentCodes,
+                    primaryCode: getMostFrequentCodeFromAnalysis(nonPresentCodes)
+                };
+            }
+        }
+
+        function getMostFrequentCodeFromAnalysis(nonPresentCodes) {
+            let maxCount = 0;
+            let primaryCode = '';
+
+            for (let code in nonPresentCodes) {
+                if (nonPresentCodes[code].length > maxCount) {
+                    maxCount = nonPresentCodes[code].length;
+                    primaryCode = code;
+                }
+            }
+
+            return primaryCode;
+        }
+
+        function consolidateAttendance(absences) {
+            if (absences.length === 0) return [];
+
+            const ranges = [];
+            let currentRange = {
+                startDate: absences[0].date,
+                endDate: absences[0].date,
+                periodAnalysis: absences[0].periodAnalysis,
+                count: 1,
+                comments: absences[0].comment ? [absences[0].comment] : []
+            };
+
+            for (let i = 1; i < absences.length; i++) {
+                const current = absences[i];
+                const prevDate = absences[i - 1].date;
+                const daysDiff = Math.floor((current.date - prevDate) / (1000 * 60 * 60 * 24));
+
+                // Check if this continues the current range (same attendance pattern and consecutive or close dates)
+                const samePattern = compareAttendancePatterns(current.periodAnalysis, currentRange.periodAnalysis);
+
+                if (samePattern && daysDiff <= 3) {
+                    currentRange.endDate = current.date;
+                    currentRange.count++;
+                    if (current.comment && !currentRange.comments.includes(current.comment)) {
+                        currentRange.comments.push(current.comment);
+                    }
+                } else {
+                    // Save current range and start new one
+                    ranges.push({ ...currentRange });
+                    currentRange = {
+                        startDate: current.date,
+                        endDate: current.date,
+                        periodAnalysis: current.periodAnalysis,
+                        count: 1,
+                        comments: current.comment ? [current.comment] : []
+                    };
+                }
+            }
+
+            // Add the last range
+            ranges.push(currentRange);
+
+            return ranges;
+        }
+
+        function analyzePatterns(absences) {
+            const dayPatterns = {};
+            const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+            // Group absences by day of week and attendance pattern
+            absences.forEach(absence => {
+                const dayOfWeek = daysOfWeek[absence.date.getDay()];
+                const patternKey = getPatternKey(absence.periodAnalysis);
+
+                if (!dayPatterns[dayOfWeek]) {
+                    dayPatterns[dayOfWeek] = {};
+                }
+
+                if (!dayPatterns[dayOfWeek][patternKey]) {
+                    dayPatterns[dayOfWeek][patternKey] = {
+                        count: 0,
+                        dates: [],
+                        absences: [],
+                        analysis: absence.periodAnalysis
+                    };
+                }
+
+                dayPatterns[dayOfWeek][patternKey].count++;
+                dayPatterns[dayOfWeek][patternKey].dates.push(absence.date);
+                dayPatterns[dayOfWeek][patternKey].absences.push(absence);
+            });
+
+            // Find recurring patterns (3+ occurrences)
+            const recurringPatterns = [];
+            const recurringAbsenceIds = new Set();
+
+            for (let day in dayPatterns) {
+                for (let pattern in dayPatterns[day]) {
+                    const data = dayPatterns[day][pattern];
+                    if (data.count >= 3) {
+                        recurringPatterns.push({
+                            day: day,
+                            pattern: pattern,
+                            count: data.count,
+                            dates: data.dates.sort((a, b) => a - b),
+                            absences: data.absences,
+                            analysis: data.analysis
+                        });
+
+                        // Mark these absences as part of recurring patterns
+                        data.absences.forEach(absence => {
+                            recurringAbsenceIds.add(absence.dateString);
+                        });
+                    }
+                }
+            }
+
+            return {
+                dayPatterns: dayPatterns,
+                recurringPatterns: recurringPatterns,
+                recurringAbsenceIds: recurringAbsenceIds
+            };
+        }
+
+        function getPatternKey(analysis) {
+            if (analysis.type === 'all_periods') {
+                return `${analysis.code}-all`;
+            } else if (analysis.type === 'partial_periods') {
+                // Create a key based on the codes and periods
+                const codeKeys = Object.keys(analysis.codes).sort();
+                return codeKeys.map(code => `${code}:${analysis.codes[code].join(',')}`).join('|');
+            }
+            return 'unknown';
+        }
+
+        function getDayOfWeek(date) {
+            const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            return days[date.getDay()];
+        }
+
+        function compareAttendancePatterns(analysis1, analysis2) {
+            if (analysis1.type !== analysis2.type) return false;
+
+            if (analysis1.type === 'all_periods') {
+                return analysis1.code === analysis2.code;
+            } else if (analysis1.type === 'partial_periods') {
+                // For partial periods, compare the codes and periods
+                const codes1 = JSON.stringify(analysis1.codes);
+                const codes2 = JSON.stringify(analysis2.codes);
+                return codes1 === codes2;
+            }
+
+            return false;
+        }
+
+        function displayStudentResults(studentData, attendanceRanges, patterns) {
+            const resultsDiv = document.getElementById('results');
+
+            const studentSection = document.createElement('div');
+            studentSection.className = 'student-section';
+
+            // Get the current color for this student (cycle through 10 colors)
+            const colorClass = `color-${studentColorCounter % 10}`;
+            studentColorCounter++;
+
+            const header = document.createElement('div');
+            header.className = `student-header ${colorClass}`;
+            header.innerHTML = `
+                <h2>${studentData.name}</h2>
+                <div class="student-info">
+                    ID: ${studentData.studentRef} | DOB: ${studentData.dob} | Gender: ${studentData.gender}
+                </div>
+            `;
+
+            const entriesDiv = document.createElement('div');
+            entriesDiv.className = 'attendance-entries';
+
+            if (attendanceRanges.length === 0) {
+                entriesDiv.innerHTML = '<div class="no-data">No significant attendance patterns found (only present or no data).</div>';
+            } else {
+                // Add summary
+                const summary = document.createElement('div');
+                summary.className = 'summary';
+                summary.style.backgroundColor = '#f8f9fa';
+                summary.style.padding = '15px';
+                summary.style.borderRadius = '4px';
+                summary.style.marginBottom = '20px';
+
+                const recurringCount = patterns.recurringPatterns.reduce((sum, p) => sum + p.count, 0);
+                const totalCount = attendanceRanges.length;
+                const nonRecurringCount = totalCount - recurringCount;
+
+                summary.innerHTML = `
+                    <strong>Summary:</strong> ${totalCount} attendance periods found requiring manual entry.<br>
+                    ${patterns.recurringPatterns.length > 0 ?
+                        `<span style="color: #27ae60;">• ${patterns.recurringPatterns.length} recurring patterns (${recurringCount} entries)</span><br>` : ''
+                    }
+                    ${nonRecurringCount > 0 ?
+                        `<span style="color: #e67e22;">• ${nonRecurringCount} individual entries</span>` : ''
+                    }
+                `;
+                entriesDiv.appendChild(summary);
+
+                // Add pattern analysis if there are recurring patterns
+                if (patterns.recurringPatterns.length > 0) {
+                    const patternDiv = document.createElement('div');
+                    patternDiv.className = 'pattern-analysis';
+
+                    let patternHtml = '<h4>🔄 Recurring Patterns Detected (Click to expand details)</h4>';
+
+                    patterns.recurringPatterns.forEach((pattern, index) => {
+                        const analysis = pattern.analysis;
+                        let description = '';
+
+                        if (analysis.type === 'all_periods') {
+                            description = `${getCodeDescription(analysis.code)} (${analysis.code}) - All 5 periods`;
+                        } else {
+                            const periodDetails = [];
+                            for (let code in analysis.codes) {
+                                const periods = analysis.codes[code].join(', ');
+                                const desc = getCodeDescription(code);
+                                periodDetails.push(`${desc} (${code}): Periods ${periods}`);
+                            }
+                            description = periodDetails.join('; ');
+                        }
+
+                        const dateRange = `${formatDate(pattern.dates[0])} to ${formatDate(pattern.dates[pattern.dates.length - 1])}`;
+
+                        // Check if all instances have the same comment
+                        const comments = pattern.absences.map(absence => absence.comment).filter(comment => comment && comment.trim() !== '');
+                        const uniqueComments = [...new Set(comments)];
+                        const hasUniformComment = uniqueComments.length === 1 && comments.length === pattern.absences.length;
+                        const uniformComment = hasUniformComment ? uniqueComments[0] : null;
+
+                        // Use global counter for unique IDs across all students
+                        const uniqueId = globalPatternCounter++;
+
+                        patternHtml += `
+                            <div class="pattern-item">
+                                <div class="pattern-header" onclick="togglePatternDetails(${uniqueId})">
+                                    <div>
+                                        <div class="pattern-title">Every ${pattern.day}: ${description}</div>
+                                        <div class="pattern-summary">
+                                            ${dateRange} (${pattern.count} occurrences)
+                                            ${uniformComment ? `<br><em style="color: #666; font-size: 12px;">Note: ${uniformComment}</em>` : ''}
+                                        </div>
+                                    </div>
+                                    <div class="expand-icon" id="icon-${uniqueId}">▶</div>
+                                </div>
+                                <div class="pattern-details" id="details-${uniqueId}">
+                        `;
+
+                        // Add individual entries for this pattern
+                        pattern.absences.forEach(absence => {
+                            const dateStr = formatDate(absence.date);
+                            const dayStr = getDayOfWeek(absence.date);
+
+                            let periodInfo = '';
+                            if (analysis.type === 'all_periods') {
+                                periodInfo = 'All 5 periods';
+                            } else {
+                                const periodDetails = [];
+                                for (let code in analysis.codes) {
+                                    const periods = analysis.codes[code].join(', ');
+                                    periodDetails.push(`${getCodeDescription(code)} (${code}): Periods ${periods}`);
+                                }
+                                periodInfo = periodDetails.join('<br>');
+                            }
+
+                            const primaryCode = analysis.type === 'all_periods' ? analysis.code : analysis.primaryCode;
+
+                            // Only show individual comments if they vary or if there's no uniform comment
+                            const showIndividualComment = !uniformComment && absence.comment && absence.comment.trim() !== '';
+
+                            patternHtml += `
+                                <div class="pattern-entry entry-${primaryCode}">
+                                    <strong>${dateStr} (${dayStr})</strong><br>
+                                    <small>${periodInfo}</small>
+                                    ${showIndividualComment ? `<br><small style="color: #666;">Notes: ${absence.comment}</small>` : ''}
+                                </div>
+                            `;
+                        });
+
+                        patternHtml += `
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    patternDiv.innerHTML = patternHtml;
+                    entriesDiv.appendChild(patternDiv);
+                }
+
+                // Filter out recurring entries from attendanceRanges and display remaining
+                const nonRecurringRanges = attendanceRanges.filter(range => {
+                    // Check if this range overlaps with any recurring pattern dates
+                    const rangeStart = range.startDate.getTime();
+                    const rangeEnd = range.endDate.getTime();
+
+                    for (let pattern of patterns.recurringPatterns) {
+                        for (let date of pattern.dates) {
+                            if (date.getTime() >= rangeStart && date.getTime() <= rangeEnd) {
+                                return false; // This range is part of a recurring pattern
+                            }
+                        }
+                    }
+                    return true; // This range is not part of any recurring pattern
+                });
+
+                if (nonRecurringRanges.length > 0) {
+                    const individualHeader = document.createElement('h4');
+                    individualHeader.style.marginTop = '20px';
+                    individualHeader.style.marginBottom = '15px';
+                    individualHeader.style.color = '#2c3e50';
+                    individualHeader.textContent = '📋 Individual Attendance Entries';
+                    entriesDiv.appendChild(individualHeader);
+
+                    nonRecurringRanges.forEach(range => {
+                        const entry = createAttendanceEntry(range);
+                        entriesDiv.appendChild(entry);
+                    });
+                }
+            }
+
+            studentSection.appendChild(header);
+            studentSection.appendChild(entriesDiv);
+            resultsDiv.appendChild(studentSection);
+        }
+
+        function createAttendanceEntry(range) {
+            const entry = document.createElement('div');
+            const analysis = range.periodAnalysis;
+            let primaryCode = '';
+            let entryClass = '';
+
+            if (analysis.type === 'all_periods') {
+                primaryCode = analysis.code;
+                entryClass = `attendance-entry entry-${analysis.code}`;
+            } else if (analysis.type === 'partial_periods') {
+                primaryCode = analysis.primaryCode;
+                entryClass = `attendance-entry entry-${analysis.primaryCode}`;
+            }
+
+            entry.className = entryClass;
+
+            const dateRange = formatDateRange(range.startDate, range.endDate);
+            const dateRangeWithDays = formatDateRangeWithDays(range.startDate, range.endDate);
+            const duration = range.count === 1 ? '1 day' : `${range.count} days`;
+            const codeDescription = getCodeDescription(primaryCode);
+
+            // Create period information
+            let periodInfo = '';
+            if (analysis.type === 'all_periods') {
+                periodInfo = '<div class="period-info period-all">All 5 teaching periods</div>';
+            } else if (analysis.type === 'partial_periods') {
+                const periodDetails = [];
+                for (let code in analysis.codes) {
+                    const periods = analysis.codes[code].join(', ');
+                    const desc = getCodeDescription(code);
+                    periodDetails.push(`${desc} (${code}): Periods ${periods}`);
+                }
+                periodInfo = `<div class="period-info period-partial">Specific periods: ${periodDetails.join('; ')}</div>`;
+            }
+
+            entry.innerHTML = `
+                <div class="entry-header">
+                    <div class="date-range">
+                        ${dateRange}
+                        <div class="day-of-week">${dateRangeWithDays}</div>
+                    </div>
+                    <div class="attendance-code">
+                        <span class="code-badge">${primaryCode}</span>
+                        <span>${codeDescription}</span>
+                    </div>
+                    <div class="duration">${duration}</div>
+                </div>
+            `;
+
+            // Add period information
+            const periodDiv = document.createElement('div');
+            periodDiv.innerHTML = periodInfo;
+            entry.appendChild(periodDiv);
+
+            if (range.comments.length > 0) {
+                const commentDiv = document.createElement('div');
+                commentDiv.style.fontSize = '12px';
+                commentDiv.style.color = '#666';
+                commentDiv.style.marginTop = '5px';
+                commentDiv.textContent = 'Notes: ' + range.comments.join('; ');
+                entry.appendChild(commentDiv);
+            }
+
+            return entry;
+        }
+
+        function togglePatternDetails(uniqueId) {
+            const details = document.getElementById(`details-${uniqueId}`);
+            const icon = document.getElementById(`icon-${uniqueId}`);
+
+            if (details.classList.contains('expanded')) {
+                details.classList.remove('expanded');
+                icon.classList.remove('expanded');
+                icon.textContent = '▶';
+            } else {
+                details.classList.add('expanded');
+                icon.classList.add('expanded');
+                icon.textContent = '▼';
+            }
+        }
+
+        function openModal() {
+            document.getElementById('helpModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('helpModal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside of it
+        window.onclick = function (event) {
+            const modal = document.getElementById('helpModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        function formatDateRange(startDate, endDate) {
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            const start = startDate.toLocaleDateString('en-US', options);
+
+            if (startDate.getTime() === endDate.getTime()) {
+                return start;
+            } else {
+                const end = endDate.toLocaleDateString('en-US', options);
+                return `${start} - ${end}`;
+            }
+        }
+
+        function formatDateRangeWithDays(startDate, endDate) {
+            if (startDate.getTime() === endDate.getTime()) {
+                return getDayOfWeek(startDate);
+            } else {
+                const startDay = getDayOfWeek(startDate);
+                const endDay = getDayOfWeek(endDate);
+
+                if (startDay === endDay) {
+                    return `All ${startDay}s`;
+                } else {
+                    return `${startDay} to ${endDay}`;
+                }
+            }
+        }
+
+        function formatDate(date) {
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            return date.toLocaleDateString('en-US', options);
+        }
+
+        function getCodeDescription(code) {
+            const descriptions = {
+                'E': 'Educational Activity',
+                'M': 'Medical or Sick Bay',
+                'W': 'Withdrawn',
+                'L': 'Late',
+                'R': 'Reasonable Cause',
+                'C': 'Cultural Absence',
+                'N': 'Notified as Sick',
+                'V': 'Vacation',
+                'Z': 'Suspended',
+                'U': 'Absence - cause not established',
+                'K': 'Unauthorised Vacation',
+                'X': 'Unacceptable Reason',
+                'T': 'Truant',
+                'Y': 'School Closure',
+                'Q': 'Not required to attend'
+            };
+            return descriptions[code] || 'Unknown';
+        }
+
+        function showError(message) {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = `<div class="error">${message}</div>`;
+        }
+    </script>
+</body>
+
+</html>

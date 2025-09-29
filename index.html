@@ -12,34 +12,270 @@
             box-sizing: border-box;
         }
 
+        /* Light mode variables (default) */
+        :root {
+            --bg-primary: #f0f2f5;
+            --bg-secondary: #ffffff;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666;
+            --text-tertiary: #94a3b8;
+            --border-color: #eee;
+            --shadow-light: rgba(0, 0, 0, 0.1);
+            --shadow-medium: rgba(0, 0, 0, 0.15);
+            --shadow-heavy: rgba(0, 0, 0, 0.2);
+            --overlay-bg: rgba(0, 0, 0, 0.5);
+            --hover-bg: #f5f5f5;
+            --hover-bg-light: rgba(0, 0, 0, 0.05);
+            --archived-opacity: 0.8;
+            --disabled-opacity: 0.5;
+        }
+
+        /* Dark mode variables */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-primary: #0a0a0a;
+                --bg-secondary: #1a1a1a;
+                --text-primary: #e5e5e5;
+                --text-secondary: #a0a0a0;
+                --text-tertiary: #64748b;
+                --border-color: #2a2a2a;
+                --shadow-light: rgba(0, 0, 0, 0.3);
+                --shadow-medium: rgba(0, 0, 0, 0.5);
+                --shadow-heavy: rgba(0, 0, 0, 0.7);
+                --overlay-bg: rgba(0, 0, 0, 0.75);
+                --hover-bg: #2a2a2a;
+                --hover-bg-light: rgba(255, 255, 255, 0.05);
+                --archived-opacity: 0.6;
+                --disabled-opacity: 0.3;
+            }
+
+            /* Adjust gradients for dark mode */
+            .section-title::after {
+                background: linear-gradient(90deg, #2196F3, #9C27B0) !important;
+                opacity: 0.8;
+            }
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background-color: #f0f2f5;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
             min-height: 100vh;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         .header {
-            background-color: #ffffff;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            background-color: var(--bg-secondary);
+            box-shadow: 0 2px 4px var(--shadow-light);
             position: fixed;
             padding: 0.75rem 1.5rem;
             height: 64px;
             width: 100%;
             top: 0;
-            transition: transform 0.3s ease;
+            transition: transform 0.3s ease, background-color 0.3s ease;
             z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
         .header.tool-active.unpinned.collapsed {
             transform: translateY(-100%);
         }
 
+        /* Hamburger menu button */
+        .hamburger-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 40px;
+            height: 40px;
+        }
+
+        .header.tool-active .hamburger-button {
+            display: flex;
+        }
+
+        .hamburger-button:hover {
+            background-color: var(--hover-bg-light);
+        }
+
+        .hamburger-line {
+            width: 20px;
+            height: 2px;
+            background-color: var(--text-primary);
+            margin: 2px 0;
+            transition: 0.3s;
+            border-radius: 2px;
+        }
+
+        .hamburger-button.active .hamburger-line:nth-child(1) {
+            transform: rotate(-45deg) translate(-4px, 4px);
+        }
+
+        .hamburger-button.active .hamburger-line:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger-button.active .hamburger-line:nth-child(3) {
+            transform: rotate(45deg) translate(-4px, -4px);
+        }
+
+        /* Sidebar menu */
+        .sidebar-menu {
+            position: fixed;
+            left: -300px;
+            top: 64px;
+            width: 300px;
+            height: calc(100vh - 64px);
+            background-color: var(--bg-secondary);
+            box-shadow: 2px 0 10px var(--shadow-light);
+            transition: left 0.3s ease, background-color 0.3s ease;
+            z-index: 999;
+            overflow-y: auto;
+            padding: 1rem 0;
+        }
+
+        .sidebar-menu.open {
+            left: 0;
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: 64px;
+            left: 0;
+            width: 100vw;
+            height: calc(100vh - 64px);
+            background-color: var(--overlay-bg);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 998;
+        }
+
+        .sidebar-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .menu-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .menu-section-title {
+            padding: 0.5rem 1.5rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .menu-item {
+            display: block;
+            padding: 0.75rem 1.5rem;
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .menu-item:hover {
+            background-color: var(--hover-bg);
+            padding-left: 2rem;
+        }
+
+        .menu-item.active {
+            background-color: rgba(var(--tool-color-rgb), 0.1);
+            border-left-color: var(--tool-color);
+            color: var(--tool-color);
+            font-weight: 600;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .menu-item.active {
+                background-color: rgba(var(--tool-color-rgb), 0.2);
+            }
+        }
+
+        .menu-item.disabled {
+            color: var(--text-tertiary);
+            cursor: not-allowed;
+            opacity: var(--disabled-opacity);
+        }
+
+        .menu-item.disabled:hover {
+            background-color: transparent;
+            padding-left: 1.5rem;
+        }
+
+        .menu-item.archived {
+            color: var(--text-tertiary);
+        }
+
+        .menu-item.return-home {
+            color: #2196F3;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .menu-item.return-home:hover {
+            background-color: var(--hover-bg);
+            padding-left: 2rem;
+        }
+
+        .menu-item.return-home svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .menu-item-badge {
+            font-size: 0.6rem;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: 8px;
+            font-weight: 600;
+        }
+
+        .badge-poc {
+            background-color: #2196F3;
+            color: white;
+        }
+
+        .badge-demo {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .badge-coming-soon {
+            background-color: #94a3b8;
+            color: white;
+        }
+
+        .badge-archived {
+            background-color: #94a3b8;
+            color: white;
+        }
+
+        .badge-extension {
+            background-color: #FF6B6B;
+            color: white;
+        }
+
         /* Pin button styles */
         .pin-button {
-            position: absolute;
-            right: 1.5rem;
-            top: 50%;
-            transform: translateY(-50%);
             background: none;
             border: none;
             cursor: pointer;
@@ -104,6 +340,12 @@
             pointer-events: none;
         }
 
+        @media (prefers-color-scheme: dark) {
+            .pin-button .tooltip-text {
+                background-color: #555;
+            }
+        }
+
         .pin-button .tooltip-text::after {
             content: "";
             position: absolute;
@@ -115,22 +357,32 @@
             border-color: transparent transparent transparent #333;
         }
 
+        @media (prefers-color-scheme: dark) {
+            .pin-button .tooltip-text::after {
+                border-color: transparent transparent transparent #555;
+            }
+        }
+
         .pin-button:hover .tooltip-text {
             visibility: visible;
             opacity: 1;
         }
 
         .header h1 {
-            position: absolute;
-            left: 1.5rem;
-            top: 50%;
-            transform: translateY(-50%);
             font-size: 1.25rem;
-            color: #1a1a1a;
+            color: var(--text-primary);
             font-weight: 600;
             cursor: pointer;
             transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             white-space: nowrap;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .header.tool-active h1 {
+            position: static;
+            transform: none;
         }
 
         .header h1:hover {
@@ -142,10 +394,10 @@
             top: 0;
             left: 50%;
             transform: translateX(-50%);
-            background-color: #ffffff;
+            background-color: var(--bg-secondary);
             padding: 4px 12px;
             border-radius: 0 0 8px 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 4px var(--shadow-light);
             cursor: pointer;
             opacity: 0;
             transition: opacity 0.3s ease, background-color 0.2s ease;
@@ -153,11 +405,15 @@
         }
 
         .chevron-indicator:hover {
-            background-color: #f0f2f5;
+            background-color: var(--hover-bg);
         }
 
         .chevron-indicator.visible {
             opacity: 1;
+        }
+
+        .chevron-indicator svg {
+            stroke: var(--text-primary);
         }
 
         .header-trigger-area {
@@ -175,8 +431,8 @@
             top: 50%;
             transform: translate(-50%, calc(-50% - 10px));
             display: flex;
-            flex-wrap: nowrap;
-            gap: 0.5rem;
+            flex-wrap: wrap;
+            gap: 0.4rem;
             align-items: center;
             opacity: 0;
             visibility: hidden;
@@ -186,18 +442,18 @@
             max-width: calc(100% - 200px);
         }
 
-        .tool-nav.visible {
+        .header:not(.tool-active) .tool-nav.visible {
             opacity: 1;
             visibility: visible;
             transform: translate(-50%, -50%);
         }
 
         .tool-nav-item {
-            padding: 0.25rem 0.75rem;
+            padding: 0.2rem 0.6rem;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 0.8rem;
-            color: #666;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
             transition: all 0.2s ease;
             text-decoration: none;
             position: relative;
@@ -205,13 +461,13 @@
         }
 
         .tool-nav-item.disabled {
-            color: #ccc;
+            color: var(--text-tertiary);
             cursor: not-allowed;
             pointer-events: none;
         }
 
         .tool-nav-item:hover {
-            color: #1a1a1a;
+            color: var(--text-primary);
         }
 
         .tool-nav-item::after {
@@ -225,59 +481,96 @@
             transition: all 0.2s ease;
         }
 
-        [data-tool="1staff/tool1.html"] {
-            --tool-color: #FF4B4B;
-            --tool-color-rgb: 255, 75, 75;
-        }
-
-        [data-tool="2student/tool2.html"] {
-            --tool-color: #4CAF50;
-            --tool-color-rgb: 76, 175, 80;
-        }
-
-        [data-tool="3calc/tool3.html"] {
+        /* Tool colors */
+        [data-tool="3calc/calc.html"] {
             --tool-color: #2196F3;
             --tool-color-rgb: 33, 150, 243;
         }
 
-        [data-tool="4map/tool4.html"] {
-            --tool-color: #9C27B0;
-            --tool-color-rgb: 156, 39, 176;
+        [data-tool="4map/map.html"] {
+            --tool-color: #607D8B;
+            --tool-color-rgb: 96, 125, 139;
         }
 
-        [data-tool="5BYOD/tool5.html"] {
-            /* #00BCD4 */
+        [data-tool="5BYOD/byod.html"] {
             --tool-color: #00BCD4;
             --tool-color-rgb: 0, 188, 212;
         }
 
-        [data-tool="6clio/tool6.html"] {
-
-            /*--tool-color: #FF9800;
-            --tool-color-rgb: 255, 152, 0;*/
-           --tool-color: #ccc;
-            --tool-color-rgb: 204, 204, 204;
+        [data-tool="7hermes/hermes.html"] {
+            --tool-color: #009688;
+            --tool-color-rgb: 0, 150, 136;
         }
 
-        [data-tool="tool7.html"] {
-            /* --tool-color: #009688;         Teal
-            --tool-color-rgb: 0, 150, 136; */
-            --tool-color: #ccc;
-            --tool-color-rgb: 204, 204, 204;
+        [data-tool="9lydians/lydians.html"] {
+            --tool-color: #8BC34A;
+            --tool-color-rgb: 139, 195, 74;
         }
 
-        [data-tool="tool8.html"] {
-            /* --tool-color: #795548;         Brown
-            --tool-color-rgb: 121, 85, 72; */
-            --tool-color: #ccc;
-            --tool-color-rgb: 204, 204, 204;
+        [data-tool="10alexandria/index.html"] {
+            --tool-color: #607D8B;
+            --tool-color-rgb: 96, 125, 139;
         }
 
-        [data-tool="tool9.html"] {
-            /* --tool-color: #795548;         Brown
-            --tool-color-rgb: 121, 85, 72; */
-            --tool-color: #ccc;
-            --tool-color-rgb: 204, 204, 204;
+        [data-tool="11scribe/scribe.html"] {
+            --tool-color: #E91E63;
+            --tool-color-rgb: 233, 30, 99;
+        }
+
+        [data-tool="13idCap/idCap.html"] {
+            --tool-color: #FFC107;
+            --tool-color-rgb: 255, 193, 7;
+        }
+
+        [data-tool="14evacLists/evacLists.html"] {
+            --tool-color: #FF5722;
+            --tool-color-rgb: 255, 87, 34;
+        }
+
+        [data-tool="16busRoutes/busRoute.html"] {
+            --tool-color: #06402B;
+            --tool-color-rgb: 6,64,43;
+        }
+        
+        [data-tool="15toolname/toolname.html"] {
+            --tool-color: #607D8B;
+            --tool-color-rgb: 96, 125, 139;
+        }
+
+        [data-tool="chrome-extension"] {
+            --tool-color: #FF6B6B;
+            --tool-color-rgb: 255, 107, 107;
+        }
+
+        /* Archived tool colors */
+        [data-tool="archivedtools/1oldStaff/oldStaff.html"] {
+            --tool-color: #FF4B4B;
+            --tool-color-rgb: 255, 75, 75;
+        }
+
+        [data-tool="archivedtools/2oldStudent/oldStudent.html"] {
+            --tool-color: #4CAF50;
+            --tool-color-rgb: 76, 175, 80;
+        }
+
+        [data-tool="archivedtools/3oldClio/oldClio.html"] {
+            --tool-color: #FF9800;
+            --tool-color-rgb: 255, 152, 0;
+        }
+
+        [data-tool="archivedtools/4oldMateria/oldMateria.html"] {
+            --tool-color: #795548;
+            --tool-color-rgb: 121, 85, 72;
+        }
+
+        [data-tool="archivedtools/5oldMap/oldMap.html"] {
+            --tool-color: #9C27B0;
+            --tool-color-rgb: 156, 39, 176;
+        }
+
+        [data-tool="archivedtools/6oldFutureAtt/oldFutureAtt.html"] {
+            --tool-color: #3F51B5;
+            --tool-color-rgb: 63, 81, 181;
         }
 
         .tool-nav-item::after {
@@ -307,42 +600,169 @@
             min-height: calc(100vh - 64px);
         }
 
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            text-align: center;
+            margin: 3rem 0 2rem 0;
+            color: var(--text-primary);
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(90deg, #2196F3, #9C27B0);
+            border-radius: 2px;
+        }
+
+        .section-title.archived {
+            font-size: 1.5rem;
+            margin: 2rem 0 1.5rem 0;
+            color: var(--text-secondary);
+        }
+
+        .section-title.archived::after {
+            background: var(--text-tertiary);
+            width: 60px;
+            height: 2px;
+        }
+
         .bento-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 1.5rem;
-            padding: 2rem;
+            padding: 2rem 2rem 2rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .archived-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            padding: 0 2rem 4rem 2rem;
             max-width: 1200px;
             margin: 0 auto;
         }
 
         .tool-card {
-            background-color: #ffffff;
+            background-color: var(--bg-secondary);
             border-radius: 12px;
             padding: 1.5rem;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px var(--shadow-light);
             border-top: 4px solid var(--tool-color);
             position: relative;
         }
 
+        .tool-card.external-link {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(255, 107, 107, 0.05) 100%);
+            border: 1px solid rgba(255, 107, 107, 0.2);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .tool-card.external-link {
+                background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(255, 107, 107, 0.1) 100%);
+                border: 1px solid rgba(255, 107, 107, 0.3);
+            }
+        }
+
+        .tool-card.external-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(45deg,
+                    transparent,
+                    transparent 10px,
+                    rgba(255, 107, 107, 0.03) 10px,
+                    rgba(255, 107, 107, 0.03) 20px);
+            border-radius: 12px;
+            pointer-events: none;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .tool-card.external-link::before {
+                background: repeating-linear-gradient(45deg,
+                        transparent,
+                        transparent 10px,
+                        rgba(255, 107, 107, 0.05) 10px,
+                        rgba(255, 107, 107, 0.05) 20px);
+            }
+        }
+
+        .external-link-icon {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 20px;
+            height: 20px;
+            color: var(--tool-color);
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+
+        .tool-card.external-link:hover .external-link-icon {
+            opacity: 1;
+            transform: translate(2px, -2px);
+        }
+
         .tool-card.disabled {
             cursor: not-allowed;
-            opacity: 0.5;
+            opacity: var(--disabled-opacity);
             pointer-events: none;
+        }
+
+        .tool-card.archived {
+            opacity: var(--archived-opacity);
+            border-top-color: var(--text-tertiary);
+            transform: scale(0.95);
         }
 
         .tool-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-            background: linear-gradient(to bottom right, #ffffff, rgba(var(--tool-color-rgb), 0.1));
+            box-shadow: 0 6px 12px var(--shadow-medium);
+            background: linear-gradient(to bottom right, var(--bg-secondary), rgba(var(--tool-color-rgb), 0.1));
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .tool-card:hover {
+                background: linear-gradient(to bottom right, var(--bg-secondary), rgba(var(--tool-color-rgb), 0.2));
+            }
+        }
+
+        .tool-card.external-link:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 8px 16px rgba(255, 107, 107, 0.2);
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(255, 107, 107, 0.1) 100%);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .tool-card.external-link:hover {
+                box-shadow: 0 8px 16px rgba(255, 107, 107, 0.3);
+                background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(255, 107, 107, 0.15) 100%);
+            }
+        }
+
+        .tool-card.archived:hover {
+            transform: scale(0.95) translateY(-2px);
+            box-shadow: 0 4px 8px var(--shadow-light);
+            background: linear-gradient(to bottom right, var(--bg-secondary), rgba(204, 204, 204, 0.1));
         }
 
         .tool-card.disabled:hover {
             transform: none;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            background: #ffffff;
+            box-shadow: 0 4px 6px var(--shadow-light);
+            background: var(--bg-secondary);
         }
 
         .tool-card h2 {
@@ -350,37 +770,55 @@
             margin-bottom: 0.5rem;
         }
 
+        .tool-card.archived h2 {
+            color: var(--text-secondary);
+        }
+
         .tool-card p {
-            color: #666;
+            color: var(--text-secondary);
             font-size: 0.9rem;
         }
 
-        .poc-badge {
+        .tool-card .external-hint {
+            font-size: 0.75rem;
+            color: var(--tool-color);
+            margin-top: 0.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .poc-badge,
+        .coming-soon-badge,
+        .archived-badge,
+        .extension-badge {
             position: absolute;
             top: -10px;
             right: -10px;
-            background-color: var(--tool-color);
             color: white;
             padding: 4px 8px;
             border-radius: 12px;
             font-size: 0.7rem;
             font-weight: 600;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 2px 4px var(--shadow-light);
             transform: rotate(5deg);
         }
 
+        .poc-badge {
+            background-color: var(--tool-color);
+        }
+
         .coming-soon-badge {
-            position: absolute;
-            top: -10px;
-            right: -10px;
             background-color: #94a3b8;
-            color: white;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-            transform: rotate(5deg);
+        }
+
+        .archived-badge {
+            background-color: #94a3b8;
+        }
+
+        .extension-badge {
+            background-color: #FF6B6B;
         }
 
         .tool-frame {
@@ -390,15 +828,12 @@
             right: 0;
             bottom: 0;
             top: 0;
-            background-color: #ffffff;
+            background-color: var(--bg-secondary);
             z-index: 100;
             padding-top: 64px;
-            /* Initial padding to account for header */
-            transition: padding-top 0.3s ease;
-            /* Smooth transition for padding change */
+            transition: padding-top 0.3s ease, background-color 0.3s ease;
         }
 
-        /* When header is hidden, remove the padding */
         .tool-frame.header-hidden {
             padding-top: 0;
         }
@@ -415,13 +850,11 @@
             bottom: 0;
             right: 0;
             padding: 1rem;
-            color: #94a3b8;
+            color: var(--text-tertiary);
             font-size: 0.9rem;
             transition: color 0.3s ease;
             z-index: 1000;
         }
-
-
 
         @keyframes rainbow {
             0% {
@@ -472,24 +905,157 @@
         .footer:hover {
             animation: rainbow 4s linear infinite;
         }
+
+        /* Dark mode notification popup */
+        .dark-mode-notice {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            background-color: var(--bg-secondary);
+            border: 2px solid var(--tool-color, #2196F3);
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 420px;
+            width: 90%;
+            box-shadow: 0 10px 30px var(--shadow-heavy);
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .dark-mode-notice.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .dark-mode-notice-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: var(--overlay-bg);
+            z-index: 1999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .dark-mode-notice-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .dark-mode-notice h3 {
+            color: #2196F3;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .dark-mode-notice h3 svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .dark-mode-notice p {
+            color: var(--text-primary);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .dark-mode-notice-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        .dark-mode-notice button {
+            padding: 0.5rem 1.5rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+        }
+
+        .dark-mode-notice .btn-primary {
+            background-color: #2196F3;
+            color: white;
+        }
+
+        .dark-mode-notice .btn-primary:hover {
+            background-color: #1976D2;
+            transform: translateY(-1px);
+        }
+
+        .dark-mode-notice .btn-secondary {
+            background-color: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .dark-mode-notice .btn-secondary:hover {
+            background-color: var(--hover-bg);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .tool-nav {
+                max-width: calc(100% - 150px);
+            }
+
+            .tool-nav-item {
+                font-size: 0.7rem;
+                padding: 0.15rem 0.5rem;
+            }
+
+            .bento-grid {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                padding: 2rem 1rem 2rem 1rem;
+            }
+
+            .archived-grid {
+                grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+                padding: 0 1rem 4rem 1rem;
+            }
+
+            .sidebar-menu {
+                width: 280px;
+                left: -280px;
+            }
+        }
     </style>
 </head>
 
 <body>
     <div class="header-trigger-area"></div>
     <header class="header">
-        <h1>Edu Tools</h1>
-        <nav class="tool-nav">
-            <a class="tool-nav-item" data-tool="1staff/tool1.html">Staff Validator</a>
-            <a class="tool-nav-item" data-tool="2student/tool2.html">Student Validator</a>
-            <a class="tool-nav-item" data-tool="3calc/tool3.html">Year Calculator</a>
-            <a class="tool-nav-item" data-tool="4map/tool4.html">Interactive Map</a>
-            <a class="tool-nav-item" data-tool="5BYOD/tool5.html">BYOD Site</a>
-            <!-- <a class="tool-nav-item" data-tool="6clio/tool6.html">Clio</a>
-            <a class="tool-nav-item disabled" data-tool="tool7.html">Tool 7 (Coming Soon)</a> 
-            <a class="tool-nav-item disabled" data-tool="tool8.html">Tool 8 (Coming Soon)</a>-->
+        <button class="hamburger-button">
+            <div class="hamburger-line"></div>
+            <div class="hamburger-line"></div>
+            <div class="hamburger-line"></div>
+        </button>
 
+        <h1>Edu Tools</h1>
+
+        <nav class="tool-nav">
+            <a class="tool-nav-item" data-tool="3calc/calc.html">Year Calculator</a>
+            <a class="tool-nav-item" data-tool="4map/map.html">Interactive Map</a>
+            <a class="tool-nav-item" data-tool="5BYOD/byod.html">BYOD Site</a>
+            <a class="tool-nav-item" data-tool="7hermes/hermes.html">Hermes</a>
+            <a class="tool-nav-item" data-tool="9lydians/lydians.html">Billing Calculator</a>
+            <!--<a class="tool-nav-item" data-tool="10alexandria/index.html">Alexandria</a>-->
+            <a class="tool-nav-item" data-tool="11scribe/scribe.html">Scribe</a>
+            <a class="tool-nav-item" data-tool="13idCap/idCap.html">ID Capture Converter</a>
+            <a class="tool-nav-item" data-tool="14evacLists/evacLists.html">Evacuation Lists</a>
         </nav>
+
         <button class="pin-button">
             <span class="tooltip-text">Toggle to minimise the header for extra space.</span>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -500,6 +1066,78 @@
         </button>
     </header>
 
+    <!-- Sidebar menu -->
+    <div class="sidebar-overlay"></div>
+    <nav class="sidebar-menu">
+        <div class="menu-section">
+            <a class="menu-item return-home">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                Return Home
+            </a>
+        </div>
+
+        <div class="menu-section">
+            <div class="menu-section-title">Current Tools</div>
+            <a class="menu-item" data-tool="3calc/calc.html">Year Calculator</a>
+            <!--<a class="menu-item" data-tool="4map/map.html">
+                Interactive Map
+                <span class="menu-item-badge badge-poc">POC</span>
+            </a>-->
+            <a class="menu-item" data-tool="5BYOD/byod.html">BYOD Site<span
+                    class="menu-item-badge badge-demo">DEMO</span></a>
+            <a class="menu-item" data-tool="7hermes/hermes.html">
+                Hermes
+                <span class="menu-item-badge badge-demo">DEMO</span>
+            </a>
+            <a class="menu-item" data-tool="9lydians/lydians.html">Billing Calculator</a>
+            <!--<a class="menu-item" data-tool="10alexandr>ia/index.html">Alexandria</a>-->
+            <a class="menu-item" data-tool="11scribe/scribe.html">Scribe</a>
+            <a class="menu-item" data-tool="13idCap/idCap.html">ID Capture Converter</a>
+            <a class="menu-item" data-tool="14evacLists/evacLists.html">Evacuation Lists</a>
+            <a class="menu-item" data-tool="16busRoutes/busRoute.html">Bus Route Finder<span class="menu-item-badge badge-poc">POC</span></a>
+        </div>
+
+        <div class="menu-section">
+            <div class="menu-section-title">Extensions</div>
+            <a class="menu-item external" data-tool="chrome-extension"
+                data-chrome-url="https://github.com/TheFauxDreamer/CompassNoNewTabs/tree/main" target="_blank">
+                CompassNoNewTabs
+                <span class="menu-item-badge badge-extension">EXTENSION</span>
+            </a>
+        </div>
+
+        <div class="menu-section">
+            <div class="menu-section-title">Archived</div>
+            <a class="menu-item archived" data-tool="archivedtools/1oldStaff/oldStaff.html">
+                Staff Validator
+                <span class="menu-item-badge badge-archived">ARCHIVED</span>
+            </a>
+            <a class="menu-item archived" data-tool="archivedtools/2oldStudent/oldStudent.html">
+                Student Validator
+                <span class="menu-item-badge badge-archived">ARCHIVED</span>
+            </a>
+            <a class="menu-item archived" data-tool="archivedtools/3oldClio/oldClio.html">
+                Clio
+                <span class="menu-item-badge badge-archived">ARCHIVED</span>
+            </a>
+            <a class="menu-item archived" data-tool="archivedtools/4oldMateria/oldMateria.html">
+                Materia
+                <span class="menu-item-badge badge-archived">ARCHIVED</span>
+            </a>
+            <a class="menu-item archived" data-tool="archivedtools/5oldMap/oldMap.html">
+                Old Map System
+                <span class="menu-item-badge badge-archived">ARCHIVED</span>
+            </a>
+            <a class="menu-item archived" data-tool="archivedtools/6oldFutureAtt/oldFutureAtt.html">
+                Future Attendance
+                <span class="menu-item-badge badge-archived">ARCHIVED</span>
+            </a>
+        </div>
+    </nav>
 
     <div class="chevron-indicator">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -510,49 +1148,117 @@
 
     <main class="main-view">
         <div class="bento-grid">
-            <div class="tool-card" data-tool="1staff/tool1.html">
-                <h2>Staff Validator</h2>
-                <p>Used to check staff data for the Kaartdijin transition.</p>
-            </div>
-            <div class="tool-card" data-tool="2student/tool2.html">
-                <span class="poc-badge">DEMO Available</span>
-                <h2>Student Validator</h2>
-                <p>Helps when checking student & contact data for the Kaartdijin transition.</p>
-            </div>
-            <div class="tool-card" data-tool="3calc/tool3.html">
+            <div class="tool-card" data-tool="3calc/calc.html">
                 <h2>Year Calculator</h2>
                 <p>Calculate what year a student should be enrolled in, in WA.</p>
             </div>
-            <div class="tool-card" data-tool="4map/tool4.html">
-                <span class="poc-badge">PROOF OF CONCEPT</span>
+            <div class="tool-card disabled" data-tool="4map/map.html">
+                <span class="coming-soon-badge">COMING SOON</span>
+                <!--<span class="poc-badge">PROOF OF CONCEPT</span>-->
                 <h2>Interactive Map</h2>
-                <p>An example of using an SVG map with search, & multiple floors.</p>
+                <p>An example multilayered SVG map with search, & multiple floors.</p>
             </div>
-            <div class="tool-card" data-tool="5BYOD/tool5.html">
-                <span class="poc-badge">PROOF OF CONCEPT</span>
+            <div class="tool-card" data-tool="5BYOD/byod.html">
+                <span class="poc-badge">DEMO Available</span>
                 <h2>BYOD Site</h2>
                 <p>An example BYOD website to help students with the basics.</p>
             </div>
-            <div class="tool-card disabled" data-tool="6clio/tool6.html">
-                <!-- <span class="poc-badge">PROOF OF CONCEPT</span> -->
-                <span class="coming-soon-badge">COMING SOON</span>
-                <h2>Clio</h2>
-                <p>A proof of concept iOS phonebook app for a school based staff directory.</p>
+            <div class="tool-card" data-tool="7hermes/hermes.html">
+                <span class="poc-badge">DEMO Available</span>
+                <h2>Hermes</h2>
+                <p>Generate standardised email signatures with customistation options.</p>
             </div>
-            <div class="tool-card disabled" data-tool="tool7.html">
-                <span class="coming-soon-badge">COMING SOON</span>
-                <h2>Aerith</h2>
-                <p>A UI overhaul for everyones soon&#8482; to be favourite website.</p>
+            <div class="tool-card" data-tool="9lydians/lydians.html">
+                <h2>Billing Calculator</h2>
+                <p>Easily calculate the discount for students attending a partial year.</p>
             </div>
-            <!-- <div class="tool-card disabled" data-tool="tool8.html">
+            <div class="tool-card disabled" data-tool="10alexandria/index.html">
                 <span class="coming-soon-badge">COMING SOON</span>
-                <h2>Cortana</h2>
-                <p>A dashboard for everyones soon&#8482; to be favourite website.</p>
-            </div> -->
-            <div class="tool-card disabled" data-tool="tool9.html">
+                <h2>Alexandria</h2>
+                <p>A centralised library for storing templates, documents, & branding.</p>
+            </div>
+            <div class="tool-card" data-tool="11scribe/scribe.html">
+                <h2>Scribe</h2>
+                <p>Create P&C reports that will always have a standardised layout.</p>
+            </div>
+            <div class="tool-card" data-tool="13idCap/idCap.html">
+                <h2>ID Capture Converter</h2>
+                <p>Convert the Compass exported CSV to a ID Capture online compatible CSV.</p>
+            </div>
+            <div class="tool-card" data-tool="14evacLists/evacLists.html">
+                <h2>Evacuation Lists</h2>
+                <p>Generate Year group & A-Z sorted evacuation lists from Compass.</p>
+            </div>
+            <div class="tool-card external-link" data-tool="chrome-extension"
+                data-chrome-url="https://github.com/TheFauxDreamer/CompassNoNewTabs/tree/main">
+                <span class="extension-badge">CHROME EXTENSION</span>
+                <!-- <span class="poc-badge">COMING SOON</span> -->
+                    <svg class="external-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                    <polyline points="15 3 21 3 21 9"></polyline>
+                    <line x1="10" y1="14" x2="21" y2="3"></line>
+                </svg>
+                <h2>CompassNoNewTabs</h2>
+                <p>Stop Compass from opening so many new tabs.</p>
+                <div class="external-hint">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                        <polyline points="15 3 21 3 21 9"></polyline>
+                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
+                    <!--Download from the Chrome Web Store-->
+                    Proof of Concept download from Github
+                </div>
+            </div>
+            <div class="tool-card" data-tool="16busRoutes/busRoute.html">
+                <span class="poc-badge">PROOF OF CONCEPT</span>
+                <h2>Bus Route Finder</h2>
+                <p>Find the best bus routes by school in WA. Routes available direct from data.gov.wa.au</p>
+            </div>
+            <div class="tool-card disabled" data-tool="15toolname/toolname.html">
                 <span class="coming-soon-badge">COMING SOON</span>
                 <h2>NERV</h2>
-                <p>Additional tools coming in the future.</p>
+                <p>A dashboard for everyone's soon™ to be favourite website.</p>
+            </div>
+            <!--<div class="tool-card disabled" data-tool="16toolname/toolname.html">
+                <span class="coming-soon-badge">COMING SOON</span>
+                <h2>Aerith</h2>
+                <p>A Ul overhaul for everyone's soon™ to be favourite website.</p>
+            </div>-->
+        </div>
+
+        <h2 class="section-title archived">Archived Tools</h2>
+        <div class="archived-grid">
+            <div class="tool-card archived" data-tool="archivedtools/1oldStaff/oldStaff.html">
+                <span class="archived-badge">ARCHIVED</span>
+                <h2>Staff Validator</h2>
+                <p>Used to check staff data for the Kaartdijin transition.</p>
+            </div>
+            <div class="tool-card archived" data-tool="archivedtools/2oldStudent/oldStudent.html">
+                <span class="archived-badge">ARCHIVED</span>
+                <h2>Student Validator</h2>
+                <p>Helps when checking student & contact data for the Kaartdijin transition.</p>
+            </div>
+            <div class="tool-card archived" data-tool="archivedtools/3oldClio/oldClio.html">
+                <span class="archived-badge">ARCHIVED</span>
+                <h2>Clio</h2>
+                <p>An easy to use web-based phonebook app for schools.</p>
+            </div>
+            <div class="tool-card archived" data-tool="archivedtools/4oldMateria/oldMateria.html">
+                <span class="archived-badge">ARCHIVED</span>
+                <h2>Materia</h2>
+                <p>A simple web-based tool to schedule lunches and avoid understaffing.</p>
+            </div>
+            <div class="tool-card archived" data-tool="archivedtools/5oldMap/oldMap.html">
+                <span class="archived-badge">ARCHIVED</span>
+                <h2>Old Map System</h2>
+                <p>An example a simple SVG map with search, & multiple floors.</p>
+            </div>
+            <div class="tool-card archived" data-tool="archivedtools/6oldFutureAtt/oldFutureAtt.html">
+                <span class="archived-badge">ARCHIVED</span>
+                <h2>Future Attendance</h2>
+                <p>Used in the Kaartdijin transition from SEQTA to show attendance.</p>
             </div>
         </div>
     </main>
@@ -563,6 +1269,27 @@
 
     <div class="footer">
         Created by Paul Sharpe
+    </div>
+
+    <!-- Dark Mode Notice Popup -->
+    <div class="dark-mode-notice-overlay"></div>
+    <div class="dark-mode-notice">
+        <h3>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+            Dark Mode Active
+        </h3>
+        <p>
+            Welcome!</br> We've detected you're using dark mode. While the main Edu Tools interface fully supports dark mode, please note that the individual tools embedded within may not have full dark mode support.
+        </p>
+        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">
+            Most tools will display in light mode. If you have issues with half implemented dark mode, please switch. 😊
+        </p>
+        <div class="dark-mode-notice-buttons">
+            <button class="btn-secondary" onclick="dismissDarkModeNotice(false)">Don't show again</button>
+            <button class="btn-primary" onclick="dismissDarkModeNotice(true)">Got it!</button>
+        </div>
     </div>
 
     <script>
@@ -576,9 +1303,139 @@
         const chevronIndicator = document.querySelector('.chevron-indicator');
         const headerTriggerArea = document.querySelector('.header-trigger-area');
         const pinButton = document.querySelector('.pin-button');
+        const hamburgerButton = document.querySelector('.hamburger-button');
+        const sidebarMenu = document.querySelector('.sidebar-menu');
+        const sidebarOverlay = document.querySelector('.sidebar-overlay');
 
         let headerTimeout;
         let isPinned = true;
+
+        // Dark mode notification logic
+        function checkAndShowDarkModeNotice() {
+            // Check if user is in dark mode
+            const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            // Check if notification has been dismissed before
+            const hasSeenNotice = localStorage.getItem('eduToolsDarkModeNoticeSeen');
+            
+            if (isDarkMode && !hasSeenNotice) {
+                // Show the notification after a short delay for better UX
+                setTimeout(() => {
+                    const notice = document.querySelector('.dark-mode-notice');
+                    const overlay = document.querySelector('.dark-mode-notice-overlay');
+                    notice.classList.add('show');
+                    overlay.classList.add('show');
+                }, 1000);
+            }
+        }
+
+        // Function to dismiss the dark mode notice
+        function dismissDarkModeNotice(temporary) {
+            const notice = document.querySelector('.dark-mode-notice');
+            const overlay = document.querySelector('.dark-mode-notice-overlay');
+            
+            notice.classList.remove('show');
+            overlay.classList.remove('show');
+            
+            // If "Don't show again" was clicked, store in localStorage
+            if (!temporary) {
+                localStorage.setItem('eduToolsDarkModeNoticeSeen', 'true');
+            }
+        }
+
+        // Make dismissDarkModeNotice globally available
+        window.dismissDarkModeNotice = dismissDarkModeNotice;
+
+        // Check for dark mode notification on page load
+        document.addEventListener('DOMContentLoaded', checkAndShowDarkModeNotice);
+
+        // Browser detection function
+        function detectBrowser() {
+            const userAgent = navigator.userAgent.toLowerCase();
+            if (userAgent.indexOf('edg') > -1 || userAgent.indexOf('edge') > -1) {
+                return 'edge';
+            } else if (userAgent.indexOf('chrome') > -1 && userAgent.indexOf('edg') === -1) {
+                return 'chrome';
+            }
+            return 'chrome'; // Default to Chrome for other browsers
+        }
+
+        // Update extension elements based on browser
+        function updateExtensionElements() {
+            const browser = detectBrowser();
+            const isEdge = browser === 'edge';
+
+            // Update all extension badges
+            document.querySelectorAll('.browser-badge').forEach(badge => {
+                badge.textContent = isEdge ? 'EDGE ADD-ON' : 'CHROME EXTENSION';
+            });
+
+            // Update store name hints
+            document.querySelectorAll('.store-name').forEach(storeName => {
+                storeName.textContent = isEdge ? 'Opens in Edge Add-ons' : 'Opens in Chrome Web Store';
+            });
+
+            // Update section title in sidebar
+            const sectionTitle = document.querySelector('.menu-section-title');
+            if (sectionTitle && sectionTitle.textContent === 'Browser Extensions') {
+                // Keep it as "Browser Extensions" for both
+            }
+        }
+
+        // Get the appropriate URL based on browser
+        function getExtensionUrl(element) {
+            const browser = detectBrowser();
+            if (browser === 'edge') {
+                return element.dataset.edgeUrl || element.dataset.chromeUrl;
+            }
+            return element.dataset.chromeUrl;
+        }
+
+        // Initialize browser-specific content
+        updateExtensionElements();
+
+        // Hamburger menu functionality
+        function toggleSidebar() {
+            const isOpen = sidebarMenu.classList.contains('open');
+            if (isOpen) {
+                closeSidebar();
+            } else {
+                openSidebar();
+            }
+        }
+
+        function openSidebar() {
+            hamburgerButton.classList.add('active');
+            sidebarMenu.classList.add('open');
+            sidebarOverlay.classList.add('visible');
+        }
+
+        function closeSidebar() {
+            hamburgerButton.classList.remove('active');
+            sidebarMenu.classList.remove('open');
+            sidebarOverlay.classList.remove('visible');
+        }
+
+        hamburgerButton.addEventListener('click', toggleSidebar);
+        sidebarOverlay.addEventListener('click', closeSidebar);
+
+        // Close sidebar when clicking a menu item
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                if (!item.classList.contains('disabled')) {
+                    closeSidebar();
+
+                    // Handle external links
+                    if (item.classList.contains('external')) {
+                        e.preventDefault();
+                        const url = getExtensionUrl(item);
+                        if (url) {
+                            window.open(url, '_blank');
+                        }
+                    }
+                }
+            });
+        });
 
         function showHeader() {
             if (!isPinned && header.classList.contains('tool-active')) {
@@ -594,7 +1451,8 @@
                 headerTimeout = setTimeout(() => {
                     if (!header.matches(':hover') &&
                         !headerTriggerArea.matches(':hover') &&
-                        !chevronIndicator.matches(':hover')) {
+                        !chevronIndicator.matches(':hover') &&
+                        !sidebarMenu.classList.contains('open')) {
                         header.classList.add('collapsed');
                         chevronIndicator.classList.add('visible');
                         toolFrame.classList.add('header-hidden');
@@ -602,7 +1460,6 @@
                 }, 2000);
             }
         }
-
 
         pinButton.addEventListener('click', () => {
             isPinned = !isPinned;
@@ -623,42 +1480,61 @@
         chevronIndicator.addEventListener('click', showHeader);
         chevronIndicator.addEventListener('mouseenter', showHeader);
         chevronIndicator.addEventListener('mouseleave', () => {
-            // Only trigger hide if not hovering over header or trigger area
             if (!header.matches(':hover') && !headerTriggerArea.matches(':hover')) {
                 hideHeader();
             }
         });
 
+        function returnHome() {
+            document.title = defaultTitle;
+            toolFrame.style.display = 'none';
+            toolFrame.classList.remove('header-hidden');
+            header.classList.remove('tool-active');
+            header.classList.remove('unpinned');
+            toolNav.classList.remove('visible');
+            mainView.style.display = 'block';
+            iframe.src = '';
+            isPinned = true;
+            pinButton.classList.remove('unpinned');
+            chevronIndicator.classList.remove('visible');
+            closeSidebar();
+
+            const footer = document.querySelector('.footer');
+            footer.style.display = 'block';
+
+            document.querySelectorAll('.tool-nav-item, .menu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+        }
+
         function activateTool(toolUrl, toolName) {
             const toolElement = document.querySelector(`[data-tool="${toolUrl}"]`);
-            if (toolElement.classList.contains('disabled')) {
+            if (toolElement && (toolElement.classList.contains('disabled'))) {
                 return;
             }
 
             document.title = `${toolName} | ${defaultTitle}`;
 
             const footer = document.querySelector('.footer');
-            if (toolUrl === '1staff/tool1.html' || toolUrl === '2student/tool2.html') {
+            if (toolUrl === 'archivedtools/1oldStaff/oldStaff.html' || toolUrl === 'archivedtools/2oldStudent/oldStudent.html') {
                 footer.style.display = 'none';
             } else {
                 footer.style.display = 'block';
             }
 
-            // Ensure tool frame starts with header spacing
             toolFrame.classList.remove('header-hidden');
             toolFrame.style.display = 'block';
-
-            // Set other UI states
             header.classList.add('tool-active');
             toolNav.classList.add('visible');
             mainView.style.display = 'none';
+            closeSidebar(); // Close sidebar when activating a tool
 
-            // Load the tool URL
             requestAnimationFrame(() => {
                 iframe.src = toolUrl;
             });
 
-            document.querySelectorAll('.tool-nav-item').forEach(item => {
+            // Update active states in both navigations
+            document.querySelectorAll('.tool-nav-item, .menu-item').forEach(item => {
                 if (item.dataset.tool === toolUrl) {
                     item.classList.add('active');
                 } else {
@@ -667,46 +1543,28 @@
             });
         }
 
-        headerTitle.addEventListener('click', () => {
-            document.title = defaultTitle;
+        headerTitle.addEventListener('click', returnHome);
 
-            // Reset tool frame
-            toolFrame.style.display = 'none';
-            toolFrame.classList.remove('header-hidden');
-
-            // Reset all header states
-            header.classList.remove('tool-active');
-            header.classList.remove('unpinned');
-            toolNav.classList.remove('visible');
-            mainView.style.display = 'block';
-
-            // Clear iframe src
-            iframe.src = '';
-
-            // Reset pin button state
-            isPinned = true;
-            pinButton.classList.remove('unpinned');
-            chevronIndicator.classList.remove('visible');
-
-            const footer = document.querySelector('.footer');
-            footer.style.display = 'block';
-
-            document.querySelectorAll('.tool-nav-item').forEach(item => {
-                item.classList.remove('active');
-            });
-        });
-
-        // Tool activation event listeners remain the same
+        // Handle clicks on tool cards
         document.querySelectorAll('.tool-card').forEach(card => {
             card.addEventListener('click', () => {
                 if (!card.classList.contains('disabled')) {
-                    const toolUrl = card.dataset.tool;
-                    const toolName = card.querySelector('h2').textContent;
-                    activateTool(toolUrl, toolName);
+                    // Check if it's an external link card
+                    if (card.classList.contains('external-link')) {
+                        const url = getExtensionUrl(card);
+                        if (url) {
+                            window.open(url, '_blank');
+                        }
+                    } else {
+                        const toolUrl = card.dataset.tool;
+                        const toolName = card.querySelector('h2').textContent;
+                        activateTool(toolUrl, toolName);
+                    }
                 }
             });
         });
 
+        // Handle clicks on tool nav items (original horizontal nav)
         document.querySelectorAll('.tool-nav-item').forEach(item => {
             item.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -717,7 +1575,35 @@
                 }
             });
         });
-    </script>
-</body>
 
-</html>
+        // Handle clicks on menu items (sidebar nav)
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (item.classList.contains('return-home')) {
+                    returnHome();
+                } else if (!item.classList.contains('disabled')) {
+                    const toolUrl = item.dataset.tool;
+                    const toolName = item.textContent.trim().split('\n')[0]; // Get just the tool name, not the badge text
+                    activateTool(toolUrl, toolName);
+                }
+            });
+        });
+
+        // Close sidebar when pressing Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && sidebarMenu.classList.contains('open')) {
+                closeSidebar();
+            }
+        });
+
+        // Also allow closing dark mode notice with Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const notice = document.querySelector('.dark-mode-notice');
+                if (notice.classList.contains('show')) {
+                    dismissDarkModeNotice(true);
+                }
+            }
+        });
+    </script>

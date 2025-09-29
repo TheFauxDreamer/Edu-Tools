@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compass CSV to ID Capture Online CSV</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8f9fa;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            max-width: 95vw;
+            width: 100%;
+            text-align: center;
+            border: 1px solid #e9ecef;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 2.2em;
+            font-weight: 600;
+        }
+        
+        .subtitle {
+            color: #6c757d;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+        }
+        
+        .requirements-box {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0 30px 0;
+            text-align: left;
+        }
+        
+        .requirements-title {
+            color: #495057;
+            font-weight: 600;
+            margin-bottom: 12px;
+            font-size: 0.95em;
+            text-align: center;
+        }
+        
+        .requirements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 8px 16px;
+            font-size: 0.85em;
+            color: #495057;
+        }
+        
+        .requirement-item {
+            padding: 4px 0;
+            position: relative;
+            padding-left: 16px;
+        }
+        
+        .requirement-item::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #6c757d;
+            font-weight: bold;
+        }
+        
+        @media (max-width: 768px) {
+            .requirements-grid {
+                grid-template-columns: 1fr;
+                gap: 6px;
+            }
+        }
+        
+        .drop-zone {
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+            padding: 30px 10px;
+            margin: 30px 0;
+            background: #fafbfc;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .drop-zone:hover {
+            border-color: #3498db;
+            background: #f8f9fa;
+        }
+        
+        .drop-zone.dragover {
+            border-color: #3498db;
+            background: #e3f2fd;
+        }
+        
+        .drop-zone-content {
+            position: relative;
+        }
+        
+        .drop-icon {
+            font-size: 2em;
+            color: #6c757d;
+            margin-bottom: 15px;
+            transition: color 0.3s ease;
+        }
+        
+        .drop-zone:hover .drop-icon {
+            color: #3498db;
+        }
+        
+        .drop-text {
+            font-size: 1.1em;
+            color: #495057;
+            font-weight: 500;
+        }
+        
+        .drop-subtext {
+            font-size: 0.9em;
+            color: #6c757d;
+            margin-top: 10px;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .status.success {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status.info {
+            background: #cce7ff;
+            color: #004085;
+            border: 1px solid #99d5ff;
+        }
+        
+        .missing-columns {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+            margin: 15px 0;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: left;
+        }
+        
+        .missing-columns h4 {
+            margin-bottom: 10px;
+            color: #856404;
+        }
+        
+        .missing-columns ul {
+            margin-left: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .missing-columns li {
+            margin-bottom: 5px;
+        }
+        
+        .download-btn {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            border-radius: 8px;
+            font-size: 1.2em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+            margin-top: 20px;
+        }
+        
+        .download-btn:hover {
+            background: #229954;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(39, 174, 96, 0.4);
+        }
+        
+        .preview {
+            margin: 20px 0;
+            text-align: left;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .preview h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        
+        .preview-content {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            border: 1px solid #dee2e6;
+        }
+        
+        .preview-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85em;
+        }
+        
+        .preview-table th {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 8px 6px;
+            text-align: left;
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.8em;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .preview-table td {
+            border: 1px solid #dee2e6;
+            padding: 8px 6px;
+            color: #333;
+            font-size: 0.8em;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 80px;
+        }
+        
+        .preview-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        .preview-table tr:hover {
+            background: #e3f2fd;
+        }
+        
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .popup {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+        
+        .popup-icon {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+        
+        .popup-title {
+            color: #2c3e50;
+            font-size: 1.5em;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .popup-message {
+            color: #495057;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            text-align: left;
+        }
+        
+        .popup-button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 6px;
+            font-size: 1em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        
+        
+        .popup-button:hover {
+            background: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Compass CSV to ID Capture Online CSV</h1>
+        <!-- Saving space, still can't fit the downlaod button with in the VH on my macbook -->
+        <!--<p class="subtitle">Convert your Compass CSV export to the ID Capture online ordering format</p>-->
+        
+        <div class="requirements-box">
+            <div class="requirements-title">We do our best to ignore unneeded columns, if you have issues make sure only the following are selected as columns in People Management:</div>
+            <div class="requirements-grid">
+                <div class="requirement-item">Date of Birth</div>
+                <div class="requirement-item">FirstName</div>
+                <div class="requirement-item">Govt Code 2</div>
+                <div class="requirement-item">Import Identifier</div>
+                <div class="requirement-item">LastName</div>
+                <div class="requirement-item">LivingAddress1.Line1</div>
+                <div class="requirement-item">LivingAddress1.Postcode</div>
+                <div class="requirement-item">LivingAddress1.State</div>
+                <div class="requirement-item">LivingAddress1.Suburb</div>
+                <div class="requirement-item">Year Level (Current)</div>
+            </div>
+        </div>
+        
+        <div class="drop-zone" id="dropZone">
+            <div class="drop-zone-content">
+                <div class="drop-icon">📁</div>
+                <div class="drop-text">Drop your CSV file here</div>
+                <div class="drop-subtext">or click to browse</div>
+            </div>
+        </div>
+        
+        <input type="file" id="fileInput" class="file-input" accept=".csv,.txt">
+        
+        <div id="status"></div>
+        <div id="preview"></div>
+        
+        <button id="downloadBtn" class="download-btn" style="display: none;">Download Converted CSV</button>
+    </div>
+
+    <script>
+        // List the minimum required columns for the conversion
+        const REQUIRED_COLUMNS = [
+            'Date Of Birth',
+            'FirstName',
+            'Govt Code 2',
+            'Import Identifier',
+            'LastName',
+            'LivingAddress1.Line1',
+            'LivingAddress1.Postcode',
+            'LivingAddress1.State',
+            'LivingAddress1.Suburb',
+            'Year Level (Current)'
+        ];
+
+        // Parse CSV in browser
+        // This would be so much easier with an external library
+        function parseCSV(csvText) {
+            const lines = csvText.split('\n');
+            const headers = parseCSVLine(lines[0]);
+            const data = [];
+            
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (line) {
+                    const values = parseCSVLine(line);
+                    const row = {};
+                    headers.forEach((header, index) => {
+                        row[header] = values[index] || '';
+                    });
+                    data.push(row);
+                }
+            }
+            
+            return { data: data, headers: headers };
+        }
+        
+        function parseCSVLine(line) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+            
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                
+                if (char === '"') {
+                    if (inQuotes && line[i + 1] === '"') {
+                        // Escaped quote
+                        current += '"';
+                        i++; // Skip next quote
+                    } else {
+                        inQuotes = !inQuotes;
+                    }
+                } else if (char === ',' && !inQuotes) {
+                    result.push(current.trim());
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+            
+            result.push(current.trim());
+            return result;
+        }
+        
+        function unparseCSV(data) {
+            if (data.length === 0) return '';
+            
+            const headers = Object.keys(data[0]);
+            const csvLines = [headers.join(',')];
+            
+            data.forEach(row => {
+                const values = headers.map(header => {
+                    let value = row[header] || '';
+                    // Escape quotes and wrap in quotes if contains comma or quote
+                    // For addresses like "Unit 2, 18 Free Street"
+                    if (value.includes(',') || value.includes('"') || value.includes('\n')) {
+                        value = '"' + value.replace(/"/g, '""') + '"';
+                    }
+                    return value;
+                });
+                csvLines.push(values.join(','));
+            });
+            
+            return csvLines.join('\n');
+        }
+
+        function validateColumns(headers) {
+            // Clean headers by removing whitespace
+            const cleanHeaders = headers.map(h => h.trim());
+            const missingColumns = [];
+            
+            REQUIRED_COLUMNS.forEach(required => {
+                if (!cleanHeaders.includes(required)) {
+                    missingColumns.push(required);
+                }
+            });
+            
+            return {
+                isValid: missingColumns.length === 0,
+                missingColumns: missingColumns,
+                foundColumns: cleanHeaders
+            };
+        }
+
+        let convertedData = '';
+        let fileName = '';
+
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const status = document.getElementById('status');
+        const preview = document.getElementById('preview');
+        const downloadBtn = document.getElementById('downloadBtn');
+
+        // Drag & Drop events
+        // I hate the old school click here to open file explorer and navigate there. Do people really not have their stuff already open and ready?
+        dropZone.addEventListener('click', () => fileInput.click());
+        dropZone.addEventListener('dragover', handleDragOver);
+        dropZone.addEventListener('dragleave', handleDragLeave);
+        dropZone.addEventListener('drop', handleDrop);
+        fileInput.addEventListener('change', handleFileSelect);
+        downloadBtn.addEventListener('click', downloadFile);
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        }
+
+        function handleDragLeave(e) {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                processFile(files[0]);
+            }
+        }
+
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (file) {
+                processFile(file);
+            }
+        }
+
+        function processFile(file) {
+            fileName = file.name.replace(/\.[^/.]+$/, '') + '_converted.csv';
+            
+            // Only here if you've got like a bajillion students, or an atom processor
+            showStatus('Processing file...', 'info');
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const csvText = e.target.result;
+                    const results = parseCSV(csvText);
+                    
+                    // Check we have the minimum amount of required columns
+                    const validation = validateColumns(results.headers);
+                    
+                    if (!validation.isValid) {
+                        showColumnError(validation.missingColumns, validation.foundColumns);
+                        downloadBtn.style.display = 'none';
+                        preview.innerHTML = '';
+                        return;
+                    }
+                    
+                    const convertedRows = convertData(results.data);
+                    convertedData = unparseCSV(convertedRows);
+                    showPreview(convertedRows);
+                    
+                    // Show the user stats so they can check all students are present after the conversion.
+                    let statusMessage = `Successfully processed ${convertedRows.length} records!`;
+                    if (convertedRows.skippedCount > 0) {
+                        statusMessage += ` (${convertedRows.skippedCount} records with "Refer to EESC" addresses were skipped)`;
+                    }
+                    showStatus(statusMessage, 'success');
+                    downloadBtn.style.display = 'block';
+                } catch (error) {
+                    showStatus(`Error processing file: ${error.message}`, 'error');
+                    downloadBtn.style.display = 'none';
+                }
+            };
+            
+            reader.onerror = function() {
+                showStatus('Error reading file', 'error');
+                downloadBtn.style.display = 'none';
+            };
+            
+            reader.readAsText(file);
+        }
+
+        // Error message for columns missing in original CSV. Maybe add something about check above for the required ones.
+        function showColumnError(missingColumns, foundColumns) {
+            const missingColumnsHTML = `
+                <div class="missing-columns">
+                    <h4>❌ Missing Required Columns</h4>
+                    <p>The following required columns are missing from your CSV:</p>
+                    <ul>
+                        ${missingColumns.map(col => `<li><strong>${col}</strong></li>`).join('')}
+                    </ul>
+                    <p><strong>Please export your CSV from Compass with all the required columns selected.</strong></p>
+                    <p style="margin-top: 15px; font-size: 0.9em; color: #666;">
+                        <strong>Columns found in your file:</strong><br>
+                        ${foundColumns.join(', ')}
+                    </p>
+                </div>
+            `;
+            
+            showStatus('Cannot process file: Missing required columns', 'error');
+            status.innerHTML += missingColumnsHTML;
+        }
+
+        function convertData(inputData) {
+            let skippedCount = 0;
+            
+            const converted = inputData.map(row => {
+                // Clean headers by removing whitespace
+                const cleanRow = {};
+                Object.keys(row).forEach(key => {
+                    cleanRow[key.trim()] = row[key];
+                });
+
+                // Check if address contains "Refer to..." skip these. I miss the Former Roll in Integris...
+                // Ed Support students are on the current roll in Compass and can't be differentiated. In Integris all their addresses include "Refer to EESC"
+                // we can search for that string and remove any students that match to make things tidy. :)
+                const address = (cleanRow['LivingAddress1.Line1'] || '').trim();
+                if (address.toLowerCase().includes('refer to')) {
+                    skippedCount++;
+                    return null; // Mark these to filter out of output
+                }
+
+                // Convert date format from DD/MM/YYYY to (the superior format) YYYY-MM-DD
+                let convertedDate = '';
+                const dobInput = (cleanRow['Date Of Birth'] || '').trim();
+                if (dobInput) {
+                    const dateParts = dobInput.split('/');
+                    if (dateParts.length === 3) {
+                        const day = dateParts[0].padStart(2, '0');
+                        const month = dateParts[1].padStart(2, '0');
+                        const year = dateParts[2];
+                        convertedDate = `${year}-${month}-${day}`;
+                    }
+                }
+
+                // Convert year group from "Year 11" to "11"
+                let convertedYearGroup = '';
+                const yearGroupInput = (cleanRow['Year Level (Current)'] || '').trim();
+                if (yearGroupInput) {
+                    // Extract number from "Year X" format
+                    const yearMatch = yearGroupInput.match(/year\s+(\d+)/i);
+                    if (yearMatch) {
+                        convertedYearGroup = yearMatch[1];
+                    } else {
+                        // If it doesn't match "Year X" format, use as is (maybe Compass will update it and just use the number in future?)
+                        convertedYearGroup = yearGroupInput;
+                    }
+                }
+
+                return {
+                    externalID: (cleanRow['Import Identifier'] || '').toString(),
+                    firstNames: (cleanRow['FirstName'] || '').trim(),
+                    lastName: (cleanRow['LastName'] || '').trim(),
+                    'dob (YYYY-MM-DD)': convertedDate,
+                    street: address,
+                    suburb: (cleanRow['LivingAddress1.Suburb'] || '').trim(),
+                    state: (cleanRow['LivingAddress1.State'] || '').trim(),
+                    postcode: (cleanRow['LivingAddress1.Postcode'] || '').toString(),
+                    curriculum: (cleanRow['Govt Code 2'] || '').toString(),
+                    custom1: '',
+                    custom2: '',
+                    custom3: '',
+                    yearGroup: convertedYearGroup
+                };
+            }).filter(row => row !== null);
+
+            // Store skip count for EESC status message
+            converted.skippedCount = skippedCount;
+            return converted;
+        }
+
+        function showStatus(message, type) {
+            status.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+
+        function showPreview(data) {
+            if (data.length > 0) {
+                const previewData = data.slice(0, 3); // Preview of converted data shows first 3 by default. Change this number for more or less.
+                const headers = Object.keys(previewData[0]);
+                
+                let tableHTML = `
+                    <table class="preview-table">
+                        <thead>
+                            <tr>
+                                ${headers.map(header => `<th>${header}</th>`).join('')}
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                previewData.forEach(row => {
+                    tableHTML += '<tr>';
+                    headers.forEach(header => {
+                        const value = row[header] || '';
+                        tableHTML += `<td title="${value}">${value}</td>`;
+                    });
+                    tableHTML += '</tr>';
+                });
+                
+                tableHTML += `
+                        </tbody>
+                    </table>
+                `;
+                
+                preview.innerHTML = `
+                    <div class="preview">
+                        <h3>Preview (first ${Math.min(3, data.length)} rows):</h3>
+                        <div class="preview-content">
+                            ${tableHTML}
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function downloadFile() {
+            // Start download when user clicks the button
+            const blob = new Blob([convertedData], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            // Force show the Excel caution popup after download starts
+            showPopup();
+            showStatus('File downloaded successfully!', 'success');
+        }
+        
+        // Look it's the caution popup I mentioned...
+        function showPopup() {
+            const popupHTML = `
+                <div class="popup-overlay" id="popupOverlay" onclick="hidePopup()">
+                    <div class="popup" onclick="event.stopPropagation()">
+                        <div class="popup-icon">⚠️</div>
+                        <div class="popup-title">Important Notice</div>
+                        <div class="popup-message">
+                            If you open the converted file in Excel it will change the DOB format to DD/MM/YYYY which will cause errors in ID Capture online. Be careful.
+                            <br><br>
+                            <strong>Recommendation:</strong> If you open the file to check it, make sure to close without saving.
+                        </div>
+                        <button class="popup-button" onclick="hidePopup()">Got It</button>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', popupHTML);
+        }
+        
+        // Magic to close said popup
+        function hidePopup() {
+            const popup = document.getElementById('popupOverlay');
+            if (popup) {
+                popup.remove();
+            }
+        }
+    </script>
+</body>
+</html>

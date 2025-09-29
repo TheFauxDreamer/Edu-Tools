@@ -1,0 +1,1504 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Billing Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .calculator {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .label-with-info {
+            display: flex;
+            align-items: center;
+        }
+
+        select,
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        /* Mode-specific colors */
+        :root {
+            --green-primary: #4CAF50;
+            --green-dark: #45a049;
+            --purple-primary: #9C27B0;
+            --purple-dark: #7B1FA2;
+        }
+
+        button {
+            background-color: var(--green-primary);
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            margin-top: 15px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: var(--green-dark);
+        }
+
+        .purple-mode button {
+            background-color: var(--purple-primary);
+        }
+
+        .purple-mode button:hover {
+            background-color: var(--purple-dark);
+        }
+
+        button.recalculate {
+            background-color: #ff9800;
+            animation: pulse 1.5s infinite;
+        }
+
+        button.recalculate:hover {
+            background-color: #e68a00;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 152, 0, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(255, 152, 0, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 152, 0, 0);
+            }
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            border-left: 4px solid var(--green-primary);
+            display: none;
+        }
+
+        .purple-mode .result {
+            border-left: 4px solid var(--purple-primary);
+        }
+
+        .result h2 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Toggle switch styles */
+        .toggle-container {
+            margin: 15px 0 25px;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .toggle-label {
+            font-weight: bold;
+            margin: 0 10px;
+            color: #666;
+            cursor: pointer;
+            transition: color 0.3s;
+            font-size: 14px;
+        }
+
+        #lateStartLabel.active {
+            color: var(--green-primary);
+        }
+
+        #earlyDepartureLabel.active {
+            color: var(--purple-primary);
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 46px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked+.toggle-slider {
+            background-color: var(--purple-primary);
+        }
+
+        input:focus+.toggle-slider {
+            box-shadow: 0 0 1px var(--purple-primary);
+        }
+
+        input:checked+.toggle-slider:before {
+            transform: translateX(22px);
+        }
+
+        /* Modal styles */
+        .info-button {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            background-color: #2196F3;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-left: 10px;
+            font-size: 14px;
+            vertical-align: middle;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10vh auto;
+            padding: 20px;
+            border: 1px solid #dddfe2;
+            width: 90%;
+            max-width: 700px;
+            max-height: 80vh;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            color: #999;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #333;
+            text-decoration: none;
+        }
+
+        /* Make calculation content sections prettier */
+        .calculation-steps,
+        .example {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .example {
+            border-left: 4px solid #4CAF50;
+        }
+
+        .calc-content h3 {
+            margin-top: 0;
+            color: #333;
+            font-size: 18px;
+        }
+
+        .calc-content h4 {
+            margin-top: 0;
+            color: var(--green-primary);
+            font-size: 16px;
+        }
+
+        .purple-mode .calc-content h4,
+        #earlyDepartureInfo .calc-content h4 {
+            color: var(--purple-primary);
+        }
+
+        .title-with-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Calculation type tabs - iOS style with green theme */
+        .calc-tabs {
+            display: flex;
+            margin: 20px 0;
+            background-color: #f1f1f1;
+            border-radius: 10px;
+            padding: 4px;
+            width: 100%;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .calc-tab {
+            flex: 1;
+            padding: 12px 8px;
+            cursor: pointer;
+            text-align: center;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            color: #666;
+            margin: 0 2px;
+        }
+
+        .calc-tab:hover {
+            background-color: rgba(76, 175, 80, 0.05);
+            color: #333;
+        }
+
+        .calc-tab.active {
+            background-color: var(--green-primary);
+            color: white;
+            box-shadow: 0 2px 4px rgba(76, 175, 80, 0.3);
+        }
+
+        .purple-mode .calc-tab.active {
+            background-color: var(--purple-primary);
+            color: white;
+            box-shadow: 0 2px 4px rgba(156, 39, 176, 0.3);
+        }
+
+        .calc-content {
+            display: none;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            background-color: #f9f9f9;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .calc-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Mode toggle in modal */
+        .calc-mode-tabs {
+            display: flex;
+            margin: 20px 0 10px;
+            background-color: #f1f1f1;
+            border-radius: 10px;
+            padding: 4px;
+            width: 100%;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .calc-mode-tab {
+            flex: 1;
+            padding: 12px 8px;
+            cursor: pointer;
+            text-align: center;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            color: #666;
+            margin: 0 2px;
+        }
+
+        .calc-mode-tab:hover {
+            background-color: rgba(76, 175, 80, 0.05);
+            color: #333;
+        }
+
+        /* Modal tabs for each mode have their own color */
+        .calc-mode-tab[data-mode-tab="lateStart"].active {
+            background-color: var(--green-primary);
+            color: white;
+            box-shadow: 0 2px 4px rgba(76, 175, 80, 0.3);
+        }
+
+        .calc-mode-tab[data-mode-tab="earlyDeparture"].active {
+            background-color: var(--purple-primary);
+            color: white;
+            box-shadow: 0 2px 4px rgba(156, 39, 176, 0.3);
+        }
+
+        .calc-mode-content {
+            display: none;
+        }
+
+        .calc-mode-content.active {
+            display: block;
+        }
+
+        #debug-info {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            display: none;
+        }
+
+        /* Subject type tooltip styles */
+        .subject-tooltip {
+            display: none;
+            position: absolute;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 15px;
+            width: 300px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            top: 40px;
+            right: 0;
+            font-size: 14px;
+        }
+
+        .subject-tooltip h4 {
+            margin-top: 0;
+            color: #333;
+            font-size: 16px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 8px;
+            margin-bottom: 10px;
+        }
+
+        .subject-tooltip p {
+            margin: 8px 0;
+        }
+
+        .subject-tooltip:before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            right: 15px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-bottom: 8px solid #fff;
+            z-index: 2;
+        }
+
+        .subject-tooltip:after {
+            content: '';
+            position: absolute;
+            top: -9px;
+            right: 15px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-bottom: 8px solid #ddd;
+            z-index: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="calculator">
+        <div class="title-with-info">
+            <h1>School Billing Calculator</h1>
+            <span class="info-button" id="infoBtn">i</span>
+        </div>
+
+        <!-- Toggle switch for calculation mode -->
+        <div class="toggle-container">
+            <span id="lateStartLabel" class="toggle-label active">Late Start</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="modeToggle">
+                <span class="toggle-slider"></span>
+            </label>
+            <span id="earlyDepartureLabel" class="toggle-label">Early Departure</span>
+        </div>
+
+        <div id="infoModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>How This Calculator Works</h2>
+
+                <div class="calc-mode-tabs">
+                    <div class="calc-mode-tab active" data-mode-tab="lateStart">Late Start</div>
+                    <div class="calc-mode-tab" data-mode-tab="earlyDeparture">Early Departure</div>
+                </div>
+
+                <div id="lateStartInfo" class="calc-mode-content active">
+                    <p>Calculate discounts for students who enroll after classes have started:</p>
+
+                    <div class="calc-tabs">
+                        <div class="calc-tab active" data-tab="fullYear">Full Year</div>
+                        <div class="calc-tab" data-tab="semester">Semester</div>
+                        <div class="calc-tab" data-tab="term">Term</div>
+                    </div>
+
+                    <div id="fullYearCalc" class="calc-content active">
+                        <h3>Full Year Subject (40 weeks)</h3>
+                        <p>For full year subjects that run across all 4 terms (40 weeks total):</p>
+                        <div class="calculation-steps">
+                            <p><strong>Step 1:</strong> Calculate weeks missed before student started</p>
+                            <ul>
+                                <li>Weeks missed from previous terms: (Term number - 1) × 10</li>
+                                <li>Weeks missed in current term: Start week - 1</li>
+                                <li>Total missed weeks = Previous terms + Current term weeks</li>
+                            </ul>
+                            <p><strong>Step 2:</strong> Calculate discount percentage</p>
+                            <ul>
+                                <li>Discount % = (Missed weeks ÷ 40) × 100%</li>
+                            </ul>
+                            <p><strong>Step 3:</strong> Calculate discount amount</p>
+                            <ul>
+                                <li>Discount Amount = Total Amount × Discount %</li>
+                            </ul>
+                        </div>
+                        <div class="example">
+                            <h4>Example: Student starting in Term 2, Week 3</h4>
+                            <ul>
+                                <li>Previous terms: (2-1) × 10 = 10 weeks missed</li>
+                                <li>Current term: 3-1 = 2 weeks missed</li>
+                                <li>Total missed: 10 + 2 = 12 weeks</li>
+                                <li>Discount: (12 ÷ 40) × 100% = 30%</li>
+                                <li>For a $1000 subject: $1000 × 30% = $300 discount</li>
+                                <li>Amount to pay: $1000 - $300 = $700</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div id="semesterCalc" class="calc-content">
+                        <h3>Semester Subject (20 weeks)</h3>
+                        <p>For semester subjects that run across 2 terms (20 weeks total):</p>
+                        <div class="calculation-steps">
+                            <p><strong>Step 1:</strong> Calculate weeks missed before student started</p>
+                            <ul>
+                                <li>First determine term position within semester:</li>
+                                <li>- For Semester 1: Term 1 = position 1, Term 2 = position 2</li>
+                                <li>- For Semester 2: Term 3 = position 1, Term 4 = position 2</li>
+                                <li>Weeks missed from previous terms: (Term position - 1) × 10</li>
+                                <li>Weeks missed in current term: Start week - 1</li>
+                                <li>Total missed weeks = Previous terms + Current term weeks</li>
+                            </ul>
+                            <p><strong>Step 2:</strong> Calculate discount percentage</p>
+                            <ul>
+                                <li>Discount % = (Missed weeks ÷ 20) × 100%</li>
+                            </ul>
+                            <p><strong>Step 3:</strong> Calculate discount amount</p>
+                            <ul>
+                                <li>Discount Amount = Total Amount × Discount %</li>
+                            </ul>
+                        </div>
+                        <div class="example">
+                            <h4>Example: Student starting in Semester 1, Term 2, Week 5</h4>
+                            <ul>
+                                <li>Term position in semester: 2</li>
+                                <li>Previous terms: (2-1) × 10 = 10 weeks missed</li>
+                                <li>Current term: 5-1 = 4 weeks missed</li>
+                                <li>Total missed: 10 + 4 = 14 weeks</li>
+                                <li>Discount: (14 ÷ 20) × 100% = 70%</li>
+                                <li>For a $800 subject: $800 × 70% = $560 discount</li>
+                                <li>Amount to pay: $800 - $560 = $240</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div id="termCalc" class="calc-content">
+                        <h3>Term Subject (10 weeks)</h3>
+                        <p>For term subjects that run for a single term (10 weeks total):</p>
+                        <div class="calculation-steps">
+                            <p><strong>Step 1:</strong> Calculate weeks missed before student started</p>
+                            <ul>
+                                <li>Weeks missed = Selected week number - 1</li>
+                            </ul>
+                            <p><strong>Step 2:</strong> Calculate discount percentage</p>
+                            <ul>
+                                <li>Discount % = (Missed weeks ÷ 10) × 100%</li>
+                            </ul>
+                            <p><strong>Step 3:</strong> Calculate discount amount</p>
+                            <ul>
+                                <li>Discount Amount = Total Amount × Discount %</li>
+                            </ul>
+                        </div>
+                        <div class="example">
+                            <h4>Example: Student starting in Week 4</h4>
+                            <ul>
+                                <li>Weeks missed: 4-1 = 3 weeks</li>
+                                <li>Discount: (3 ÷ 10) × 100% = 30%</li>
+                                <li>For a $500 subject: $500 × 30% = $150 discount</li>
+                                <li>Amount to pay: $500 - $150 = $350</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="earlyDepartureInfo" class="calc-mode-content">
+                    <p>Calculate discounts for students who leave before classes have ended:</p>
+
+                    <div class="calc-tabs">
+                        <div class="calc-tab active" data-tab="fullYearEarly">Full Year</div>
+                        <div class="calc-tab" data-tab="semesterEarly">Semester</div>
+                        <div class="calc-tab" data-tab="termEarly">Term</div>
+                    </div>
+
+                    <div id="fullYearEarlyCalc" class="calc-content active">
+                        <h3>Full Year Subject (40 weeks)</h3>
+                        <p>For full year subjects that run across all 4 terms (40 weeks total):</p>
+                        <div class="calculation-steps">
+                            <p><strong>Step 1:</strong> Calculate weeks remaining after student leaves</p>
+                            <ul>
+                                <li>Weeks remaining in current term: 10 - End week</li>
+                                <li>Weeks in remaining terms: (4 - Term number) × 10</li>
+                                <li>Total remaining weeks = Current term remaining + Future terms</li>
+                            </ul>
+                            <p><strong>Step 2:</strong> Calculate discount percentage</p>
+                            <ul>
+                                <li>Discount % = (Remaining weeks ÷ 40) × 100%</li>
+                            </ul>
+                            <p><strong>Step 3:</strong> Calculate discount amount</p>
+                            <ul>
+                                <li>Discount Amount = Total Amount × Discount %</li>
+                            </ul>
+                        </div>
+                        <div class="example">
+                            <h4>Example: Student leaving in Term 2, Week 3</h4>
+                            <ul>
+                                <li>Current term remaining: 10 - 3 = 7 weeks</li>
+                                <li>Future terms: (4 - 2) × 10 = 20 weeks</li>
+                                <li>Total remaining: 7 + 20 = 27 weeks</li>
+                                <li>Discount: (27 ÷ 40) × 100% = 67.5%</li>
+                                <li>For a $1000 subject: $1000 × 67.5% = $675 discount</li>
+                                <li>Amount to pay: $1000 - $675 = $325</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div id="semesterEarlyCalc" class="calc-content">
+                        <h3>Semester Subject (20 weeks)</h3>
+                        <p>For semester subjects that run across 2 terms (20 weeks total):</p>
+                        <div class="calculation-steps">
+                            <p><strong>Step 1:</strong> Calculate weeks remaining after student leaves</p>
+                            <ul>
+                                <li>First determine term position within semester:</li>
+                                <li>- For Semester 1: Term 1 = position 1, Term 2 = position 2</li>
+                                <li>- For Semester 2: Term 3 = position 1, Term 4 = position 2</li>
+                                <li>Weeks remaining in current term: 10 - End week</li>
+                                <li>Weeks in remaining terms: (2 - Term position) × 10</li>
+                                <li>Total remaining weeks = Current term remaining + Future terms</li>
+                            </ul>
+                            <p><strong>Step 2:</strong> Calculate discount percentage</p>
+                            <ul>
+                                <li>Discount % = (Remaining weeks ÷ 20) × 100%</li>
+                            </ul>
+                            <p><strong>Step 3:</strong> Calculate discount amount</p>
+                            <ul>
+                                <li>Discount Amount = Total Amount × Discount %</li>
+                            </ul>
+                        </div>
+                        <div class="example">
+                            <h4>Example: Student leaving in Semester 1, Term 1, Week 5</h4>
+                            <ul>
+                                <li>Term position in semester: 1</li>
+                                <li>Current term remaining: 10 - 5 = 5 weeks</li>
+                                <li>Future terms: (2 - 1) × 10 = 10 weeks</li>
+                                <li>Total remaining: 5 + 10 = 15 weeks</li>
+                                <li>Discount: (15 ÷ 20) × 100% = 75%</li>
+                                <li>For a $800 subject: $800 × 75% = $600 discount</li>
+                                <li>Amount to pay: $800 - $600 = $200</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div id="termEarlyCalc" class="calc-content">
+                        <h3>Term Subject (10 weeks)</h3>
+                        <p>For term subjects that run for a single term (10 weeks total):</p>
+                        <div class="calculation-steps">
+                            <p><strong>Step 1:</strong> Calculate weeks remaining after student leaves</p>
+                            <ul>
+                                <li>Remaining weeks = 10 - End week number</li>
+                            </ul>
+                            <p><strong>Step 2:</strong> Calculate discount percentage</p>
+                            <ul>
+                                <li>Discount % = (Remaining weeks ÷ 10) × 100%</li>
+                            </ul>
+                            <p><strong>Step 3:</strong> Calculate discount amount</p>
+                            <ul>
+                                <li>Discount Amount = Total Amount × Discount %</li>
+                            </ul>
+                        </div>
+                        <div class="example">
+                            <h4>Example: Student leaving in Week 4</h4>
+                            <ul>
+                                <li>Remaining weeks: 10 - 4 = 6 weeks</li>
+                                <li>Discount: (6 ÷ 10) × 100% = 60%</li>
+                                <li>For a $500 subject: $500 × 60% = $300 discount</li>
+                                <li>Amount to pay: $500 - $300 = $200</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <form id="calculatorForm">
+            <div class="form-group">
+                <label for="subjectType">Subject Type:</label>
+                <div style="position: relative; display: flex; align-items: center;">
+                    <select id="subjectType" required style="flex: 1;">
+                        <option value="" disabled selected>Select Subject Type</option>
+                        <option value="fullYear">Full Year Subject</option>
+                        <option value="semester">Semester Subject</option>
+                        <option value="term">Term Subject</option>
+                    </select>
+                    <span class="info-button" id="subjectInfoBtn" style="margin-left: 10px;">?</span>
+                    <div id="subjectTooltip" class="subject-tooltip">
+                        <h4>Subject Type Examples:</h4>
+                        <p><strong>Full Year Subjects (40 weeks):</strong> These subjects are often Year 11-12 and do
+                            not have a number in the code (AMTER)</p>
+                        <p><strong>Semester Subjects (20 weeks):</strong> Most subjects are semester based, they'll have
+                            a 1 or 2 near the start (G1KIE)</p>
+                        <p><strong>Term Subjects (10 weeks):</strong> These are for taster classes only in Year 7
+                            (?????)</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="dateHeader" class="hidden">
+                <h3 id="dateHeaderText"
+                    style="margin-top: 20px; margin-bottom: 15px; color: #333; border-bottom: 1px solid #ddd; padding-bottom: 10px;">
+                    Select when the student started at school
+                </h3>
+            </div>
+
+            <div id="semesterSelection" class="form-group hidden">
+                <label for="semesterNumber">Semester:</label>
+                <select id="semesterNumber">
+                    <option value="1">Semester 1</option>
+                    <option value="2">Semester 2</option>
+                </select>
+            </div>
+
+            <div id="termSelection" class="form-group hidden">
+                <label for="term">Term:</label>
+                <select id="term">
+                    <!-- Options will be populated by JavaScript -->
+                </select>
+            </div>
+
+            <div id="weekSelection" class="form-group hidden">
+                <label for="week">Week:</label>
+                <select id="week">
+                    <!-- Options will be populated by JavaScript based on subject type -->
+                </select>
+            </div>
+
+            <div id="amountInput" class="form-group hidden">
+                <label for="totalAmount">Total Amount ($):</label>
+                <input type="number" id="totalAmount" min="0" step="0.01" placeholder="Enter total amount">
+            </div>
+
+            <button type="button" id="calculateBtn" disabled>Calculate</button>
+        </form>
+
+        <div id="result" class="result">
+            <h2>Calculation Result</h2>
+            <p id="resultText" style="font-size: 18px; font-weight: bold;"></p>
+            <p id="discountDetails"></p>
+        </div>
+
+        <div id="debug-info"></div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const calculatorForm = document.getElementById('calculatorForm');
+        const subjectTypeSelect = document.getElementById('subjectType');
+        const semesterSelection = document.getElementById('semesterSelection');
+        const semesterNumber = document.getElementById('semesterNumber');
+        const termSelection = document.getElementById('termSelection');
+        const termSelect = document.getElementById('term');
+        const weekSelection = document.getElementById('weekSelection');
+        const weekSelect = document.getElementById('week');
+        const amountInput = document.getElementById('amountInput');
+        const totalAmountInput = document.getElementById('totalAmount');
+        const calculateBtn = document.getElementById('calculateBtn');
+        const result = document.getElementById('result');
+        const resultText = document.getElementById('resultText');
+        const discountDetails = document.getElementById('discountDetails');
+        const dateHeader = document.getElementById('dateHeader');
+        const dateHeaderText = document.getElementById('dateHeaderText');
+        const debugInfo = document.getElementById('debug-info');
+
+        // Toggle Elements
+        const modeToggle = document.getElementById('modeToggle');
+        const lateStartLabel = document.getElementById('lateStartLabel');
+        const earlyDepartureLabel = document.getElementById('earlyDepartureLabel');
+
+        // Modal Elements
+        const infoBtn = document.getElementById('infoBtn');
+        const infoModal = document.getElementById('infoModal');
+        const closeBtn = document.querySelector('.close');
+        const calcTabs = document.querySelectorAll('.calc-tab');
+        const calcContents = document.querySelectorAll('.calc-content');
+        const calcModeTabs = document.querySelectorAll('.calc-mode-tab');
+        const calcModeContents = document.querySelectorAll('.calc-mode-content');
+
+        // Subject Type Tooltip Elements
+        const subjectInfoBtn = document.getElementById('subjectInfoBtn');
+        const subjectTooltip = document.getElementById('subjectTooltip');
+
+        // Constants for calculation
+        /**
+         * Total weeks constants used in discount calculations
+         * These define the period lengths for different subject types
+         * 
+         * TOTAL_WEEKS_YEAR = 40 weeks (4 terms × 10 weeks)
+         * TOTAL_WEEKS_SEMESTER = 20 weeks (2 terms × 10 weeks)
+         * TOTAL_WEEKS_TERM = 10 weeks (1 term)
+         */
+        const TOTAL_WEEKS_YEAR = 40; // 4 terms × 10 weeks
+        const TOTAL_WEEKS_SEMESTER = 20; // 2 terms × 10 weeks
+        const TOTAL_WEEKS_TERM = 10; // 1 term × 10 weeks
+
+        // State tracking
+        let hasCalculated = false;
+        let calculationState = {
+            subjectType: '',
+            semesterValue: '',
+            termValue: '',
+            weekValue: '',
+            amountValue: '',
+            calculationMode: 'lateStart' // Default to late start
+        };
+
+        // Debug function
+        function debug(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            debugInfo.textContent += `[${timestamp}] ${message}\n`;
+            console.log(`[${timestamp}] ${message}`);
+        }
+
+        // Event Listeners for Mode Toggle
+        modeToggle.addEventListener('change', function () {
+            const calculator = document.querySelector('.calculator');
+            const isEarlyDeparture = this.checked;
+
+            if (isEarlyDeparture) {
+                // Early Departure mode (Purple)
+                lateStartLabel.classList.remove('active');
+                earlyDepartureLabel.classList.add('active');
+                dateHeaderText.textContent = 'Select when the student is leaving school';
+                calculator.classList.add('purple-mode');
+            } else {
+                // Late Start mode (Green)
+                lateStartLabel.classList.add('active');
+                earlyDepartureLabel.classList.remove('active');
+                dateHeaderText.textContent = 'Select when the student started at school';
+                calculator.classList.remove('purple-mode');
+            }
+
+            // Save the current mode preference to localStorage
+            localStorage.setItem('calculatorMode', isEarlyDeparture ? 'earlyDeparture' : 'lateStart');
+            debug(`Toggle changed to: ${isEarlyDeparture ? 'earlyDeparture' : 'lateStart'} and saved to localStorage`);
+
+            // Check if recalculation is needed without updating calculationState
+            checkIfRecalculateNeeded();
+        });
+
+        // Event Listeners
+        /**
+         * Subject Type change event
+         * Updates the form fields based on the selected subject type
+         */
+        subjectTypeSelect.addEventListener('change', function () {
+            debug(`Subject type changed to: ${this.value}`);
+            handleSubjectTypeChange();
+            checkIfRecalculateNeeded();
+        });
+
+        /**
+         * Semester change event 
+         * Updates term options based on the selected semester
+         */
+        semesterNumber.addEventListener('change', function () {
+            debug(`Semester changed to: ${this.value}`);
+            handleSemesterChange();
+            checkIfRecalculateNeeded();
+        });
+
+        /**
+         * Term change event
+         * Checks if the form is complete and if recalculation is needed
+         */
+        termSelect.addEventListener('change', function () {
+            debug(`Term changed to: ${this.value}`);
+            checkFormComplete();
+            checkIfRecalculateNeeded();
+        });
+
+        /**
+         * Week change event
+         * Checks if the form is complete and if recalculation is needed
+         */
+        weekSelect.addEventListener('change', function () {
+            debug(`Week changed to: ${this.value}`);
+            checkFormComplete();
+            checkIfRecalculateNeeded();
+        });
+
+        /**
+         * Total Amount input event
+         * Checks if the form is complete and if recalculation is needed
+         */
+        totalAmountInput.addEventListener('input', function () {
+            debug(`Amount changed to: ${this.value}`);
+            checkFormComplete();
+            checkIfRecalculateNeeded();
+        });
+
+        /**
+         * Calculate button click event
+         * Performs the discount calculation and displays the result
+         */
+        calculateBtn.addEventListener('click', function (e) {
+            debug("Calculate button clicked");
+            e.preventDefault(); // Prevent form submission
+            calculateDiscount();
+            storeCalculationState();
+        });
+
+        // Modal Event Listeners
+        infoBtn.addEventListener('click', function () {
+            infoModal.style.display = 'block';
+        });
+
+        closeBtn.addEventListener('click', function () {
+            infoModal.style.display = 'none';
+        });
+
+        window.addEventListener('click', function (event) {
+            if (event.target == infoModal) {
+                infoModal.style.display = 'none';
+            }
+        });
+
+        // Subject Type Tooltip Event Listeners
+        subjectInfoBtn.addEventListener('mouseenter', function () {
+            subjectTooltip.style.display = 'block';
+        });
+
+        subjectInfoBtn.addEventListener('mouseleave', function () {
+            subjectTooltip.style.display = 'none';
+        });
+
+        // Add tab functionality to modal
+        calcTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Get the parent container to determine which set of tabs to update
+                const parentContainer = tab.closest('.calc-mode-content');
+
+                // Remove active class from all tabs and content in this container
+                parentContainer.querySelectorAll('.calc-tab').forEach(t => t.classList.remove('active'));
+
+                // For the regular tabs (Full Year, Semester, Term)
+                const tabId = tab.getAttribute('data-tab');
+                let contentSelector;
+
+                // Determine which set of contents to update based on which mode we're in
+                if (parentContainer.id === 'lateStartInfo') {
+                    // For Late Start info
+                    calcContents.forEach(c => c.classList.remove('active'));
+                    contentSelector = '#' + tabId + 'Calc';
+                } else {
+                    // For Early Departure info
+                    parentContainer.querySelectorAll('.calc-content').forEach(c => c.classList.remove('active'));
+                    contentSelector = '#' + tabId + 'Calc';
+                }
+
+                // Add active class to clicked tab
+                tab.classList.add('active');
+
+                // Show corresponding content
+                const contentElement = document.querySelector(contentSelector);
+                if (contentElement) {
+                    contentElement.classList.add('active');
+                }
+            });
+        });
+
+        // Add mode tab functionality
+        calcModeTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all mode tabs
+                calcModeTabs.forEach(t => t.classList.remove('active'));
+
+                // Remove active class from all mode content
+                calcModeContents.forEach(c => c.classList.remove('active'));
+
+                // Add active class to clicked tab
+                tab.classList.add('active');
+
+                // Show corresponding content
+                const modeTabId = tab.getAttribute('data-mode-tab');
+                document.getElementById(modeTabId + 'Info').classList.add('active');
+
+                // Also update the toggle switch and mode colors to match
+                const calculator = document.querySelector('.calculator');
+
+                if (modeTabId === 'lateStart') {
+                    modeToggle.checked = false;
+                    lateStartLabel.classList.add('active');
+                    earlyDepartureLabel.classList.remove('active');
+                    calculator.classList.remove('purple-mode');
+                } else {
+                    modeToggle.checked = true;
+                    lateStartLabel.classList.remove('active');
+                    earlyDepartureLabel.classList.add('active');
+                    calculator.classList.add('purple-mode');
+                }
+            });
+        });
+
+        // Add click event listeners to the labels
+        lateStartLabel.addEventListener('click', function () {
+            // Set the toggle to "Late Start" (unchecked) position
+            modeToggle.checked = false;
+
+            // Manually trigger the change event to update the UI
+            const changeEvent = new Event('change');
+            modeToggle.dispatchEvent(changeEvent);
+        });
+
+        earlyDepartureLabel.addEventListener('click', function () {
+            // Set the toggle to "Early Departure" (checked) position
+            modeToggle.checked = true;
+
+            // Manually trigger the change event to update the UI
+            const changeEvent = new Event('change');
+            modeToggle.dispatchEvent(changeEvent);
+        });
+
+        // Functions
+        /**
+         * Handles the change of subject type
+         * Controls which form fields are shown/hidden based on the subject type
+         * and populates appropriate dropdown options
+         * 
+         * Flow:
+         * - Full Year: Shows term (1-4) and week range dropdowns
+         * - Semester: Shows semester (1-2), then term (1-2 or 3-4), and week range dropdowns
+         * - Term: Shows only individual week (1-10) dropdown
+         */
+        function handleSubjectTypeChange() {
+            // Reset form
+            termSelect.innerHTML = '';
+            weekSelect.innerHTML = '';
+            result.style.display = 'none';
+
+            const selectedType = subjectTypeSelect.value;
+            debug(`Handling subject type change: ${selectedType}`);
+
+            if (selectedType === 'fullYear') {
+                // Show term selection for full year
+                semesterSelection.classList.add('hidden');
+                populateTermsForFullYear();  // Populate terms 1-4
+                populateWeekRanges();        // Populate week ranges (1-2, 3-4, etc.)
+                dateHeader.classList.remove('hidden');
+                termSelection.classList.remove('hidden');
+                weekSelection.classList.remove('hidden');
+                amountInput.classList.remove('hidden');
+            }
+            else if (selectedType === 'semester') {
+                // Show semester selection first
+                dateHeader.classList.remove('hidden');
+                semesterSelection.classList.remove('hidden');
+                termSelection.classList.add('hidden');
+                weekSelection.classList.add('hidden');
+                amountInput.classList.add('hidden');
+                handleSemesterChange(); // Initialize with default semester value
+            }
+            else if (selectedType === 'term') {
+                // No term selection needed for term subjects, just show individual weeks
+                dateHeader.classList.remove('hidden');
+                semesterSelection.classList.add('hidden');
+                termSelection.classList.add('hidden');
+                populateIndividualWeeks();   // Populate individual weeks 1-10
+                weekSelection.classList.remove('hidden');
+                amountInput.classList.remove('hidden');
+            }
+            else {
+                // Nothing selected, hide all
+                dateHeader.classList.add('hidden');
+                semesterSelection.classList.add('hidden');
+                termSelection.classList.add('hidden');
+                weekSelection.classList.add('hidden');
+                amountInput.classList.add('hidden');
+            }
+
+            checkFormComplete();
+        }
+
+        /**
+         * Handles the change of semester
+         * Controls which terms are shown based on the selected semester
+         * and populates appropriate term options
+         * 
+         * Logic:
+         * - Semester 1: Shows terms 1-2
+         * - Semester 2: Shows terms 3-4
+         */
+        function handleSemesterChange() {
+            // Reset term options
+            termSelect.innerHTML = '';
+            weekSelect.innerHTML = '';
+
+            const selectedSemester = semesterNumber.value;
+            debug(`Handling semester change: ${selectedSemester}`);
+
+            if (selectedSemester === '1') {
+                populateTermsForSemester1();  // Populate terms 1-2
+            } else {
+                populateTermsForSemester2();  // Populate terms 3-4
+            }
+
+            populateWeekRanges();  // Populate week ranges (1-2, 3-4, etc.)
+
+            termSelection.classList.remove('hidden');
+            weekSelection.classList.remove('hidden');
+            amountInput.classList.remove('hidden');
+
+            checkFormComplete();
+        }
+
+        function populateTermsForFullYear() {
+            termSelect.innerHTML = '';
+            debug("Populating terms for full year");
+
+            for (let i = 1; i <= 4; i++) {
+                const option = document.createElement('option');
+                option.value = i.toString();
+                option.textContent = `Term ${i}`;
+                termSelect.appendChild(option);
+            }
+        }
+
+        function populateTermsForSemester1() {
+            termSelect.innerHTML = '';
+            debug("Populating terms for semester 1");
+
+            for (let i = 1; i <= 2; i++) {
+                const option = document.createElement('option');
+                option.value = i.toString();
+                option.textContent = `Term ${i}`;
+                termSelect.appendChild(option);
+            }
+        }
+
+        function populateTermsForSemester2() {
+            termSelect.innerHTML = '';
+            debug("Populating terms for semester 2");
+
+            for (let i = 3; i <= 4; i++) {
+                const option = document.createElement('option');
+                option.value = i.toString();
+                option.textContent = `Term ${i}`;
+                termSelect.appendChild(option);
+            }
+        }
+
+        /**
+         * Populates the week selection dropdown with ranges (e.g., "Weeks 1-2") 
+         * for full year and semester subjects
+         * 
+         * Used for: Full Year and Semester subjects
+         * Ranges: 1-2, 3-4, 5-6, 7-8, 9-10
+         */
+        function populateWeekRanges() {
+            weekSelect.innerHTML = '';
+            debug("Populating week ranges");
+
+            const weekRanges = [
+                { value: "1-2", text: "Weeks 1-2" },
+                { value: "3-4", text: "Weeks 3-4" },
+                { value: "5-6", text: "Weeks 5-6" },
+                { value: "7-8", text: "Weeks 7-8" },
+                { value: "9-10", text: "Weeks 9-10" }
+            ];
+
+            weekRanges.forEach(range => {
+                const option = document.createElement('option');
+                option.value = range.value;
+                option.textContent = range.text;
+                weekSelect.appendChild(option);
+            });
+        }
+
+        /**
+         * Populates the week selection dropdown with individual weeks (1-10)
+         * for term subjects
+         * 
+         * Used for: Term subjects only
+         * Individual weeks: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+         */
+        function populateIndividualWeeks() {
+            weekSelect.innerHTML = '';
+            debug("Populating individual weeks for term subject");
+
+            for (let i = 1; i <= 10; i++) {
+                const option = document.createElement('option');
+                option.value = i.toString();
+                option.textContent = `Week ${i}`;
+                weekSelect.appendChild(option);
+            }
+        }
+
+        function checkFormComplete() {
+            const subjectType = subjectTypeSelect.value;
+            const weekValue = weekSelect.value;
+            const termValue = termSelect.value;
+            const amountValue = totalAmountInput.value;
+
+            let isFormComplete = false;
+
+            if (subjectType === 'fullYear' && termValue && weekValue && amountValue > 0) {
+                isFormComplete = true;
+            } else if (subjectType === 'semester' && termValue && weekValue && amountValue > 0) {
+                isFormComplete = true;
+            } else if (subjectType === 'term' && weekValue && amountValue > 0) {
+                isFormComplete = true;
+            }
+
+            calculateBtn.disabled = !isFormComplete;
+            debug(`Form complete: ${isFormComplete}`);
+        }
+
+        function storeCalculationState() {
+            hasCalculated = true;
+            calculationState = {
+                subjectType: subjectTypeSelect.value,
+                semesterValue: semesterNumber.value,
+                termValue: termSelect.value,
+                weekValue: weekSelect.value,
+                amountValue: totalAmountInput.value,
+                calculationMode: modeToggle.checked ? 'earlyDeparture' : 'lateStart'
+            };
+            // Reset the button to normal state
+            calculateBtn.textContent = 'Calculate';
+            calculateBtn.classList.remove('recalculate');
+            debug("Stored calculation state");
+        }
+
+        function checkIfRecalculateNeeded() {
+            if (!hasCalculated) return;
+
+            const currentState = {
+                subjectType: subjectTypeSelect.value,
+                semesterValue: semesterNumber.value,
+                termValue: termSelect.value,
+                weekValue: weekSelect.value,
+                amountValue: totalAmountInput.value,
+                calculationMode: modeToggle.checked ? 'earlyDeparture' : 'lateStart'
+            };
+
+            // Check if any values have changed
+            const stateChanged =
+                currentState.subjectType !== calculationState.subjectType ||
+                currentState.semesterValue !== calculationState.semesterValue ||
+                currentState.termValue !== calculationState.termValue ||
+                currentState.weekValue !== calculationState.weekValue ||
+                currentState.amountValue !== calculationState.amountValue ||
+                currentState.calculationMode !== calculationState.calculationMode;
+
+            if (stateChanged) {
+                calculateBtn.textContent = 'Re-calculate';
+                calculateBtn.classList.add('recalculate');
+                debug("Recalculation needed");
+            } else {
+                calculateBtn.textContent = 'Calculate';
+                calculateBtn.classList.remove('recalculate');
+            }
+        }
+
+        /**
+         * Calculates the discount amount based on the selected subject type, term/week, and total amount.
+         * Core calculation logic:
+         * 
+         * For Late Start Mode:
+         * 1. Calculate missed weeks (weeks before student started)
+         * 2. Calculate discount percentage as (missed weeks / total weeks) * 100
+         * 
+         * For Early Departure Mode:
+         * 1. Calculate remaining weeks (weeks after student leaves)
+         * 2. Calculate discount percentage as (remaining weeks / total weeks) * 100
+         * 
+         * For both modes:
+         * 3. Calculate discount amount as (total amount * discount percentage / 100)
+         * 4. Calculate amount to pay as (total amount - discount amount)
+         */
+        function calculateDiscount() {
+            debug("========== STARTING CALCULATION ==========");
+
+            // Clear previous results
+            resultText.innerHTML = "";
+            discountDetails.innerHTML = "";
+
+            // Get input values
+            const subjectType = subjectTypeSelect.value;
+            const totalAmount = parseFloat(totalAmountInput.value);
+            const isEarlyDeparture = modeToggle.checked;
+
+            debug(`Subject Type: ${subjectType}`);
+            debug(`Total Amount: ${totalAmount.toFixed(2)}`);
+            debug(`Calculation Mode: ${isEarlyDeparture ? 'Early Departure' : 'Late Start'}`);
+
+            // Initialize calculation variables
+            let discountWeeks = 0;  // Weeks for discount calculation (missed or remaining)
+            let totalWeeks = 0;     // Total weeks in the subject period
+            let discountDescription = ""; // Description for the result display
+
+            // STEP 1: Determine total weeks based on subject type
+            if (subjectType === 'fullYear') {
+                totalWeeks = TOTAL_WEEKS_YEAR; // 40 weeks (4 terms × 10 weeks)
+            } else if (subjectType === 'semester') {
+                totalWeeks = TOTAL_WEEKS_SEMESTER; // 20 weeks (2 terms × 10 weeks)
+            } else if (subjectType === 'term') {
+                totalWeeks = TOTAL_WEEKS_TERM; // 10 weeks (1 term)
+            }
+            debug(`Total Weeks for this subject type: ${totalWeeks}`);
+
+            // STEP 2: Calculate discount weeks based on subject type, start/end date, and mode
+            if (subjectType === 'fullYear') {
+                // For full year subjects (40 weeks total)
+
+                // Get term and week from form
+                const termValue = parseInt(termSelect.value);
+                const weekRange = weekSelect.value;
+                const weekNum = parseInt(weekRange.split('-')[isEarlyDeparture ? 1 : 0]);  // First week for late start, last week for early departure
+
+                debug(`Full Year - Term: ${termValue}, Week Range: ${weekRange}, Week Number: ${weekNum}`);
+
+                if (isEarlyDeparture) {
+                    // Early Departure: Calculate weeks remaining
+                    const remainingInCurrentTerm = 10 - weekNum;
+                    const remainingInFutureTerms = (4 - termValue) * 10;
+                    discountWeeks = remainingInCurrentTerm + remainingInFutureTerms;
+
+                    debug(`Remaining in Current Term: ${remainingInCurrentTerm}`);
+                    debug(`Remaining in Future Terms: ${remainingInFutureTerms}`);
+                    discountDescription = `${discountWeeks} of ${totalWeeks} weeks remaining`;
+                } else {
+                    // Late Start: Calculate weeks missed
+                    const missedInPreviousTerms = (termValue - 1) * 10;
+                    const missedInCurrentTerm = weekNum - 1;
+                    discountWeeks = missedInPreviousTerms + missedInCurrentTerm;
+
+                    debug(`Missed in Previous Terms: ${missedInPreviousTerms}`);
+                    debug(`Missed in Current Term: ${missedInCurrentTerm}`);
+                    discountDescription = `missed ${discountWeeks} of ${totalWeeks} weeks`;
+                }
+
+            } else if (subjectType === 'semester') {
+                // For semester subjects (20 weeks total)
+
+                // Get semester, term and week from form
+                const semesterValue = parseInt(semesterNumber.value);
+                const termValue = parseInt(termSelect.value);
+                const weekRange = weekSelect.value;
+                const weekNum = parseInt(weekRange.split('-')[isEarlyDeparture ? 1 : 0]);  // First week for late start, last week for early departure
+
+                debug(`Semester: ${semesterValue}, Term: ${termValue}, Week Range: ${weekRange}, Week Number: ${weekNum}`);
+
+                // Calculate term position within the semester:
+                // - For Semester 1: Term 1 = position 1, Term 2 = position 2
+                // - For Semester 2: Term 3 = position 1, Term 4 = position 2
+                const termInSemester = semesterValue === 1 ? termValue : (termValue - 2);
+                debug(`Term Position in Semester: ${termInSemester}`);
+
+                if (isEarlyDeparture) {
+                    // Early Departure: Calculate weeks remaining
+                    const remainingInCurrentTerm = 10 - weekNum;
+                    const remainingInFutureTerms = (2 - termInSemester) * 10;
+                    discountWeeks = remainingInCurrentTerm + remainingInFutureTerms;
+
+                    debug(`Remaining in Current Term: ${remainingInCurrentTerm}`);
+                    debug(`Remaining in Future Terms: ${remainingInFutureTerms}`);
+                    discountDescription = `${discountWeeks} of ${totalWeeks} weeks remaining`;
+                } else {
+                    // Late Start: Calculate weeks missed
+                    const missedInPreviousTerms = (termInSemester - 1) * 10;
+                    const missedInCurrentTerm = weekNum - 1;
+                    discountWeeks = missedInPreviousTerms + missedInCurrentTerm;
+
+                    debug(`Missed in Previous Terms: ${missedInPreviousTerms}`);
+                    debug(`Missed in Current Term: ${missedInCurrentTerm}`);
+                    discountDescription = `missed ${discountWeeks} of ${totalWeeks} weeks`;
+                }
+
+            } else if (subjectType === 'term') {
+                // For term subjects (10 weeks total)
+
+                // Get selected week from form
+                const selectedWeek = parseInt(weekSelect.value);
+                debug(`Term Subject - Selected Week: ${selectedWeek}`);
+
+                if (isEarlyDeparture) {
+                    // Early Departure: Remaining weeks is simply weeks after the selected week
+                    // e.g., If leaving in Week 3, remaining = 10 - 3 = 7 weeks
+                    discountWeeks = 10 - selectedWeek;
+                    discountDescription = `${discountWeeks} of ${totalWeeks} weeks remaining`;
+                } else {
+                    // Late Start: Missed weeks is simply weeks before the selected week
+                    // e.g., If starting in Week 3, missed = 3-1 = 2 weeks
+                    discountWeeks = selectedWeek - 1;
+                    discountDescription = `missed ${discountWeeks} of ${totalWeeks} weeks`;
+                }
+            }
+
+            debug(`Total Weeks: ${totalWeeks}`);
+            debug(`Discount Weeks: ${discountWeeks}`);
+
+            // STEP 3: Calculate discount percentage
+            // Formula: Discount Percentage = (Discount Weeks / Total Weeks) * 100
+            const discountPercentage = (discountWeeks / totalWeeks) * 100;
+            debug(`Raw Discount Percentage: ${discountPercentage.toFixed(2)}%`);
+
+            // STEP 4: Ensure percentage is between 0-100 (validation)
+            const clampedDiscountPercentage = Math.max(0, Math.min(100, discountPercentage));
+            debug(`Clamped Discount Percentage: ${clampedDiscountPercentage.toFixed(2)}%`);
+
+            // STEP 5: Calculate discount amount and amount to pay
+            // Formula: Discount Amount = Total Amount * Discount Percentage / 100
+            const discountAmount = (totalAmount * clampedDiscountPercentage) / 100;
+
+            // Formula: Amount to Pay = Total Amount - Discount Amount
+            const amountToPay = totalAmount - discountAmount;
+
+            debug(`Discount Amount: ${discountAmount.toFixed(2)}`);
+            debug(`Amount to Pay: ${amountToPay.toFixed(2)}`);
+
+            // STEP 6: Display results
+            resultText.innerHTML = `Discount Amount: $${discountAmount.toFixed(2)} (Amount to pay: $${amountToPay.toFixed(2)})`;
+            discountDetails.innerHTML = `Discount Percentage: ${clampedDiscountPercentage.toFixed(2)}% (${discountDescription})`;
+            result.style.display = 'block';
+
+            debug("========== CALCULATION COMPLETE ==========");
+        }
+
+        // Initialize the debug panel (hidden by default)
+        // Uncomment to show debug panel
+        // debugInfo.style.display = 'block';
+
+        // Load saved mode preference from localStorage
+        function loadSavedModePreference() {
+            const savedMode = localStorage.getItem('calculatorMode');
+            debug(`Found saved mode preference: ${savedMode}`);
+
+            if (savedMode === 'earlyDeparture') {
+                // Set to Early Departure mode
+                modeToggle.checked = true;
+
+                // Trigger the change event manually to update UI
+                const changeEvent = new Event('change');
+                modeToggle.dispatchEvent(changeEvent);
+
+                debug("Loaded Early Departure mode from localStorage");
+            }
+        }
+
+        // Call this function when the page loads
+        loadSavedModePreference();
+
+        debug("Calculator initialized");
+    </script>
+</body>
+
+</html>
