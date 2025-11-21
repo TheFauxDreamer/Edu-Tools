@@ -131,9 +131,9 @@
         /* Sidebar menu */
         .sidebar-menu {
             position: fixed;
-            left: -300px;
+            left: -325px;
             top: 64px;
-            width: 300px;
+            width: 325px;
             height: calc(100vh - 64px);
             background-color: var(--bg-secondary);
             box-shadow: 2px 0 10px var(--shadow-light);
@@ -529,9 +529,14 @@
 
         [data-tool="16busRoutes/busRoute.html"] {
             --tool-color: #06402B;
-            --tool-color-rgb: 6,64,43;
+            --tool-color-rgb: 6, 64, 43;
         }
-        
+
+        [data-tool="17bday/bdayICS.html"] {
+            --tool-color: #607D8B;
+            --tool-color-rgb: 96, 125, 139;
+        }
+
         [data-tool="15toolname/toolname.html"] {
             --tool-color: #607D8B;
             --tool-color-rgb: 96, 125, 139;
@@ -540,6 +545,24 @@
         [data-tool="chrome-extension"] {
             --tool-color: #FF6B6B;
             --tool-color-rgb: 255, 107, 107;
+        }
+
+        [data-tool="chrome-extension-calendar"] {
+            --tool-color: #FF8A80;
+            --tool-color-rgb: 255, 138, 128;
+        }
+
+        [data-tool="chrome-extension-calendar"] h2 {
+            font-size: 1.3rem;
+        }
+
+        [data-tool="chrome-extension-timetable"] {
+            --tool-color: #FF5252;
+            --tool-color-rgb: 255, 82, 82;
+        }
+
+        [data-tool="chrome-extension-timetable"] h2 {
+            font-size: 1.3rem;
         }
 
         /* Archived tool colors */
@@ -1054,6 +1077,8 @@
             <a class="tool-nav-item" data-tool="11scribe/scribe.html">Scribe</a>
             <a class="tool-nav-item" data-tool="13idCap/idCap.html">ID Capture Converter</a>
             <a class="tool-nav-item" data-tool="14evacLists/evacLists.html">Evacuation Lists</a>
+            <a class="tool-nav-item" data-tool="17bday/bdayICS.html">Birthday ICS Converter</a>
+
         </nav>
 
         <button class="pin-button">
@@ -1098,7 +1123,11 @@
             <a class="menu-item" data-tool="11scribe/scribe.html">Scribe</a>
             <a class="menu-item" data-tool="13idCap/idCap.html">ID Capture Converter</a>
             <a class="menu-item" data-tool="14evacLists/evacLists.html">Evacuation Lists</a>
-            <a class="menu-item" data-tool="16busRoutes/busRoute.html">Bus Route Finder<span class="menu-item-badge badge-poc">POC</span></a>
+            <a class="menu-item" data-tool="16busRoutes/busRoute.html">Bus Route Finder<span
+                    class="menu-item-badge badge-poc">POC</span></a>
+            <a class="menu-item" data-tool="17bday/bdayICS.html">Birthday ICS Converter<span
+                    class="menu-item-badge badge-demo">DEMO</span></a>
+
         </div>
 
         <div class="menu-section">
@@ -1106,6 +1135,17 @@
             <a class="menu-item external" data-tool="chrome-extension"
                 data-chrome-url="https://github.com/TheFauxDreamer/CompassNoNewTabs/tree/main" target="_blank">
                 CompassNoNewTabs
+                <span class="menu-item-badge badge-extension">EXTENSION</span>
+            </a>
+            <a class="menu-item external" data-tool="chrome-extension-calendar"
+                data-chrome-url="https://github.com/TheFauxDreamer/CompassBetterPrintedCal/tree/main" target="_blank">
+                CompassBetterCalendar
+                <span class="menu-item-badge badge-extension">EXTENSION</span>
+            </a>
+            <a class="menu-item external" data-tool="chrome-extension-timetable"
+                data-chrome-url="https://github.com/TheFauxDreamer/CompassBetterPrintedTimetable/tree/main"
+                target="_blank">
+                CompassBetterTimetable
                 <span class="menu-item-badge badge-extension">EXTENSION</span>
             </a>
         </div>
@@ -1193,7 +1233,7 @@
                 data-chrome-url="https://github.com/TheFauxDreamer/CompassNoNewTabs/tree/main">
                 <span class="extension-badge">CHROME EXTENSION</span>
                 <!-- <span class="poc-badge">COMING SOON</span> -->
-                    <svg class="external-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                <svg class="external-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                     stroke-linecap="round" stroke-linejoin="round">
                     <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
                     <polyline points="15 3 21 3 21 9"></polyline>
@@ -1211,10 +1251,55 @@
                     Proof of Concept download from Github
                 </div>
             </div>
+            <div class="tool-card external-link" data-tool="chrome-extension-calendar"
+                data-chrome-url="https://github.com/TheFauxDreamer/CompassBetterPrintedCal/tree/main">
+                <span class="extension-badge">CHROME EXTENSION</span>
+                <svg class="external-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                    <polyline points="15 3 21 3 21 9"></polyline>
+                    <line x1="10" y1="14" x2="21" y2="3"></line>
+                </svg>
+                <h2>CompassBetterCalendar</h2>
+                <p>Provides an easier to read printable version of the Compass calendar.</p>
+                <div class="external-hint">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                        <polyline points="15 3 21 3 21 9"></polyline>
+                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
+                    Proof of Concept download from Github
+                </div>
+            </div>
+            <div class="tool-card external-link" data-tool="chrome-extension-timetable"
+                data-chrome-url="https://github.com/TheFauxDreamer/CompassBetterPrintedTimetable/tree/main">
+                <span class="extension-badge">CHROME EXTENSION</span>
+                <svg class="external-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                    <polyline points="15 3 21 3 21 9"></polyline>
+                    <line x1="10" y1="14" x2="21" y2="3"></line>
+                </svg>
+                <h2>CompassBetterTimetable</h2>
+                <p>Fixes confusing choices and provides a more user friendly Compass timetable.</p>
+                <div class="external-hint">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                        <polyline points="15 3 21 3 21 9"></polyline>
+                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
+                    Proof of Concept download from Github
+                </div>
+            </div>
             <div class="tool-card" data-tool="16busRoutes/busRoute.html">
                 <span class="poc-badge">PROOF OF CONCEPT</span>
                 <h2>Bus Route Finder</h2>
                 <p>Find the best bus routes by school in WA. Routes available direct from data.gov.wa.au</p>
+            </div>
+            <div class="tool-card" data-tool="17bday/bdayICS.html">
+                <span class="poc-badge">DEMO Available</span>
+                <h2>Birthday ICS Generator</h2>
+                <p>An easy way to take staff birthdays from Compass and view them in your calendar of choice.</p>
             </div>
             <div class="tool-card disabled" data-tool="15toolname/toolname.html">
                 <span class="coming-soon-badge">COMING SOON</span>
@@ -1275,13 +1360,15 @@
     <div class="dark-mode-notice-overlay"></div>
     <div class="dark-mode-notice">
         <h3>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
                 <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
             </svg>
             Dark Mode Active
         </h3>
         <p>
-            Welcome!</br> We've detected you're using dark mode. While the main Edu Tools interface fully supports dark mode, please note that the individual tools embedded within may not have full dark mode support.
+            Welcome!</br> We've detected you're using dark mode. While the main Edu Tools interface fully supports dark
+            mode, please note that the individual tools embedded within may not have full dark mode support.
         </p>
         <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">
             Most tools will display in light mode. If you have issues with half implemented dark mode, please switch. 😊
@@ -1314,10 +1401,10 @@
         function checkAndShowDarkModeNotice() {
             // Check if user is in dark mode
             const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-            
+
             // Check if notification has been dismissed before
             const hasSeenNotice = localStorage.getItem('eduToolsDarkModeNoticeSeen');
-            
+
             if (isDarkMode && !hasSeenNotice) {
                 // Show the notification after a short delay for better UX
                 setTimeout(() => {
@@ -1333,10 +1420,10 @@
         function dismissDarkModeNotice(temporary) {
             const notice = document.querySelector('.dark-mode-notice');
             const overlay = document.querySelector('.dark-mode-notice-overlay');
-            
+
             notice.classList.remove('show');
             overlay.classList.remove('show');
-            
+
             // If "Don't show again" was clicked, store in localStorage
             if (!temporary) {
                 localStorage.setItem('eduToolsDarkModeNoticeSeen', 'true');

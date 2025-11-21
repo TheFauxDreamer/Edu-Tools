@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV to iCal Birthday Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f9;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 25px 35px;
+            border-radius: 12px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+        }
+        .instructions {
+            background-color: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-left: 4px solid #007bff;
+            border-radius: 6px;
+            padding: 15px 20px;
+            margin-bottom: 25px;
+        }
+        .instructions h3 {
+            margin: 0 0 10px 0;
+            color: #333;
+            font-size: 1.1em;
+        }
+        .instructions ol {
+            margin: 0;
+            padding-left: 20px;
+            color: #555;
+            line-height: 1.7;
+        }
+        .instructions li { margin-bottom: 5px; }
+        .instructions code {
+            background-color: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+        .step-container {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .step-container:last-of-type {
+            border-bottom: none;
+            padding-bottom: 0;
+            margin-bottom: 0;
+        }
+        .step-label {
+            display: block;
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .drop-area {
+            border: 3px dashed #a0c3ff; 
+            border-radius: 8px;
+            padding: 30px 20px;
+            text-align: center;
+            transition: border-color 0.3s, background-color 0.3s;
+            cursor: pointer;
+        }
+        .drop-area:hover { border-color: #007bff; }
+        .drop-area.highlight {
+            border-color: #0056b3;
+            background-color: #e6f7ff; 
+        }
+        .drop-area.success {
+            border: 3px solid #28a745; 
+            background-color: #e8f5e9; 
+        }
+        .drop-area.success #drop-text {
+            color: #28a745; 
+            font-weight: normal; 
+            line-height: 1.4; 
+        }
+        #drop-text {
+            margin: 0;
+            color: #4a4a4a;
+            font-size: 1em;
+            font-weight: 500;
+        }
+        #csvFile { display: none; }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1.1em;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+        button:hover { background-color: #0056b3; }
+        .options-content {
+            padding: 10px;
+            border: 1px solid #eee;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+        }
+        .options-content input {
+            margin-right: 10px;
+            transform: scale(1.1);
+        }
+        .options-content label {
+            margin: 0; 
+            font-weight: normal;
+            font-size: 0.95em;
+        }
+        .download-area {
+            text-align: center;
+            padding: 15px 0;
+            background-color: #f0fff0; 
+            border-radius: 8px;
+            border: 1px solid #d0e9d0;
+            margin-top: 20px;
+        }
+        .download-area p {
+            font-weight: bold;
+            color: #28a745;
+            margin-top: 0;
+        }
+        .download-btn {
+            text-decoration: none;
+            color: white;
+            background-color: #28a745;
+            padding: 10px 25px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            width: auto;
+        }
+        .download-btn:hover { background-color: #1e7e34; }
+        .error {
+            color: red;
+            margin-top: 15px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            padding: 25px 30px;
+            border-radius: 12px;
+            max-width: 450px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+        .modal-content h3 {
+            margin-top: 0;
+            color: #333;
+            font-size: 1.4em;
+        }
+        .modal-content p {
+            color: #555;
+            line-height: 1.6;
+            margin: 15px 0;
+        }
+        .modal-btn {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 30px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+            width: auto;
+        }
+        .modal-btn:hover { background-color: #0056b3; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Staff Birthday iCal Generator</h1>
+
+        <div class="instructions">
+            <h3>How to generate the CSV from Compass</h3>
+            <ol>
+                <li>Login to <strong>Compass</strong> and navigate to <em>Waffle → People Management</em></li>
+                <li>Select <strong>Active Staff</strong> on the left</li>
+                <li>Select the <strong>Columns</strong> button on the right</li>
+                <li>Tick both <strong>Full Name</strong> & <strong>Date Of Birth</strong>, then the Save button</li>
+                <li>Click the <strong>Export CSV</strong> button on the left</li>
+            </ol>
+        </div>
+
+        <div id="statusMessage" class="error"></div>
+
+        <div class="step-container">
+            <span class="step-label">1. Upload your CSV File:</span>
+            <div id="drop-area" class="drop-area">
+                <input type="file" id="csvFile" accept=".csv">
+                <p id="drop-text">Drag and drop your <strong>GridExport.csv</strong> file here, or click to select.</p>
+            </div>
+        </div>
+        
+        <div class="step-container">
+            <span class="step-label">2. Options:</span>
+            <div class="options-content">
+                <input type="checkbox" id="repeatYearly" checked>
+                <label for="repeatYearly">Repeat the birthdays every year (Recommended)</label>
+            </div>
+            <div class="options-content" style="margin-top: 8px;">
+                <input type="checkbox" id="usePreferred" checked>
+                <label for="usePreferred">Use preferred names when available (e.g., "Alex" from "Alexandria (Alex) Vance")</label>
+            </div>
+        </div>
+        
+        <div class="step-container" style="border-bottom: none;">
+            <span class="step-label">3. Generate:</span>
+            <button id="convertBtn">Generate Staff Birthdays .ics File</button>
+        </div>
+
+        <div class="download-area" id="downloadArea" style="display: none;">
+            <p>4. File Generated! Click to Download:</p>
+            <button id="downloadBtn" class="download-btn">Download staff_birthdays.ics</button>
+            <a id="downloadLink" href="#" download="staff_birthdays.ics" style="display: none;"></a>
+        </div>
+
+        <div id="reminderModal" class="modal-overlay" style="display: none;">
+            <div class="modal-content">
+                <h3>Before You Continue...</h3>
+                <p>Don't forget! The generated calendar (.ics) file needs to be <strong>hosted online</strong> if you plan on adding it to Compass. This will make the information <strong>publicly accessible</strong>.</p>
+                <p>Alternatively, you can <strong>import the file directly into Outlook</strong> for a more secure option.</p>
+                <button id="modalCloseBtn" class="modal-btn">I understand, download the file!</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const dropArea = document.getElementById('drop-area');
+        const fileInput = document.getElementById('csvFile');
+        const dropText = document.getElementById('drop-text');
+        const statusMessage = document.getElementById('statusMessage');
+        const defaultDropText = 'Drag and drop your <strong>GridExport.csv</strong> file here, or click to select.';
+
+        // Proper CSV parser that handles quoted fields with commas
+        function parseCSVLine(line) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                const nextChar = line[i + 1];
+                if (inQuotes) {
+                    if (char === '"' && nextChar === '"') {
+                        current += '"';
+                        i++;
+                    } else if (char === '"') {
+                        inQuotes = false;
+                    } else {
+                        current += char;
+                    }
+                } else {
+                    if (char === '"') {
+                        inQuotes = true;
+                    } else if (char === ',') {
+                        result.push(current.trim());
+                        current = '';
+                    } else {
+                        current += char;
+                    }
+                }
+            }
+            result.push(current.trim());
+            return result;
+        }
+
+        // Check if a name should be skipped
+        function shouldSkipName(name) {
+            const lowerName = name.toLowerCase();
+            if (/\([^)]+\)\s*$/.test(name)) return true;
+            const skipNames = ['replacement teacher', 'relief teacher', 'casual teacher', 'tba', 'tbc', 'vacant'];
+            return skipNames.some(skip => lowerName.includes(skip));
+        }
+
+        // Format name, optionally using preferred name from parentheses
+        function formatName(fullName, usePreferred) {
+            const match = fullName.match(/^(.+?)\s+\(([^)]+)\)\s+(.+)$/);
+            if (match) {
+                const legalFirst = match[1];
+                const preferredFirst = match[2];
+                const lastName = match[3];
+                return usePreferred ? `${preferredFirst} ${lastName}` : `${legalFirst} ${lastName}`;
+            }
+            return fullName;
+        }
+
+        // Escape special characters for iCalendar text fields
+        function escapeIcalText(text) {
+            return text
+                .replace(/\\/g, '\\\\')
+                .replace(/;/g, '\\;')
+                .replace(/,/g, '\\,');
+        }
+
+        function revertDropArea(message = '') {
+            fileInput.value = '';
+            dropArea.classList.remove('success', 'highlight');
+            dropText.innerHTML = defaultDropText;
+            statusMessage.textContent = message;
+            document.getElementById('downloadArea').style.display = 'none';
+        }
+
+        function handleFiles(files) {
+            statusMessage.textContent = '';
+            document.getElementById('downloadArea').style.display = 'none';
+            if (files.length === 0) { revertDropArea(); return; }
+
+            const file = files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(event) {
+                const csvText = event.target.result;
+                const lines = csvText.split(/\r?\n/).filter(line => line.trim() !== '');
+                if (lines.length < 2) {
+                    revertDropArea('Error: CSV file is empty or only contains headers.');
+                    return;
+                }
+
+                const headers = parseCSVLine(lines[0]);
+                const nameIndex = headers.indexOf('Full Name');
+                const dobIndex = headers.indexOf('Date Of Birth');
+
+                if (nameIndex === -1 || dobIndex === -1) {
+                    revertDropArea("Error: Required CSV headers ('Full Name' or 'Date Of Birth') not found. Check your column names.");
+                    return;
+                }
+
+                let birthdayCount = 0;
+                let skippedCount = 0;
+                for (let i = 1; i < lines.length; i++) {
+                    const values = parseCSVLine(lines[i]);
+                    const fullName = values[nameIndex] ? values[nameIndex].trim() : '';
+                    const dob = values[dobIndex] ? values[dobIndex].trim() : '';
+                    const dateParts = dob.split('/');
+                    if (fullName && dob && dateParts.length === 3) {
+                        if (shouldSkipName(fullName)) {
+                            skippedCount++;
+                        } else {
+                            birthdayCount++;
+                        }
+                    }
+                }
+                
+                dropArea.classList.add('success');
+                dropArea.classList.remove('highlight');
+                let statusText = `Successfully uploaded: <strong>${file.name}</strong><br>Found <strong>${birthdayCount}</strong> birthdays to convert.`;
+                if (skippedCount > 0) {
+                    statusText += `<br><small style="color:#666;">Skipped ${skippedCount} non-staff entries.</small>`;
+                }
+                dropText.innerHTML = statusText;
+                statusMessage.textContent = '';
+            };
+            reader.onerror = () => revertDropArea('Error reading file content.');
+            reader.readAsText(file);
+        }
+
+        dropArea.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', () => handleFiles(fileInput.files));
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(e => {
+            dropArea.addEventListener(e, ev => { ev.preventDefault(); ev.stopPropagation(); }, false);
+        });
+        ['dragenter', 'dragover'].forEach(e => {
+            dropArea.addEventListener(e, () => { dropArea.classList.add('highlight'); dropArea.classList.remove('success'); }, false);
+        });
+        ['dragleave', 'drop'].forEach(e => {
+            dropArea.addEventListener(e, () => dropArea.classList.remove('highlight'), false);
+        });
+        dropArea.addEventListener('drop', e => {
+            fileInput.files = e.dataTransfer.files; 
+            handleFiles(e.dataTransfer.files);
+        }, false);
+
+        // Modal handling
+        const modal = document.getElementById('reminderModal');
+        const downloadLink = document.getElementById('downloadLink');
+        const downloadBtn = document.getElementById('downloadBtn');
+        
+        downloadBtn.addEventListener('click', () => {
+            modal.style.display = 'flex';
+        });
+
+        document.getElementById('modalCloseBtn').addEventListener('click', () => {
+            modal.style.display = 'none';
+            downloadLink.click();
+        });
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+
+        document.getElementById('convertBtn').addEventListener('click', () => {
+            const repeatYearly = document.getElementById('repeatYearly').checked;
+            const usePreferred = document.getElementById('usePreferred').checked;
+            statusMessage.textContent = '';
+            document.getElementById('downloadArea').style.display = 'none';
+
+            if (fileInput.files.length === 0) {
+                statusMessage.textContent = 'Please complete step 1 by selecting or dropping a CSV file.';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                try {
+                    const icalContent = generateIcal(event.target.result, repeatYearly, usePreferred);
+                    const blob = new Blob([icalContent], { type: 'text/calendar;charset=utf-8;' });
+                    downloadLink.href = URL.createObjectURL(blob);
+                    document.getElementById('downloadArea').style.display = 'block';
+                } catch (e) {
+                    statusMessage.textContent = 'Error during conversion: ' + e.message;
+                }
+            };
+            reader.onerror = () => revertDropArea('Error reading file during conversion.');
+            reader.readAsText(fileInput.files[0]);
+        });
+
+        function generateIcal(csv, repeat, usePreferred) {
+            const lines = csv.split(/\r?\n/).filter(line => line.trim() !== '');
+            if (lines.length < 2) throw new Error("CSV file is empty or only contains headers.");
+
+            const headers = parseCSVLine(lines[0]);
+            const nameIndex = headers.indexOf('Full Name');
+            const dobIndex = headers.indexOf('Date Of Birth');
+
+            if (nameIndex === -1 || dobIndex === -1) {
+                throw new Error("Required CSV headers ('Full Name' or 'Date Of Birth') not found.");
+            }
+
+            let ical = 'BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//MyCompany//StaffBirthdays//EN\nCALSCALE:GREGORIAN';
+            const now = new Date();
+            const dtStamp = now.toISOString().replace(/[-:.]/g, '').slice(0, 15) + 'Z';
+            const currentYear = now.getFullYear();
+            let validEntryCount = 0;
+
+            for (let i = 1; i < lines.length; i++) {
+                const values = parseCSVLine(lines[i]);
+                const fullName = values[nameIndex] ? values[nameIndex].trim() : '';
+                const dob = values[dobIndex] ? values[dobIndex].trim() : '';
+
+                if (!fullName || !dob) continue;
+                if (shouldSkipName(fullName)) continue;
+
+                const dateParts = dob.split('/');
+                if (dateParts.length !== 3) continue;
+
+                const day = dateParts[0].padStart(2, '0');
+                const month = dateParts[1].padStart(2, '0');
+                const icalDate = `${currentYear}${month}${day}`;
+                const displayName = formatName(fullName, usePreferred);
+                const escapedName = escapeIcalText(displayName);
+                const uid = `${Date.now()}-${i}-${fullName.replace(/[^a-zA-Z0-9]/g, '')}@staffbirthdays.com`;
+
+                ical += `\nBEGIN:VEVENT\nUID:${uid}\nDTSTAMP:${dtStamp}\nDTSTART;VALUE=DATE:${icalDate}\nSUMMARY:${escapedName}'s Birthday`;
+                if (repeat) ical += '\nRRULE:FREQ=YEARLY';
+                ical += '\nEND:VEVENT';
+                validEntryCount++;
+            }
+
+            if (validEntryCount === 0) throw new Error("No valid birthday entries found in the CSV.");
+            return ical + '\nEND:VCALENDAR';
+        }
+    </script>
+</body>
+</html>
